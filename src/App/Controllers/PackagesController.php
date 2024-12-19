@@ -4,19 +4,20 @@ namespace App\Controllers;
 
 use App\Models\Package;
 
-class PackageController extends BaseController
+class PackagesController extends BaseController
 {
     private $packageModel;
 
     public function __construct()
     {
+        parent::__construct();
         $this->packageModel = new Package();
     }
 
     public function index()
     {
         $packages = $this->packageModel->findAll();
-        $this->view('package/index', [
+        $this->view('admin/packages/index', [
             'title' => 'Quản lý Gói tập',
             'packages' => $packages
         ]);
@@ -28,58 +29,52 @@ class PackageController extends BaseController
             $data = [
                 'name' => $_POST['name'],
                 'description' => $_POST['description'],
-                'price' => $_POST['price'],
                 'duration' => $_POST['duration'],
-                'maxFreeze' => $_POST['maxFreeze'],
-                'benefits' => $_POST['benefits'],
-                'status' => $_POST['status']
+                'price' => $_POST['price'],
+                'status' => 'active'
             ];
-
+            
             if ($this->packageModel->create($data)) {
-                // Chuyển hướng hoặc thông báo thành công
+                $_SESSION['success'] = 'Thêm gói tập thành công';
             } else {
-                // Thông báo lỗi
+                $_SESSION['error'] = 'Có lỗi xảy ra';
             }
-        } else {
-            $this->view('package/create', [
-                'title' => 'Tạo Gói tập mới'
-            ]);
+            $this->redirect('admin/packages/');
         }
     }
 
     public function edit($id)
     {
+        $package = $this->packageModel->findById($id);
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'name' => $_POST['name'],
                 'description' => $_POST['description'],
-                'price' => $_POST['price'],
                 'duration' => $_POST['duration'],
-                'maxFreeze' => $_POST['maxFreeze'],
-                'benefits' => $_POST['benefits'],
-                'status' => $_POST['status']
+                'price' => $_POST['price']
             ];
-
+            
             if ($this->packageModel->update($id, $data)) {
-                // Chuyển hướng hoặc thông báo thành công
+                $_SESSION['success'] = 'Cập nhật gói tập thành công';
             } else {
-                // Thông báo lỗi
+                $_SESSION['error'] = 'Có lỗi xảy ra';
             }
-        } else {
-            $package = $this->packageModel->findById($id);
-            $this->view('package/edit', [
-                'title' => 'Chỉnh sửa Gói tập',
-                'package' => $package
-            ]);
+            $this->redirect('admin/packages');
         }
+        
+        $this->view('admin/packages/edit', [
+            'title' => 'Sửa gói tập',
+            'package' => $package
+        ]);
     }
 
     public function delete($id)
     {
         if ($this->packageModel->delete($id)) {
-            // Chuyển hướng hoặc thông báo thành công
+            $_SESSION['success'] = 'Xóa gói tập thành công';
         } else {
-            // Thông báo lỗi
+            $_SESSION['error'] = 'Có lỗi xảy ra';
         }
+        $this->redirect('admin/packages');
     }
 } 

@@ -1,7 +1,7 @@
 -- Xóa database nếu tồn tại và tạo mới
-DROP DATABASE IF EXISTS gym-php;
-CREATE DATABASE gym-php;
-USE gym-php;
+DROP DATABASE IF EXISTS `gym-php`;
+CREATE DATABASE `gym-php`;
+USE `gym-php`;
 
 -- Thiết lập môi trường
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -11,7 +11,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- 1. Bảng Users
 CREATE TABLE users (
-  `id` int(11) NOT NULL AUTO_INCREMENT,gym_managementa
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `avatar` varchar(255) NOT NULL,
   `username` varchar(50) NOT NULL,
   `fullName` varchar(255) NOT NULL,

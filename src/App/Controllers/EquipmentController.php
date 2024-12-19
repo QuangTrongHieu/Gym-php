@@ -15,9 +15,11 @@ class EquipmentController extends BaseController
 
     public function index()
     {
-        $equipments = $this->equipmentModel->findAll();
-        $title = 'Quản lý Thiết bị';
-        include 'views/admin/equipment/index.php';
+        $packages = $this->equipmentModel->findAll();
+        $this->view('admin/equipment/index', [
+            'title' => 'Quản lý Gói tập',
+            'packages' => $packages
+        ]);
     }
 
     public function create()

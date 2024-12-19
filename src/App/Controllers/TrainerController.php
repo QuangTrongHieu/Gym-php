@@ -1,161 +1,86 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\Trainer;
-use App\Models\Schedule;
-use App\Models\PTRegistration;
-use App\Models\TrainingSession;
 
-class TrainerController {
+class TrainerController extends BaseController
+{
     private $trainerModel;
-    private $scheduleModel; 
-    private $ptRegistrationModel;
-    private $trainingSessionModel;
 
-    public function __construct() {
+    public function __construct()
+    {
+        parent::__construct();
         $this->trainerModel = new Trainer();
-        $this->scheduleModel = new Schedule();
-        $this->ptRegistrationModel = new PTRegistration();
-        $this->trainingSessionModel = new TrainingSession();
     }
 
-    // Lấy danh sách huấn luyện viên
-    public function index() {
-        $trainers = $this->trainerModel->getAllTrainers();
-        return [
-            'status' => 'success',
-            'data' => $trainers
-        ];
+    public function index()
+    {
+        $trainer = $this->trainerModel->getAllTrainers();
+        if (empty($trainer)) {
+            $_SESSION['error'] = 'Không có huấn luyện viên nào được tìm thấy.';
+        }
+        $this->view('admin/trainer/index', [
+            'title' => 'Quản lý huấn luyện viên',
+            'trainer' => $trainer
+        ]);
     }
 
-    // Thêm huấn luyện viên mới
-    public function create($data) {
-        $required = ['username', 'fullName', 'dateOfBirth', 'sex', 'phone', 
-                    'email', 'specialization', 'experience', 'certification', 'salary', 'password'];
-        
-        foreach($required as $field) {
-            if(!isset($data[$field])) {
-                return [
-                    'status' => 'error',
-                    'message' => "Thiếu trường $field"
-                ];
+    public function create()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'],
+                'description' => $_POST['description'],
+                'duration' => $_POST['duration'],
+                'price' => $_POST['price'],
+                'status' => 'active'
+            ];
+            
+            if ($this->trainerModel->create($data)) {
+                $_SESSION['success'] = 'Thêm gói tập thành công';
+            } else {
+                $_SESSION['error'] = 'Có lỗi xảy ra';
             }
+            $this->redirect('admin/trainer');
         }
-
-        $trainerId = $this->trainerModel->create($data);
-        return [
-            'status' => 'success',
-            'message' => 'Thêm huấn luyện viên thành công',
-            'data' => ['id' => $trainerId]
-        ];
     }
 
-    // Cập nhật thông tin huấn luyện viên
-    public function update($id, $data) {
+    public function edit($id)
+    {
         $trainer = $this->trainerModel->getById($id);
-        if(!$trainer) {
-            return [
-                'status' => 'error',
-                'message' => 'Không tìm thấy huấn luyện viên'
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'],
+                'description' => $_POST['description'],
+                'duration' => $_POST['duration'],
+                'price' => $_POST['price']
             ];
+            
+            if ($this->trainerModel->update($id, $data)) {
+                $_SESSION['success'] = 'Cập nhật gói tập thành công';
+            } else {
+                $_SESSION['error'] = 'Có lỗi xảy ra';
+            }
+            $this->redirect('admin/trainer');
         }
-
-        $this->trainerModel->update($id, $data);
-        return [
-            'status' => 'success',
-            'message' => 'Cập nhật thành công'
-        ];
+        
+        $this->view('admin/trainer/edit', [
+            'title' => 'Sửa gói tập',
+            'trainer' => $trainer
+        ]);
     }
 
-    // Xóa huấn luyện viên
-    public function delete($id) {
-        $trainer = $this->trainerModel->getById($id);
-        if(!$trainer) {
-            return [
-                'status' => 'error', 
-                'message' => 'Không tìm thấy huấn luyện viên'
-            ];
-        }
-
-        $this->trainerModel->delete($id);
-        return [
-            'status' => 'success',
-            'message' => 'Xóa huấn luyện viên thành công'
-        ];
-    }
-
-    // Quản lý lịch làm việc
-    public function getSchedule($trainerId) {
-        $schedule = $this->scheduleModel->getByTrainerId($trainerId);
-        return [
-            'status' => 'success',
-            'data' => $schedule
-        ];
-    }
-
-    public function updateSchedule($trainerId, $scheduleData) {
-        $this->scheduleModel->updateTrainerSchedule($trainerId, $scheduleData);
-        return [
-            'status' => 'success',
-            'message' => 'Cập nhật lịch làm việc thành công'
-        ];
-    }
-
-    // Quản lý buổi tập
-    public function getTrainingSessions($trainerId) {
-        $sessions = $this->trainingSessionModel->getByTrainerId($trainerId);
-        return [
-            'status' => 'success',
-            'data' => $sessions
-        ];
-    }
-
-    public function updateSessionStatus($sessionId, $status, $notes = '') {
-        $this->trainingSessionModel->updateStatus($sessionId, $status, $notes);
-        return [
-            'status' => 'success',
-            'message' => 'Cập nhật trạng thái buổi tập thành công'
-        ];
-    }
-
-    // Xem thống kê hiệu suất
-    public function getPerformanceStats($trainerId) {
-        $stats = $this->trainerModel->getPerformanceStats($trainerId);
-        return [
-            'status' => 'success',
-            'data' => $stats
-        ];
-    }
-
-    // Xem danh sách học viên
-    public function getClients($trainerId) {
-        $clients = $this->ptRegistrationModel->getClientsByTrainerId($trainerId);
-        return [
-            'status' => 'success',
-            'data' => $clients
-        ];
-    }
-
-    // Hiển thị trang danh sách huấn luyện viên
-    public function showTrainerList() {
+    public function delete($id)
+    {
         $trainers = $this->trainerModel->getAllTrainers();
-        
-        // Render view với dữ liệu trainers
-        require_once ROOT_PATH . '/src/App/Views/RegisTrainer/RegisTrainer.php';
-    }
-
-    // Hiển thị chi tiết huấn luyện viên
-    public function showTrainerDetail($id) {
-        $trainer = $this->trainerModel->getById($id);
-        if (!$trainer) {
-            header('Location: /gym-php/trainers');
-            exit;
+        if ($this->trainerModel->delete($id)) {
+            $_SESSION['success'] = 'Xóa gói tập thành công';
+        } else {
+            $_SESSION['error'] = 'Có lỗi xảy ra';
         }
-        
-        // Lấy thêm thông tin lịch và các buổi tập
-        $schedule = $this->scheduleModel->getByTrainerId($id);
-        $sessions = $this->trainingSessionModel->getByTrainerId($id);
-        
-        require_once ROOT_PATH . '/src/App/Views/RegisTrainer/TrainerDetail.php';
+        $this->view('admin/trainer/delete', [
+            'trainers' => $trainers
+        ]);
     }
-}
+} 

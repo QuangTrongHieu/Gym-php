@@ -62,7 +62,7 @@
 </table>
 
 <?php 
-require_once ROOT_PATH . '/src/App/Views/admin/TrainerManagement/create.php';
-require_once ROOT_PATH . '/src/App/Views/admin/TrainerManagement/edit.php';
-require_once ROOT_PATH . '/src/App/Views/admin/TrainerManagement/delete.php';
+require_once ROOT_PATH . '/src/App/Views/admin/ScheduleManagement/create.php';
+require_once ROOT_PATH . '/src/App/Views/admin/ScheduleManagement/edit.php';
+require_once ROOT_PATH . '/src/App/Views/admin/ScheduleManagement/delete.php';
 ?>

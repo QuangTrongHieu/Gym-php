@@ -68,7 +68,7 @@
                         <a class="nav-link" href="/gym-php/list-trainers">Huấn Luyện Viên</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/gym-php/pricing">Bảng Giá</a>
+                        <a class="nav-link" href="/gym-php/equipment">Thiết bị tập</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/gym-php/contact">Liên Hệ</a>
@@ -77,6 +77,7 @@
             </div>
 
             <!-- User Account -->
+             
             <?php if ($user['isLoggedIn']): ?>
                 <!-- Hiển thị dropdown menu khi đã đăng nhập -->
                 <div class="dropdown">
@@ -87,8 +88,8 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="/gym-php/user/profile">Hồ Sơ Cá Nhân</a></li>
-                        <!-- <li><a class="dropdown-item" href="/gym-php/user/training">Lịch Tập</a></li>
-                        <li><a class="dropdown-item" href="/gym-php/user/progress">Theo Dõi Tiến Độ</a></li> -->
+                        <li><a class="dropdown-item" href="/gym-php/user/training">Lịch Tập</a></li>
+                        <li><a class="dropdown-item" href="/gym-php/user/progress">Theo Dõi Tiến Độ</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -108,6 +109,13 @@
             </button>
         </div>
     </nav>
+
+    <?php if (isset($_SESSION['login_message'])): ?>
+        <div class="alert alert-info" role="alert">
+            <?= htmlspecialchars($_SESSION['login_message']) ?>
+        </div>
+        <?php unset($_SESSION['login_message']); ?>
+    <?php endif; ?>
 </body>
 
 </html>

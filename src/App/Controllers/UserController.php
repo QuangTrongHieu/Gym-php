@@ -25,7 +25,7 @@ class UserController extends BaseController
     public function index()
     {
         // Điều hướng từ /user sang /user/profile
-        header('Location: /gym-php/user/profile');
+        header('Location: /ecommerce-php/user/profile');
         exit();
     }
 

@@ -150,4 +150,17 @@ class User extends BaseModel
     {
         return preg_match('/^[0-9]{10,11}$/', $phone) === 1;
     }
+
+    public function findAllMembers()
+    {
+        try {
+            $sql = "SELECT * FROM {$this->table} WHERE eRole = 'USER'";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error finding members: " . $e->getMessage());
+            return [];
+        }
+    }
 }

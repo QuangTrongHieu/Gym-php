@@ -11,6 +11,7 @@ spl_autoload_register(function (string $class_name) {
 });
 
 require_once ROOT_PATH . "/src/Core/Router.php";
+// require_once ROOT_PATH . "/src/App/Controllers/PackageController.php";
 
 $app = new Core\App();
 $path = $_SERVER['REQUEST_URI'] ?? '/';

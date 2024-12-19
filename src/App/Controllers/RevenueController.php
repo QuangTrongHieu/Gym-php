@@ -10,14 +10,29 @@ class RevenueController extends BaseController
 
     public function __construct()
     {
+        parent::__construct();
         $this->revenueModel = new Revenue();
+    }
+
+    public function getRevenueData()
+    {
+        return $this->revenueModel->getRevenueByPackage();
     }
 
     public function index()
     {
-        $revenueData = $this->revenueModel->getRevenueByPackage();
+        $revenueData = $this->getRevenueData();
         $this->view('revenue/index', [
-            'title' => 'Thống kê Doanh thu theo Gói tập',
+            'title' => 'Thống kê doanh thu theo Gói tập',
+            'revenueData' => $revenueData
+        ]);
+    }
+
+    public function revenueIndex()
+    {
+        $revenueData = $this->getRevenueData();
+        $this->view('revenue/index', [
+            'title' => 'Thống kê doanh thu',
             'revenueData' => $revenueData
         ]);
     }

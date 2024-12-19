@@ -57,6 +57,8 @@ abstract class BaseController
             // Load layout mặc định
             require_once ROOT_PATH . "/src/App/Views/" . $defaultLayout;
         }
+        
+        return $content;
     }
 
     // Trả về dữ liệu dạng JSON

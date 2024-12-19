@@ -43,7 +43,16 @@ class AdminController extends BaseController
                         <div class="card-body">
                             <h5 class="card-title">Quản lý Nhân viên</h5>
                             <p class="card-text">Quản lý thông tin nhân viên</p>
-                            <a href="/gym-php/admin/Trainer-management" class="btn btn-primary">Truy cập</a>
+                            <a href="/gym-php/admin/Trainer" class="btn btn-primary">Truy cập</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Theo dõi Doanh thu</h5>
+                            <p class="card-text">Theo dõi doanh thu từ các gói tập</p>
+                            <a href="/admin/revenue" class="btn btn-primary">Truy cập</a>
                         </div>
                     </div>
                 </div>

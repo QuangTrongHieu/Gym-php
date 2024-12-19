@@ -11,14 +11,14 @@ class AuthController extends BaseController
 {
     private $userModel;
     private $adminModel;
-    private $trainerModel;
+    private $trainer;
 
     public function __construct()
     {
         parent::__construct();
         $this->userModel = new User();
         $this->adminModel = new Admin();
-        $this->trainerModel = new Trainer();
+        $this->trainer = new Trainer();
     }
 
     // Login cho user thường
@@ -95,8 +95,8 @@ class AuthController extends BaseController
         $this->view('admin/login', [], 'default_layout');
     }
 
-    // Login cho Trainer 
-    public function TrainerLogin()
+    // Login cho trainer  
+    public function trainerLogin()
     {
         if ($this->auth->isLoggedIn()) {
             $this->redirect('trainer');
@@ -108,17 +108,17 @@ class AuthController extends BaseController
                 $username = $_POST['username'] ?? '';
                 $password = $_POST['password'] ?? '';
 
-                $trainer = $this->trainerModel->findByUsername($username);
+                $trainer = $this->trainer->findByUsername($username);
 
                 if (!$trainer || !password_verify($password, $trainer['password'])) {
                     throw new Exception('Thông tin đăng nhập không đúng');
                 }
 
-                if ($trainer['eRole'] !== 'TRAINER') {
+                if ($trainer['eRole'] !== 'trainer') {
                     throw new Exception('Bạn không có quyền truy cập');
                 }
 
-                $this->auth->login($trainer['id'], $trainer['username'], $trainer['avatar'], 'TRAINER');
+                $this->auth->login($trainer['id'], $trainer['username'], $trainer['avatar'], 'trainer');
                 $this->redirect('trainer');
 
             } catch (Exception $e) {
@@ -204,7 +204,7 @@ class AuthController extends BaseController
             case 'ADMIN':
                 $this->redirect('');
                 break;
-        case 'TRAINNER':
+            case 'trainer':
                 $this->redirect('');
                 break;
             default:

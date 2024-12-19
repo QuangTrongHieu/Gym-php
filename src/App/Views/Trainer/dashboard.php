@@ -29,7 +29,7 @@
                         <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $personalInfo ?? 'Chưa có thông tin' ?></div>
                     </div>
                     <div class="col-auto">
-                        <a href="/ecommerce-php/employee/profile/edit" class="btn btn-warning btn-sm">
+                        <a href="/ecommerce-php/trainer/profile/edit" class="btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Chỉnh sửa
                         </a>
                     </div>

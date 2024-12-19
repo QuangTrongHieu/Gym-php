@@ -18,7 +18,7 @@
                             <div class="alert alert-danger"><?= $error ?></div>
                         <?php endif; ?>
 
-                        <form action="/ecommerce-php/employee-login" method="POST">
+                        <form action="/ecommerce-php/trainer-login" method="POST">
                             <div class="mb-3">
                                 <label class="form-label">Tên đăng nhập</label>
                                 <input type="text" name="username" class="form-control" required>

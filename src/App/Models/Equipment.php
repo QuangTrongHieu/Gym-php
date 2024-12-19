@@ -84,4 +84,11 @@ class Equipment extends BaseModel
             return false;
         }
     }
+
+    public function findById($id)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM equipment WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch();
+    }
 }

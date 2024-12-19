@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Membership;
+use App\Models\MembershipRegistration;
 
 class MembershipController extends BaseController
 {
@@ -79,5 +80,22 @@ class MembershipController extends BaseController
             $_SESSION['error'] = 'Có lỗi xảy ra khi xóa hội viên: ' . $e->getMessage();
             header('Location: /membership');
         }
+    }
+
+    public function show($id)
+    {
+        $membershipRegistrationModel = new MembershipRegistration();
+        $membership = $membershipRegistrationModel->find($id);
+        
+        if (!$membership) {
+            $_SESSION['error'] = 'Không tìm thấy hội viên này';
+            header('Location: /membership');
+            return;
+        }
+
+        $this->view('membership/show', [
+            'title' => 'Chi tiết hội viên',
+            'membership' => $membership
+        ]);
     }
 } 

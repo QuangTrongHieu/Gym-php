@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Admin Dashboard' ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         .nav-item .nav-link {
             padding: 0.8rem 1rem;
@@ -38,26 +38,46 @@
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link text-white" href="/gym-php/admin/dashboard">
-                            <i class="bi bi-speedometer2"></i> Dashboard
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white" href="/gym-php/admin/admin-management">
-                            <i class="bi bi-people"></i> Quản lý admin
+                            <i class="fas fa-users"></i> Quản lý admin
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/gym-php/admin/Trainer-management">
-                            <i class="bi bi-people"></i> Quản lý nhân viên
+                        <a class="nav-link text-white" href="/gym-php/admin/trainer">
+                            <i class="fas fa-user-tie"></i> Quản lý huấn luyện viên
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/gym-php/admin/user-management">
-                            <i class="bi bi-people"></i> Quản lý khách hàng
+                        <a class="nav-link text-white" href="/gym-php/admin/member">
+                            <i class="fas fa-user-friends"></i> Quản lý hội viên
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/gym-php/logout">
+                        <a class="nav-link text-white" href="/gym-php/admin/equipment">
+                            <i class="fas fa-tools"></i> Quản lý thiết bị
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/gym-php/admin/packages">
+                            <i class="fas fa-box-open"></i> Quản lý gói tập
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/gym-php/admin/Schedule">
+                            <i class="fas fa-calendar-alt"></i> Lịch tập
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/gym-php/admin/Revenue">
+                            <i class="fas fa-chart-line"></i> Doanh thu
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/gym-php/admin/logout">
                             <i class="bi bi-box-arrow-right"></i> Đăng xuất
                         </a>
                     </li>

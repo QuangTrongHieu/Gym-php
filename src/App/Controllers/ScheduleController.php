@@ -1,8 +1,8 @@
 <?php
 
 // Kết nối đến model Schedule
-require_once 'models/Schedule.php';
 use App\Controllers\BaseController;
+
 use App\Models\Schedule;
 
 class ScheduleController extends BaseController
@@ -48,6 +48,7 @@ class ScheduleController extends BaseController
                 return;
             }
 
+            // Thêm lịch tập
             if ($this->scheduleModel->create($data)) {
                 $message = 'Thêm lịch tập thành công';
                 $alertClass = 'alert alert-success';
@@ -72,6 +73,6 @@ class ScheduleController extends BaseController
             ]);
         }
     }
-}
 
-// Tương tự, bạn có thể chuyển đổi các hàm `edit` và `delete` theo cách này.
+    // ... thêm các phương thức edit và delete tương tự
+}

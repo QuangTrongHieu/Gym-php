@@ -14,33 +14,53 @@ $router->add("/admin/admin-management/create", ["controller" => "admin", "action
 $router->add("/admin/admin-management/edit/{id:\d+}", ["controller" => "admin", "action" => "edit"]);
 $router->add("/admin/admin-management/delete/{id:\d+}", ["controller" => "admin", "action" => "delete"]);
 
-$router->add('/admin/trainer', ['controller' => 'trainer', 'action' => 'trainerManagement']);
-$router->add('/admin/trainer/create', ['controller' => 'trainer', 'action' => 'create']);
-$router->add('/admin/trainer/edit/{id:\d+}', ['controller' => 'trainer', 'action' => 'edit']);
-$router->add('/admin/trainer/delete/{id:\d+}', ['controller' => 'trainer', 'action' => 'delete']);
+$router->add('/admin/trainer', ['controller' => 'Trainer', 'action' => 'index']);
+$router->add('/admin/trainer/create', ['controller' => 'Trainer', 'action' => 'create']);
+$router->add('/admin/trainer/edit/{id:\d+}', ['controller' => 'Trainer', 'action' => 'edit']);
+$router->add('/admin/trainer/delete/{id:\d+}', ['controller' => 'Trainer', 'action' => 'delete']);
+
+$router->add('/admin/equipment', ['controller' => 'Equipment', 'action' => 'index']);
+$router->add('/admin/equipment/create', ['controller' => 'Equipment', 'action' => 'create']);
+$router->add('/admin/equipment/edit/{id:\d+}', ['controller' => 'Equipment', 'action' => 'edit']);
+$router->add('/admin/equipment/delete/{id:\d+}', ['controller' => 'Equipment', 'action' => 'delete']);
+
+$router->add('/admin/packages', ['controller' => 'packages', 'action' => 'index']);
+$router->add('/admin/packages/create', ['controller' => 'packages', 'action' => 'create']);
+$router->add('/admin/packages/edit/{id:\d+}', ['controller' => 'packages', 'action' => 'edit']);
+$router->add('/admin/packages/delete/{id:\d+}', ['controller' => 'packages', 'action' => 'delete']);
+
+$router->add('/admin/member', ['controller' => 'member', 'action' => 'index']);
+$router->add('/admin/member/create', ['controller' => 'member', 'action' => 'create']);
+$router->add('/admin/member/edit/{id:\d+}', ['controller' => 'member', 'action' => 'edit']);
+$router->add('/admin/member/delete/{id:\d+}', ['controller' => 'member', 'action' => 'delete']);
+
+$router->add('/admin/revenue', ['controller' => 'revenue', 'action' => 'index']);
+$router->add('/admin/revenue/create', ['controller' => 'revenue', 'action' => 'create']);
+$router->add('/admin/revenue/edit/{id:\d+}', ['controller' => 'revenue', 'action' => 'edit']);
+$router->add('/admin/revenue/delete/{id:\d+}', ['controller' => 'revenue', 'action' => 'delete']);
+
+$router->add('/admin/schedule', ['controller' => 'schedule', 'action' => 'index']);
+$router->add('/admin/schedule/create', ['controller' => 'schedule', 'action' => 'create']);
+$router->add('/admin/schedule/edit/{id:\d+}', ['controller' => 'schedule', 'action' => 'edit']);
+$router->add('/admin/schedule/delete/{id:\d+}', ['controller' => 'schedule', 'action' => 'delete']);
 
 // Auth routes
 $router->add("/login", ["controller" => "Auth", "action" => "login"]);
 $router->add("/register", ["controller" => "Auth", "action" => "register"]);
 $router->add("/logout", ["controller" => "Auth", "action" => "logout"]);
 
-// Equipment routes
-$router->add('/admin/equipment', ['controller' => 'Equipment', 'action' => 'index']);
-$router->add('/admin/equipment/create', ['controller' => 'Equipment', 'action' => 'create']);
-$router->add('/admin/equipment/edit/{id:\d+}', ['controller' => 'Equipment', 'action' => 'edit']);
-$router->add('/admin/equipment/delete/{id:\d+}', ['controller' => 'Equipment', 'action' => 'delete']);
 
-// Membership routes
-$router->add('/membership', ['controller' => 'Membership', 'action' => 'index']);
-$router->add('/membership/create', ['controller' => 'Membership', 'action' => 'create']);
-$router->add('/membership/update/{id:\d+}', ['controller' => 'Membership', 'action' => 'update']);
-$router->add('/membership/delete/{id:\d+}', ['controller' => 'Membership', 'action' => 'delete']);
+// // Membership routes
+// $router->add('/member', ['controller' => 'Membership', 'action' => 'index']);
+// $router->add('/member/create', ['controller' => 'Membership', 'action' => 'create']);
+// $router->add('/member/edit/{id:\d+}', ['controller' => 'Membership', 'action' => 'edit']);
+// $router->add('/member/delete/{id:\d+}', ['controller' => 'Membership', 'action' => 'delete']);
 
-// Package routes
-$router->add('/packages', ['controller' => 'Package', 'action' => 'index']);
-$router->add('/packages/create', ['controller' => 'Package', 'action' => 'create']);
-$router->add('/packages/edit/{id:\d+}', ['controller' => 'Package', 'action' => 'edit']);
-$router->add('/packages/delete/{id:\d+}', ['controller' => 'Package', 'action' => 'delete']);
+// // Package routes
+// $router->add('/packages', ['controller' => 'Package', 'action' => 'index']);
+// $router->add('/packages/create', ['controller' => 'Package', 'action' => 'create']);
+// $router->add('/packages/edit/{id:\d+}', ['controller' => 'Package', 'action' => 'edit']);
+// $router->add('/packages/delete/{id:\d+}', ['controller' => 'Package', 'action' => 'delete']);
 
 // Payment routes
 $router->add('/payment/create', ['controller' => 'Payment', 'action' => 'create']);
@@ -96,7 +116,7 @@ $router->add("/admin-login", ["controller" => "Auth", "action" => "adminLogin"])
 $router->add("/admin/logout", ["controller" => "Auth", "action" => "logout"]);
 
 // Trainer auth routes
-$router->add("/Trainer-login", ["controller" => "Auth", "action" => "trainerLogin"]);
-$router->add("/Trainer/logout", ["controller" => "Auth", "action" => "logout"]);
+$router->add("/trainer-login", ["controller" => "Auth", "action" => "trainerLogin"]);
+$router->add("/trainer/logout", ["controller" => "Auth", "action" => "logout"]);
 
 return $router;

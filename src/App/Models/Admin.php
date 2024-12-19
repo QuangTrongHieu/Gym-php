@@ -33,4 +33,10 @@ class Admin extends BaseModel
         $data['updatedAt'] = date('Y-m-d H:i:s');
         return parent::update($id, $data);
     }
+
+    public function findAll()
+    {
+        $sql = "SELECT * FROM {$this->table}";
+        return $this->db->query($sql)->fetchAll();
+    }
 }

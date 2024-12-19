@@ -24,15 +24,15 @@ class Trainer extends BaseModel
     }
 
     public function create($data) {
-        $sql = "INSERT INTO trainers (username, fullName, dateOfBirth, sex, phone, 
-                email, specialization, experience, certification, salary, password, status) 
-                VALUES (:username, :fullName, :dateOfBirth, :sex, :phone, 
-                :email, :specialization, :experience, :certification, :salary, :password, 'active')";
-        
-        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-        
-        $this->db->query($sql, $data);
-        return $this->db->lastInsertId();
+        $sql = "INSERT INTO {$this->table} (username, password, fullName, dateOfBirth, 
+                sex, phone, email, specialization, experience, certification, salary, 
+                eRole, status, avatar) 
+                VALUES (:username, :password, :fullName, :dateOfBirth, :sex, :phone, 
+                :email, :specialization, :experience, :certification, :salary, 
+                :eRole, :status, :avatar)";
+                
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($data);
     }
 
     public function update($id, $data) {
