@@ -37,20 +37,15 @@ class Trainer extends BaseModel
 
     public function update($id, $data) {
         $fields = [];
-        $params = ['id' => $id];
         foreach ($data as $key => $value) {
-            if ($key !== 'id') {
-                $fields[] = "$key = :$key";
-                $params[$key] = $value;
-            }
+            $fields[] = "$key = :$key";
         }
-        if (isset($data['password'])) {
-            $params['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-        }
-        $sql = "UPDATE trainers SET " . implode(', ', $fields) . " WHERE id = :id";
+        
+        $sql = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :id";
+        $data['id'] = $id;
+        
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->rowCount();
+        return $stmt->execute($data);
     }
 
     public function delete($id) {
@@ -128,5 +123,18 @@ class Trainer extends BaseModel
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['username' => $username]);
         return $stmt->fetch();
+    }
+
+    public function findActiveTrainers()
+    {
+        try {
+            $sql = "SELECT * FROM {$this->table} WHERE status = 'ACTIVE'";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Error finding active trainers: " . $e->getMessage());
+            return [];
+        }
     }
 }

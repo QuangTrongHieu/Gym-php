@@ -6,7 +6,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="/gym/admin/trainer/create" method="POST">
+                <form action="/gym-php/admin/trainer/create" method="POST">
                     <div class="mb-3">
                         <label class="form-label">Username</label>
                         <input type="text" name="username" class="form-control" required>
@@ -40,16 +40,24 @@
                         <input type="tel" name="phone" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Địa chỉ</label>
-                        <input type="text" name="address" class="form-control" required>
+                        <label class="form-label">Chuyên môn</label>
+                        <textarea name="specialization" class="form-control" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kinh nghiệm (năm)</label>
+                        <input type="number" name="experience" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Chứng chỉ</label>
+                        <textarea name="certification" class="form-control" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Lương</label>
                         <input type="number" name="salary" class="form-control" required>
                     </div>
-                    <div class="modal-footer px-0 pb-0">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" name="create" class="btn btn-primary">Thêm huấn luyện viên mới</button>
+                        <button type="submit" class="btn btn-primary">Thêm mới</button>
                     </div>
                 </form>
             </div>

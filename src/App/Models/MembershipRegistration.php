@@ -42,4 +42,13 @@ class MembershipRegistration extends BaseModel
         // Gọi phương thức update của lớp hiện tại để cập nhật trường 'status'
         return $this->update($id, ['status' => $status]);
     }
-} 
+
+    // Phương thức tìm bản ghi theo userId
+    public function findByUserId($userId)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE userId = :userId ORDER BY id DESC LIMIT 1");
+        $stmt->bindParam(':userId', $userId);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+}

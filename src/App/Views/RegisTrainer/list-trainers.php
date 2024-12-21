@@ -1,127 +1,147 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <?php require_once ROOT_PATH . '/src/App/Views/layouts/header.php'; ?>
     <style>
-        .trainer-profile {
+        .trainer-grid {
             padding: 50px 0;
         }
+        .trainer-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .trainer-card:hover {
+            transform: translateY(-5px);
+        }
         .trainer-image {
-            max-width: 100%;
-            border-radius: 10px;
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
         }
         .trainer-info {
             padding: 20px;
         }
-        .trainer-specialties {
+        .trainer-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .trainer-specialty {
             color: #ff4d4d;
-            font-size: 1.2rem;
-            margin: 15px 0;
+            font-size: 1rem;
+            margin-bottom: 15px;
         }
         .trainer-stats {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+            text-align: center;
         }
-        .schedule-table {
-            margin-top: 30px;
+        .stat-item {
+            flex: 1;
         }
-        .certification-list {
-            list-style: none;
-            padding-left: 0;
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
         }
-        .certification-list li {
-            margin-bottom: 10px;
-            padding-left: 20px;
-            position: relative;
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
         }
-        .certification-list li:before {
-            content: "•";
+        .social-links {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .social-links a {
+            color: #666;
+            margin: 0 10px;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+        .social-links a:hover {
             color: #ff4d4d;
-            position: absolute;
-            left: 0;
         }
     </style>
 </head>
 <body>
-    <div class="container trainer-profile">
-        <div class="row">
-            <div class="col-md-4">
-                <img src="<?= $trainer['avatar'] ?? '/gym-php/public/images/trainers/default.jpg' ?>" 
-                     class="trainer-image" 
-                     alt="<?= htmlspecialchars($trainer['fullName']) ?>">
-                
-                <div class="social-links mt-4 text-center">
-                    <?php if (!empty($trainer['facebook'])): ?>
-                        <a href="<?= $trainer['facebook'] ?>" target="_blank"><i class="fab fa-facebook"></i></a>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($trainer['instagram'])): ?>
-                        <a href="<?= $trainer['instagram'] ?>" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($trainer['twitter'])): ?>
-                        <a href="<?= $trainer['twitter'] ?>" target="_blank"><i class="fab fa-twitter"></i></a>
-                    <?php endif; ?>
-                </div>
-            </div>
-            
-            <div class="col-md-8 trainer-info">
-                <h1><?= htmlspecialchars($trainer['fullName']) ?></h1>
-                <p class="trainer-specialties"><?= htmlspecialchars($trainer['specialties']) ?></p>
-                
-                <div class="trainer-stats">
-                    <div class="row text-center">
-                        <div class="col-md-4">
-                            <h4><?= $trainer['experience'] ?></h4>
-                            <p>Năm kinh nghiệm</p>
-                        </div>
-                        <div class="col-md-4">
-                            <h4><?= $trainer['clientsCount'] ?>+</h4>
-                            <p>Khách hàng</p>
-                        </div>
-                        <div class="col-md-4">
-                            <h4><?= $trainer['classesCount'] ?>+</h4>
-                            <p>Lớp đã dạy</p>
+    <div class="container trainer-grid">
+        <h1 class="text-center mb-5">Đội ngũ Huấn luyện viên</h1>
+
+        <?php if (!empty($trainers)): ?>
+            <div class="row">
+                <?php foreach ($trainers as $trainer): ?>
+                    <div class="col-md-4">
+                        <div class="trainer-card">
+                            <img src="<?= !empty($trainer['avatar']) ? '/gym-php/public/images/trainers/' . $trainer['avatar'] : '/gym-php/public/images/trainers/default.jpg' ?>" 
+                                 class="trainer-image" 
+                                 alt="<?= htmlspecialchars($trainer['fullName'] ?? '') ?>">
+                            
+                            <div class="trainer-info">
+                                <h3 class="trainer-name"><?= htmlspecialchars($trainer['fullName'] ?? '') ?></h3>
+                                <div class="trainer-specialty">
+                                    <i class="fas fa-dumbbell"></i> 
+                                    <strong>Chuyên môn:</strong> <?= htmlspecialchars($trainer['specialization'] ?? 'Chưa cập nhật') ?>
+                                </div>
+                                
+                                <div class="trainer-certification mb-2">
+                                    <i class="fas fa-certificate"></i>
+                                    <strong>Chứng chỉ:</strong> <?= htmlspecialchars($trainer['certification'] ?? 'Chưa cập nhật') ?>
+                                </div>
+                                
+                                <div class="trainer-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-value">
+                                            <?php 
+                                            $experience = intval($trainer['experience'] ?? 0);
+                                            if ($experience == 0) {
+                                                echo 'Mới';
+                                            } else {
+                                                echo $experience . '+';
+                                            }
+                                            ?>
+                                        </div>
+                                        <div class="stat-label">Năm kinh nghiệm</div>
+                                    </div>
+                                </div>
+
+                                <div class="social-links">
+                                    <?php if (!empty($trainer['facebook'])): ?>
+                                        <a href="<?= htmlspecialchars($trainer['facebook']) ?>" target="_blank">
+                                            <i class="fab fa-facebook"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($trainer['instagram'])): ?>
+                                        <a href="<?= htmlspecialchars($trainer['instagram']) ?>" target="_blank">
+                                            <i class="fab fa-instagram"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="text-center mt-3">
+                                    <a href="/gym-php/trainer/profile/<?= $trainer['id'] ?? '' ?>" 
+                                       class="btn btn-primary">
+                                        <i class="fas fa-info-circle"></i> Xem chi tiết
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <h3>Giới thiệu</h3>
-                <p><?= nl2br(htmlspecialchars($trainer['description'])) ?></p>
-
-                <h3>Chứng chỉ</h3>
-                <ul class="certification-list">
-                    <?php foreach ($trainer['certifications'] as $cert): ?>
-                        <li><?= htmlspecialchars($cert) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-
-                <h3>Lịch dạy</h3>
-                <table class="table schedule-table">
-                    <thead>
-                        <tr>
-                            <th>Thời gian</th>
-                            <th>Lớp</th>
-                            <th>Phòng</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($trainer['schedule'] as $class): ?>
-                        <tr>
-                            <td><?= $class['time'] ?></td>
-                            <td><?= htmlspecialchars($class['name']) ?></td>
-                            <td><?= htmlspecialchars($class['room']) ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                <?php endforeach; ?>
             </div>
-        </div>
+        <?php else: ?>
+            <div class="alert alert-info text-center">
+                Hiện chưa có huấn luyện viên nào.
+            </div>
+        <?php endif; ?>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+</html>

@@ -78,7 +78,7 @@ error_log('User data in header: ' . print_r($user ?? [], true));
                         <a class="nav-link" href="/gym-php/list-trainers">Huấn Luyện Viên</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/gym-php/pricing">Bảng Giá</a>
+                        <a class="nav-link" href="/gym-php/packages">Gói tập</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/gym-php/contact">Liên Hệ</a>

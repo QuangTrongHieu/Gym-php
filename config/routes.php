@@ -5,6 +5,7 @@ $router = new Core\Router;
 // Home routes
 $router->add('/', ['controller' => 'Home', 'action' => 'index']);
 $router->add('/home', ['controller' => 'Home', 'action' => 'index']);
+$router->add('/list-trainers', ['controller' => 'Trainer', 'action' => 'listTrainers']);
 
 // Admin routes
 $router->add("/admin", ["controller" => "admin", "action" => "index"]);
