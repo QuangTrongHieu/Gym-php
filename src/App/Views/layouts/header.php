@@ -1,3 +1,13 @@
+<?php
+// Đảm bảo session được khởi tạo ở đầu file
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Debug session (có thể comment lại sau khi fix xong)
+error_log('Session data in header: ' . print_r($_SESSION, true));
+error_log('User data in header: ' . print_r($user ?? [], true));
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -43,9 +53,9 @@
             color: white;
         }
 
-        .navbar-brand img {
+        /* .navbar-brand img {
             border-radius: 25px;
-        }
+        } */
     </style>
 </head>
 
@@ -68,7 +78,7 @@
                         <a class="nav-link" href="/gym-php/list-trainers">Huấn Luyện Viên</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/gym-php/equipment">Thiết bị tập</a>
+                        <a class="nav-link" href="/gym-php/pricing">Bảng Giá</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/gym-php/contact">Liên Hệ</a>
@@ -77,14 +87,20 @@
             </div>
 
             <!-- User Account -->
-             
-            <?php if ($user['isLoggedIn']): ?>
+            <?php 
+            // Kiểm tra session trực tiếp
+            $isLoggedIn = isset($_SESSION['user_id']);
+            $userName = $_SESSION['user_name'] ?? null;
+            $userAvatar = $_SESSION['avatar'] ?? null;
+            
+            if ($isLoggedIn): 
+            ?>
                 <!-- Hiển thị dropdown menu khi đã đăng nhập -->
                 <div class="dropdown">
                     <button class="btn btn-dark dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
-                        <img src="<?= $user['avatar'] ?? 'https://openui.fly.dev/openui/24x24.svg?text=👤' ?>"
+                        <img src="<?= $userAvatar ?? 'https://openui.fly.dev/openui/24x24.svg?text=👤' ?>"
                             alt="user-avatar" class="rounded-circle" style="width: 30px; height: 30px;">
-                        <span class="ms-2 text-white"><?= htmlspecialchars($user['name']) ?></span>
+                        <span class="ms-2 text-white"><?= htmlspecialchars($userName) ?></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="/gym-php/user/profile">Hồ Sơ Cá Nhân</a></li>
@@ -110,12 +126,8 @@
         </div>
     </nav>
 
-    <?php if (isset($_SESSION['login_message'])): ?>
-        <div class="alert alert-info" role="alert">
-            <?= htmlspecialchars($_SESSION['login_message']) ?>
-        </div>
-        <?php unset($_SESSION['login_message']); ?>
-    <?php endif; ?>
+    <!-- Thêm Bootstrap JS để dropdown hoạt động -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

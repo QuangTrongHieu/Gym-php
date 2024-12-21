@@ -11,14 +11,14 @@ class AuthController extends BaseController
 {
     private $userModel;
     private $adminModel;
-    private $trainer;
+    private $trainerModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->userModel = new User();
         $this->adminModel = new Admin();
-        $this->trainer = new Trainer();
+        $this->trainerModel = new Trainer();
     }
 
     // Login cho user thường
@@ -44,7 +44,17 @@ class AuthController extends BaseController
                     throw new Exception('Tài khoản không hợp lệ');
                 }
 
-                $this->auth->login($user['id'], $user['username'], $user['avatar'], 'USER', 'MEMBER');
+                // Thực hiện login và kiểm tra kết quả
+                $loginSuccess = $this->auth->login($user['id'], $user['username'], $user['avatar'], 'USER');
+                
+                
+
+                // Đảm bảo session được ghi trước khi redirect
+                session_write_close();
+                
+                // Thêm độ trễ nhỏ để đảm bảo session được ghi
+                usleep(100000); // 0.1 giây
+                
                 $this->redirect('');
 
             } catch (Exception $e) {
@@ -95,8 +105,8 @@ class AuthController extends BaseController
         $this->view('admin/login', [], 'default_layout');
     }
 
-    // Login cho trainer  
-    public function trainerLogin()
+    // Login cho Trainer 
+    public function TrainerLogin()
     {
         if ($this->auth->isLoggedIn()) {
             $this->redirect('trainer');
@@ -108,17 +118,17 @@ class AuthController extends BaseController
                 $username = $_POST['username'] ?? '';
                 $password = $_POST['password'] ?? '';
 
-                $trainer = $this->trainer->findByUsername($username);
+                $trainer = $this->trainerModel->findByUsername($username);
 
                 if (!$trainer || !password_verify($password, $trainer['password'])) {
                     throw new Exception('Thông tin đăng nhập không đúng');
                 }
 
-                if ($trainer['eRole'] !== 'trainer') {
+                if ($trainer['eRole'] !== 'TRAINER') {
                     throw new Exception('Bạn không có quyền truy cập');
                 }
 
-                $this->auth->login($trainer['id'], $trainer['username'], $trainer['avatar'], 'trainer');
+                $this->auth->login($trainer['id'], $trainer['username'], $trainer['avatar'], 'TRAINER');
                 $this->redirect('trainer');
 
             } catch (Exception $e) {
@@ -204,7 +214,7 @@ class AuthController extends BaseController
             case 'ADMIN':
                 $this->redirect('');
                 break;
-            case 'trainer':
+        case 'TRAINNER':
                 $this->redirect('');
                 break;
             default:
