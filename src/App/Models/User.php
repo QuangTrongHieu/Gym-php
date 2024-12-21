@@ -4,10 +4,17 @@ namespace App\Models;
 
 use PDO;
 use PDOException;
+use Core\ImageUploader;
 
 class User extends BaseModel
 {
     protected $table = 'users';
+    protected $uploadPath = 'public/uploads/users';
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     public function findByUsername($username)
     {
@@ -161,6 +168,57 @@ class User extends BaseModel
         } catch (PDOException $e) {
             error_log("Error finding members: " . $e->getMessage());
             return [];
+        }
+    }
+
+    public function uploadAvatar($file) {
+        try {
+            $uploader = new ImageUploader($this->uploadPath);
+            return $uploader->upload($file);
+        } catch (\RuntimeException $e) {
+            throw new \RuntimeException('Avatar upload failed: ' . $e->getMessage());
+        }
+    }
+
+    public function updateAvatar($id, $file) {
+        try {
+            // Get current avatar
+            $user = $this->getById($id);
+            $oldAvatar = $user['avatar'] ?? null;
+
+            // Upload new avatar
+            $uploader = new ImageUploader($this->uploadPath);
+            $newAvatar = $uploader->upload($file);
+
+            // Delete old avatar if exists
+            if ($oldAvatar) {
+                $uploader->delete($oldAvatar);
+            }
+
+            // Update avatar in database
+            $this->update($id, ['avatar' => $newAvatar]);
+            
+            return $newAvatar;
+        } catch (\RuntimeException $e) {
+            throw new \RuntimeException('Avatar update failed: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteAvatar($fileName) {
+        $uploader = new ImageUploader($this->uploadPath);
+        return $uploader->delete($fileName);
+    }
+
+    public function getById($id)
+    {
+        try {
+            $sql = "SELECT * FROM {$this->table} WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['id' => $id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error getting user by ID: " . $e->getMessage());
+            return false;
         }
     }
 }

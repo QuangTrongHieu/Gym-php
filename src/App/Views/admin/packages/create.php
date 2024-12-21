@@ -1,33 +1,48 @@
-<div class="modal fade" id="createModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Thêm Gói Tập Mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form action="/gym/admin/package/create" method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Tên Gói</label>
-                        <input type="text" name="name" class="form-control" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Giá</label>
-                        <input type="number" name="price" class="form-control" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Thời gian (tháng)</label>
-                        <input type="number" name="duration" class="form-control" required>
-                    </div>
+<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
 
-                    <div class="modal-footer px-0 pb-0">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" name="create" class="btn btn-primary">Thêm Gói Tập Mới</button>
-                    </div>
-                </form>
-            </div>
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Thêm Gói tập mới</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-plus me-1"></i>
+            Thông tin gói tập
+        </div>
+        <div class="card-body">
+            <form action="/gym-php/admin/packages/create" method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Tên gói tập</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Mô tả</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="duration" class="form-label">Thời hạn (tháng)</label>
+                    <input type="number" class="form-control" id="duration" name="duration" required min="1">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="price" class="form-label">Giá (VNĐ)</label>
+                    <input type="number" class="form-control" id="price" name="price" required min="0">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="status" class="form-label">Trạng thái</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="active">Hoạt động</option>
+                        <option value="inactive">Không hoạt động</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Thêm mới</button>
+                <a href="/gym-php/admin/packages" class="btn btn-secondary">Hủy</a>
+            </form>
         </div>
     </div>
 </div>
+
+<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>

@@ -19,22 +19,32 @@ class Package extends BaseModel
         return $stmt->fetchAll();
     }
 
+    public function findById($id)
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM membership_packages WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log("Error finding package by ID: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function create($data)
     {
         try {
-            $sql = "INSERT INTO membership_packages (name, description, price, duration, maxFreeze, benefits, status) 
-                    VALUES (:name, :description, :price, :duration, :maxFreeze, :benefits, :status)";
+            $sql = "INSERT INTO membership_packages (name, description, duration, price, status) VALUES (?, ?, ?, ?, ?)";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
-                ':name' => $data['name'],
-                ':description' => $data['description'],
-                ':price' => $data['price'],
-                ':duration' => $data['duration'],
-                ':maxFreeze' => $data['maxFreeze'] ?? 0,
-                ':benefits' => $data['benefits'] ?? '',
-                ':status' => $data['status'] ?? 'ACTIVE'
+                $data['name'],
+                $data['description'],
+                $data['duration'],
+                $data['price'],
+                $data['status'] ?? 'active'
             ]);
         } catch (PDOException $e) {
+            error_log("Error creating package: " . $e->getMessage());
             return false;
         }
     }
@@ -42,23 +52,17 @@ class Package extends BaseModel
     public function update($id, $data)
     {
         try {
-            $sql = "UPDATE membership_packages 
-                    SET name = :name, description = :description, price = :price, 
-                        duration = :duration, maxFreeze = :maxFreeze, 
-                        benefits = :benefits, status = :status 
-                    WHERE id = :id";
+            $sql = "UPDATE membership_packages SET name = ?, description = ?, duration = ?, price = ? WHERE id = ?";
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([
-                ':id' => $id,
-                ':name' => $data['name'],
-                ':description' => $data['description'],
-                ':price' => $data['price'],
-                ':duration' => $data['duration'],
-                ':maxFreeze' => $data['maxFreeze'] ?? 0,
-                ':benefits' => $data['benefits'] ?? '',
-                ':status' => $data['status'] ?? 'ACTIVE'
+                $data['name'],
+                $data['description'],
+                $data['duration'],
+                $data['price'],
+                $id
             ]);
         } catch (PDOException $e) {
+            error_log("Error updating package: " . $e->getMessage());
             return false;
         }
     }
@@ -66,35 +70,22 @@ class Package extends BaseModel
     public function delete($id)
     {
         try {
-            $sql = "DELETE FROM membership_packages WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute([':id' => $id]);
+            $stmt = $this->db->prepare("DELETE FROM membership_packages WHERE id = ?");
+            return $stmt->execute([$id]);
         } catch (PDOException $e) {
+            error_log("Error deleting package: " . $e->getMessage());
             return false;
         }
     }
 
-    public function getAllPackages()
+    public function findActivePackages()
     {
-        $sql = "SELECT * FROM membership_packages WHERE status = 'ACTIVE'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        try {
+            $stmt = $this->db->query("SELECT * FROM membership_packages WHERE status = 'active' ORDER BY price ASC");
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            error_log("Error in findActivePackages: " . $e->getMessage());
+            return [];
+        }
     }
-
-    public function findByTrainerId($trainerId)
-    {
-        $sql = "SELECT p.* FROM membership_packages p 
-                JOIN trainer_packages tp ON p.id = tp.package_id 
-                WHERE tp.trainer_id = :trainer_id AND p.status = 'ACTIVE'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['trainer_id' => $trainerId]);
-        return $stmt->fetchAll();
-    }
-
-    public function getAllActivePackages()
-    {
-        $sql = "SELECT * FROM membership_packages WHERE status = 'ACTIVE'";
-        return $this->db->query($sql)->fetchAll();
-    }
-} 
+}

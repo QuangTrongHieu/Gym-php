@@ -71,4 +71,17 @@ class BaseModel
         $stmt = $this->db->prepare($sql);
         return $stmt->execute(['id' => $id]);
     }
+
+    public function getById($id)
+    {
+        try {
+            $sql = "SELECT * FROM {$this->table} WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['id' => $id]);
+            return $stmt->fetch(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Error getting record by ID: " . $e->getMessage());
+            return false;
+        }
+    }
 }

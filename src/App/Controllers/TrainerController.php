@@ -206,7 +206,7 @@ class TrainerController extends BaseController
         exit;
     }
 
-    public function listTrainers()
+    public function list()
     {
         $trainers = $this->trainerModel->findActiveTrainers();
         $this->view('RegisTrainer/list-trainers', [

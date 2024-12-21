@@ -5,7 +5,8 @@ $router = new Core\Router;
 // Home routes
 $router->add('/', ['controller' => 'Home', 'action' => 'index']);
 $router->add('/home', ['controller' => 'Home', 'action' => 'index']);
-$router->add('/list-trainers', ['controller' => 'Trainer', 'action' => 'listTrainers']);
+$router->add('/list-trainers', ['controller' => 'Trainer', 'action' => 'list']);
+$router->add('/list-packages', ['controller' => 'Packages', 'action' => 'listpackages']);
 
 // Admin routes
 $router->add("/admin", ["controller" => "admin", "action" => "index"]);
@@ -45,23 +46,16 @@ $router->add('/admin/schedule/create', ['controller' => 'schedule', 'action' => 
 $router->add('/admin/schedule/edit/{id:\d+}', ['controller' => 'schedule', 'action' => 'edit']);
 $router->add('/admin/schedule/delete/{id:\d+}', ['controller' => 'schedule', 'action' => 'delete']);
 
+// Package management routes
+$router->add('/admin/packages', ['controller' => 'Packages', 'action' => 'index']);
+$router->add('/admin/packages/create', ['controller' => 'Packages', 'action' => 'create']);
+$router->add('/admin/packages/edit/{id:\d+}', ['controller' => 'Packages', 'action' => 'edit']);
+$router->add('/admin/packages/delete/{id:\d+}', ['controller' => 'Packages', 'action' => 'delete']);
+
 // Auth routes
 $router->add("/login", ["controller" => "Auth", "action" => "login"]);
 $router->add("/register", ["controller" => "Auth", "action" => "register"]);
 $router->add("/logout", ["controller" => "Auth", "action" => "logout"]);
-
-
-// // Membership routes
-// $router->add('/member', ['controller' => 'Membership', 'action' => 'index']);
-// $router->add('/member/create', ['controller' => 'Membership', 'action' => 'create']);
-// $router->add('/member/edit/{id:\d+}', ['controller' => 'Membership', 'action' => 'edit']);
-// $router->add('/member/delete/{id:\d+}', ['controller' => 'Membership', 'action' => 'delete']);
-
-// // Package routes
-// $router->add('/packages', ['controller' => 'Package', 'action' => 'index']);
-// $router->add('/packages/create', ['controller' => 'Package', 'action' => 'create']);
-// $router->add('/packages/edit/{id:\d+}', ['controller' => 'Package', 'action' => 'edit']);
-// $router->add('/packages/delete/{id:\d+}', ['controller' => 'Package', 'action' => 'delete']);
 
 // Payment routes
 $router->add('/payment/create', ['controller' => 'Payment', 'action' => 'create']);

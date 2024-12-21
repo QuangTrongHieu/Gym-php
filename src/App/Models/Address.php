@@ -23,7 +23,7 @@ class Address extends BaseModel
         }
     }
 
-    public function getById($id, $userId)
+    public function getByIdAndUser($id, $userId)
     {
         try {
             $sql = "SELECT * FROM {$this->table} WHERE id = :id AND userId = :userId";
@@ -67,7 +67,7 @@ class Address extends BaseModel
     {
         try {
             // Đảm bảo userId khớp
-            $currentAddress = $this->getById($id, $data['userId']);
+            $currentAddress = $this->getByIdAndUser($id, $data['userId']);
             if (!$currentAddress) {
                 throw new Exception("Địa chỉ không tồn tại hoặc không thuộc về người dùng này");
             }
@@ -127,7 +127,7 @@ class Address extends BaseModel
     {
         try {
             // Kiểm tra xem địa chỉ có thuộc về user không
-            $address = $this->getById($id, $userId);
+            $address = $this->getByIdAndUser($id, $userId);
             if (!$address) {
                 throw new Exception('Địa chỉ không tồn tại hoặc không thuộc về người dùng này');
             }
@@ -150,6 +150,12 @@ class Address extends BaseModel
     {
         try {
             $this->db->beginTransaction();
+
+            // Kiểm tra địa chỉ tồn tại
+            $address = $this->getByIdAndUser($id, $userId);
+            if (!$address) {
+                throw new Exception('Địa chỉ không tồn tại');
+            }
 
             // Bỏ mặc định tất cả địa chỉ của user
             $sql = "UPDATE {$this->table} SET isDefault = false WHERE userId = :userId";
