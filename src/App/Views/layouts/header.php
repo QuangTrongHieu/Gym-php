@@ -43,9 +43,9 @@
             color: white;
         }
 
-        /* .navbar-brand img {
+        .navbar-brand img {
             border-radius: 25px;
-        } */
+        }
     </style>
 </head>
 

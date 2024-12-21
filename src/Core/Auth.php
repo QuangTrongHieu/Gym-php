@@ -11,12 +11,13 @@ class Auth
         }
     }
 
-    public function login($userId, $username, $avatar, $role)
+    public function login($userId, $username, $avatar = null, $role = 'USER', $userType = null)
     {
         $_SESSION['user_id'] = $userId;
-        $_SESSION['user_name'] = $username; 
+        $_SESSION['user_name'] = $username;
         $_SESSION['avatar'] = $avatar;
         $_SESSION['user_role'] = $role;
+        $_SESSION['user_type'] = $userType;
     }
 
     public function logout()

@@ -44,7 +44,7 @@ class AuthController extends BaseController
                     throw new Exception('Tài khoản không hợp lệ');
                 }
 
-                $this->auth->login($user['id'], $user['username'], $user['avatar'], 'USER');
+                $this->auth->login($user['id'], $user['username'], $user['avatar'], 'USER', 'MEMBER');
                 $this->redirect('');
 
             } catch (Exception $e) {
