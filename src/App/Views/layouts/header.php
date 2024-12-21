@@ -53,9 +53,9 @@ error_log('User data in header: ' . print_r($user ?? [], true));
             color: white;
         }
 
-        /* .navbar-brand img {
+        .navbar-brand img {
             border-radius: 25px;
-        } */
+        }
     </style>
 </head>
 

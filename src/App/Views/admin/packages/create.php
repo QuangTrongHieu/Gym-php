@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
+
 
 <div class="container-fluid px-4">
     <h1 class="mt-4">Thêm Gói tập mới</h1>
@@ -45,4 +45,3 @@
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>

@@ -19,7 +19,7 @@
                         <small class="text-muted">Hành động này sẽ đánh dấu huấn luyện viên là không hoạt động.</small>
                     </div>
 
-                    <form action="/gym-php/admin/trainer/<?= $trainer['id'] ?>" method="POST">
+                    <form action="/gym-php/admin/trainer/destroy/<?= $trainer['id'] ?>" method="POST">
                         <input type="hidden" name="id" value="<?= $trainer['id'] ?>">
                         <div class="d-flex gap-2">
                             <a href="/gym-php/admin/trainer" class="btn btn-secondary">

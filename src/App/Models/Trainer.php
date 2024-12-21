@@ -2,12 +2,9 @@
 
 namespace App\Models;
 
-use Core\ImageUploader;
-
 class Trainer extends BaseModel
 {
     protected $table = 'trainers';
-    protected $uploadPath = 'public/uploads/trainers';
 
     public function __construct()
     {
@@ -139,43 +136,5 @@ class Trainer extends BaseModel
             error_log("Error finding active trainers: " . $e->getMessage());
             return [];
         }
-    }
-
-    public function uploadAvatar($file) {
-        try {
-            $uploader = new ImageUploader($this->uploadPath);
-            return $uploader->upload($file);
-        } catch (\RuntimeException $e) {
-            throw new \RuntimeException('Avatar upload failed: ' . $e->getMessage());
-        }
-    }
-
-    public function updateAvatar($id, $file) {
-        try {
-            // Get current avatar
-            $trainer = $this->getById($id);
-            $oldAvatar = $trainer['avatar'] ?? null;
-
-            // Upload new avatar
-            $uploader = new ImageUploader($this->uploadPath);
-            $newAvatar = $uploader->upload($file);
-
-            // Delete old avatar if exists
-            if ($oldAvatar) {
-                $uploader->delete($oldAvatar);
-            }
-
-            // Update avatar in database
-            $this->update($id, ['avatar' => $newAvatar]);
-            
-            return $newAvatar;
-        } catch (\RuntimeException $e) {
-            throw new \RuntimeException('Avatar update failed: ' . $e->getMessage());
-        }
-    }
-
-    public function deleteAvatar($fileName) {
-        $uploader = new ImageUploader($this->uploadPath);
-        return $uploader->delete($fileName);
     }
 }

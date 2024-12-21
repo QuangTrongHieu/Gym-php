@@ -1,5 +1,3 @@
-<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
-
 <div class="container-fluid px-4">
     <h1 class="mt-4">Sửa Gói tập</h1>
     
@@ -44,5 +42,3 @@
         </div>
     </div>
 </div>
-
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>

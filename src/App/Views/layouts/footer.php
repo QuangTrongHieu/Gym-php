@@ -11,7 +11,7 @@
                         </a>
                     </li>
                     <li class="mb-3">
-                        <a href="../trainers.php" class="text-light hover-effect">
+                        <a href="gym-php/list-trainers" class="text-light hover-effect">
                             <i class="fas fa-user-friends me-2"></i>Huấn Luyện Viên
                         </a>
                     </li>

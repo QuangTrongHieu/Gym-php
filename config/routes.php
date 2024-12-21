@@ -114,4 +114,7 @@ $router->add("/admin/logout", ["controller" => "Auth", "action" => "logout"]);
 $router->add("/trainer-login", ["controller" => "Auth", "action" => "trainerLogin"]);
 $router->add("/trainer/logout", ["controller" => "Auth", "action" => "logout"]);
 
+// Contact route
+$router->add('/contact', ['controller' => 'Contact', 'action' => 'index']);
+
 return $router;
