@@ -13,31 +13,53 @@ class Equipment extends BaseModel
     {
         parent::__construct();
     }
-    public function findAll()
-    {
-        $stmt = $this->db->query("SELECT * FROM equipment");
-        return $stmt->fetchAll();
-    }
 
     public function create($data)
     {
         try {
-            $sql = "INSERT INTO equipment (name, description, purchaseDate, price, status, lastMaintenanceDate, nextMaintenanceDate) 
-                    VALUES (:name, :description, :purchaseDate, :price, :status, :lastMaintenanceDate, :nextMaintenanceDate)";
+            $sql = "INSERT INTO {$this->table} (
+                        name, 
+                        description, 
+                        image_path, 
+                        purchaseDate, 
+                        price, 
+                        status, 
+                        lastMaintenanceDate, 
+                        nextMaintenanceDate,
+                        created_at,
+                        updated_at
+                    ) VALUES (
+                        :name, 
+                        :description, 
+                        :image_path, 
+                        :purchaseDate, 
+                        :price, 
+                        :status, 
+                        :lastMaintenanceDate, 
+                        :nextMaintenanceDate,
+                        NOW(),
+                        NOW()
+                    )";
             
             $stmt = $this->db->prepare($sql);
             
-            return $stmt->execute([
-                ':name' => $data['name'],
-                ':description' => $data['description'],
+            $result = $stmt->execute([
+                ':name' => trim($data['name']),
+                ':description' => trim($data['description']),
+                ':image_path' => isset($data['image_path']) ? trim($data['image_path']) : null,
                 ':purchaseDate' => $data['purchaseDate'],
-                ':price' => $data['price'],
+                ':price' => floatval($data['price']),
                 ':status' => $data['status'],
-                ':lastMaintenanceDate' => $data['lastMaintenanceDate'],
-                ':nextMaintenanceDate' => $data['nextMaintenanceDate']
+                ':lastMaintenanceDate' => !empty($data['lastMaintenanceDate']) ? $data['lastMaintenanceDate'] : null,
+                ':nextMaintenanceDate' => !empty($data['nextMaintenanceDate']) ? $data['nextMaintenanceDate'] : null
             ]);
+
+            if ($result) {
+                return $this->db->lastInsertId();
+            }
+            return false;
         } catch (PDOException $e) {
-            // Xử lý lỗi
+            error_log("Error creating equipment: " . $e->getMessage());
             return false;
         }
     }
@@ -45,30 +67,42 @@ class Equipment extends BaseModel
     public function update($id, $data)
     {
         try {
-            $sql = "UPDATE equipment 
+            $sql = "UPDATE {$this->table} 
                     SET name = :name,
                         description = :description,
                         purchaseDate = :purchaseDate,
                         price = :price,
                         status = :status,
                         lastMaintenanceDate = :lastMaintenanceDate,
-                        nextMaintenanceDate = :nextMaintenanceDate
-                    WHERE id = :id";
+                        nextMaintenanceDate = :nextMaintenanceDate,
+                        updated_at = NOW()";
+            
+            if (isset($data['image_path']) && !empty($data['image_path'])) {
+                $sql .= ", image_path = :image_path";
+            }
+            
+            $sql .= " WHERE id = :id";
             
             $stmt = $this->db->prepare($sql);
             
-            return $stmt->execute([
+            $params = [
                 ':id' => $id,
-                ':name' => $data['name'],
-                ':description' => $data['description'],
+                ':name' => trim($data['name']),
+                ':description' => trim($data['description']),
                 ':purchaseDate' => $data['purchaseDate'],
-                ':price' => $data['price'],
+                ':price' => floatval($data['price']),
                 ':status' => $data['status'],
-                ':lastMaintenanceDate' => $data['lastMaintenanceDate'],
-                ':nextMaintenanceDate' => $data['nextMaintenanceDate']
-            ]);
+                ':lastMaintenanceDate' => !empty($data['lastMaintenanceDate']) ? $data['lastMaintenanceDate'] : null,
+                ':nextMaintenanceDate' => !empty($data['nextMaintenanceDate']) ? $data['nextMaintenanceDate'] : null
+            ];
+            
+            if (isset($data['image_path']) && !empty($data['image_path'])) {
+                $params[':image_path'] = trim($data['image_path']);
+            }
+            
+            return $stmt->execute($params);
         } catch (PDOException $e) {
-            // Xử lý lỗi
+            error_log("Error updating equipment: " . $e->getMessage());
             return false;
         }
     }
@@ -76,19 +110,51 @@ class Equipment extends BaseModel
     public function delete($id)
     {
         try {
-            $sql = "DELETE FROM equipment WHERE id = :id";
+            $equipment = $this->findById($id);
+            if (!$equipment) {
+                return false;
+            }
+            
+            $sql = "DELETE FROM {$this->table} WHERE id = :id LIMIT 1";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([':id' => $id]);
+            $result = $stmt->execute([':id' => $id]);
+            
+            if ($result && !empty($equipment['image_path'])) {
+                $imagePath = ROOT_PATH . $equipment['image_path'];
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+            
+            return $result;
         } catch (PDOException $e) {
-            // Xử lý lỗi
+            error_log("Error deleting equipment: " . $e->getMessage());
             return false;
         }
     }
 
     public function findById($id)
     {
-        $stmt = $this->db->prepare("SELECT * FROM equipment WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch();
+        try {
+            $sql = "SELECT * FROM {$this->table} WHERE id = :id LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id' => (int)$id]);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log("Error finding equipment: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function findAll()
+    {
+        try {
+            $sql = "SELECT * FROM {$this->table} ORDER BY created_at DESC, id DESC";
+            $stmt = $this->db->query($sql);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            error_log("Error getting all equipment: " . $e->getMessage());
+            return [];
+        }
     }
 }

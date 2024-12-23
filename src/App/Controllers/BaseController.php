@@ -6,14 +6,16 @@ use Core\Auth;
 abstract class BaseController
 {
     protected $auth;
+    protected $route_params;
 
-    public function __construct()
+    public function __construct($route_params = [])
     {
         // Đảm bảo session được khởi tạo trước khi làm bất cứ điều gì
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         $this->auth = new Auth();
+        $this->route_params = $route_params;
     }
 
     public function view($view, $data = [], $layout = null)

@@ -13,12 +13,37 @@ class EquipmentController extends BaseController
         $this->equipmentModel = new Equipment();
     }
 
+    private function handleImageUpload($file) {
+        if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
+            return false;
+        }
+
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            return false;
+        }
+
+        $uploadDir = ROOT_PATH . '/public/uploads/equipment/';
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $fileName = uniqid() . '_' . basename($file['name']);
+        $targetPath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            return '/public/uploads/equipment/' . $fileName;
+        }
+
+        return false;
+    }
+
     public function index()
     {
-        $packages = $this->equipmentModel->findAll();
+        $equipments = $this->equipmentModel->findAll();
         $this->view('admin/equipment/index', [
-            'title' => 'Quản lý Gói tập',
-            'packages' => $packages
+            'title' => 'Quản lý Thiết bị',
+            'equipments' => $equipments
         ]);
     }
 
@@ -36,6 +61,14 @@ class EquipmentController extends BaseController
                 'nextMaintenanceDate' => !empty($_POST['nextMaintenanceDate']) ? $_POST['nextMaintenanceDate'] : null
             ];
 
+            // Xử lý upload ảnh
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $imagePath = $this->handleImageUpload($_FILES['image']);
+                if ($imagePath) {
+                    $data['image_path'] = $imagePath;
+                }
+            }
+
             // Kiểm tra validate
             $errors = [];
             if(empty($data['name'])) {
@@ -51,10 +84,12 @@ class EquipmentController extends BaseController
             if(empty($errors)) {
                 if($this->equipmentModel->create($data)) {
                     $_SESSION['success'] = 'Thêm thiết bị thành công';
-                    header('Location: /admin/equipment');
+                    header('Location: /gym-php/admin/equipment');
                     exit();
                 } else {
                     $_SESSION['error'] = 'Có lỗi xảy ra';
+                    header('Location: /gym-php/admin/equipment');
+                    exit();
                 }
             }
 
@@ -71,7 +106,7 @@ class EquipmentController extends BaseController
         $equipment = $this->equipmentModel->findById($id);
         if(!$equipment) {
             $_SESSION['error'] = 'Không tìm thấy thiết bị';
-            header('Location: /admin/equipment');
+            header('Location: /gym-php/admin/equipment');
             exit();
         }
 
@@ -86,6 +121,21 @@ class EquipmentController extends BaseController
                 'lastMaintenanceDate' => !empty($_POST['lastMaintenanceDate']) ? $_POST['lastMaintenanceDate'] : null,
                 'nextMaintenanceDate' => !empty($_POST['nextMaintenanceDate']) ? $_POST['nextMaintenanceDate'] : null
             ];
+
+            // Xử lý upload ảnh mới
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $imagePath = $this->handleImageUpload($_FILES['image']);
+                if ($imagePath) {
+                    // Xóa ảnh cũ nếu có
+                    if (!empty($equipment['image_path'])) {
+                        $oldImagePath = ROOT_PATH . $equipment['image_path'];
+                        if (file_exists($oldImagePath)) {
+                            unlink($oldImagePath);
+                        }
+                    }
+                    $data['image_path'] = $imagePath;
+                }
+            }
 
             // Kiểm tra validate
             $errors = [];
@@ -102,10 +152,12 @@ class EquipmentController extends BaseController
             if(empty($errors)) {
                 if($this->equipmentModel->update($id, $data)) {
                     $_SESSION['success'] = 'Cập nhật thiết bị thành công';
-                    header('Location: /admin/equipment');
+                    header('Location: /gym-php/admin/equipment');
                     exit();
                 } else {
                     $_SESSION['error'] = 'Có lỗi xảy ra';
+                    header('Location: /gym-php/admin/equipment');
+                    exit();
                 }
             }
 
@@ -125,13 +177,27 @@ class EquipmentController extends BaseController
     public function delete($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if($this->equipmentModel->delete($id)) {
+            // Get equipment details before deletion
+            $equipment = $this->equipmentModel->findById($id);
+            
+            if ($equipment && $this->equipmentModel->delete($id)) {
+                // Delete associated image if it exists
+                if (!empty($equipment['image_path'])) {
+                    $imagePath = ROOT_PATH . $equipment['image_path'];
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
+                }
                 $_SESSION['success'] = 'Xóa thiết bị thành công';
+                header('Location: /gym-php/admin/equipment');
+                exit();
             } else {
                 $_SESSION['error'] = 'Có lỗi xảy ra';
+                header('Location: /gym-php/admin/equipment');
+                exit();
             }
         }
-        header('Location: /admin/equipment');
+        header('Location: /gym-php/admin/equipment');
         exit();
     }
-} 
+}

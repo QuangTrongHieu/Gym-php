@@ -38,7 +38,7 @@ class App
 
             // Kiểm tra xem controller có tồn tại không
             if (class_exists($controllerClass)) {
-                $controllerInstance = new $controllerClass(); // Tạo instance của controller
+                $controllerInstance = new $controllerClass($params); // Pass route params to constructor
                 $action = $params['action']; // Tên action cần thực thi
 
                 // Kiểm tra xem action có tồn tại trong controller không

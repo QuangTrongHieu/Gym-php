@@ -204,20 +204,22 @@ CREATE TABLE progress_tracking (
   CONSTRAINT `progress_tracking_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 12. Bảng Equipment
-CREATE TABLE equipment (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `purchaseDate` date NOT NULL,
-  `price` decimal(15,2) NOT NULL,
-  `status` enum('ACTIVE','MAINTENANCE','BROKEN','RETIRED') NOT NULL,
-  `lastMaintenanceDate` date DEFAULT NULL,
-  `nextMaintenanceDate` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- Tạo bảng thiết bị
+CREATE TABLE IF NOT EXISTS equipment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL COMMENT 'Tên thiết bị',
+    description TEXT COMMENT 'Mô tả thiết bị',
+    image_path VARCHAR(255) COMMENT 'Đường dẫn hình ảnh',
+    purchaseDate DATE NOT NULL COMMENT 'Ngày mua',
+    price DECIMAL(10,2) NOT NULL COMMENT 'Giá thiết bị',
+    status ENUM('active', 'inactive') DEFAULT 'active' COMMENT 'Trạng thái: active-Hoạt động, inactive-Ngừng hoạt động',
+    lastMaintenanceDate DATE COMMENT 'Ngày bảo trì gần nhất',
+    nextMaintenanceDate DATE COMMENT 'Ngày bảo trì tiếp theo',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Ngày tạo',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Ngày cập nhật'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bảng lưu thông tin thiết bị';
 
--- 13. Bảng Maintenance Logs
+-- 12. Bảng Maintenance Logs
 CREATE TABLE maintenance_logs (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `equipmentId` int(11) NOT NULL,
@@ -230,7 +232,7 @@ CREATE TABLE maintenance_logs (
   CONSTRAINT `maintenance_logs_ibfk_1` FOREIGN KEY (`equipmentId`) REFERENCES `equipment` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 14. Bảng Announcements
+-- 13. Bảng Announcements
 CREATE TABLE announcements (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -243,7 +245,7 @@ CREATE TABLE announcements (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 15. Bảng Promotions
+-- 14. Bảng Promotions
 CREATE TABLE promotions (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -257,7 +259,7 @@ CREATE TABLE promotions (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 16. Bảng Schedules
+-- 15. Bảng Schedules
 CREATE TABLE schedules (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `trainerId` int(11) NOT NULL,
@@ -270,7 +272,7 @@ CREATE TABLE schedules (
   CONSTRAINT `schedules_ibfk_1` FOREIGN KEY (`trainerId`) REFERENCES `trainers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 17. Bảng Remember Tokens
+-- 16. Bảng Remember Tokens
 CREATE TABLE remember_tokens (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -281,7 +283,7 @@ CREATE TABLE remember_tokens (
     UNIQUE KEY unique_token (token)
 );
 
--- 18. Bảng Equipment Images
+-- 17. Bảng Equipment Images
 CREATE TABLE equipment_images (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `equipment_id` int(11) NOT NULL,

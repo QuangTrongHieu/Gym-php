@@ -37,14 +37,12 @@ $router->add('/admin/member/edit/{id:\d+}', ['controller' => 'member', 'action' 
 $router->add('/admin/member/delete/{id:\d+}', ['controller' => 'member', 'action' => 'delete']);
 
 $router->add('/admin/revenue', ['controller' => 'revenue', 'action' => 'index']);
-$router->add('/admin/revenue/create', ['controller' => 'revenue', 'action' => 'create']);
-$router->add('/admin/revenue/edit/{id:\d+}', ['controller' => 'revenue', 'action' => 'edit']);
-$router->add('/admin/revenue/delete/{id:\d+}', ['controller' => 'revenue', 'action' => 'delete']);
 
-$router->add('/admin/schedule', ['controller' => 'schedule', 'action' => 'index']);
-$router->add('/admin/schedule/create', ['controller' => 'schedule', 'action' => 'create']);
-$router->add('/admin/schedule/edit/{id:\d+}', ['controller' => 'schedule', 'action' => 'edit']);
-$router->add('/admin/schedule/delete/{id:\d+}', ['controller' => 'schedule', 'action' => 'delete']);
+// Admin Schedule routes
+$router->add('/admin/schedule', ['controller' => 'Schedule', 'action' => 'index']);
+$router->add('/admin/schedule/create', ['controller' => 'Schedule', 'action' => 'create']);
+$router->add('/admin/schedule/update/{id:\d+}', ['controller' => 'Schedule', 'action' => 'update']);
+$router->add('/admin/schedule/delete/{id:\d+}', ['controller' => 'Schedule', 'action' => 'delete']);
 
 // Package management routes
 $router->add('/admin/packages', ['controller' => 'Packages', 'action' => 'index']);
@@ -67,12 +65,11 @@ $router->add('/pt-registration/create', ['controller' => 'PTRegistration', 'acti
 $router->add('/pt-registration/update/{id:\d+}', ['controller' => 'PTRegistration', 'action' => 'update']);
 $router->add('/pt-registration/delete/{id:\d+}', ['controller' => 'PTRegistration', 'action' => 'delete']);
 
-// Revenue routes
-$router->add('/admin/revenue', ['controller' => 'Revenue', 'action' => 'index']);
-
 // Schedule routes
 $router->add('/schedule', ['controller' => 'Schedule', 'action' => 'index']);
 $router->add('/schedule/create', ['controller' => 'Schedule', 'action' => 'create']);
+
+
 
 // Trainer routes
 $router->add('/trainers', ['controller' => 'Trainer', 'action' => 'index']);

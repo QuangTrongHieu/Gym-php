@@ -67,12 +67,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/gym-php/admin/Schedule">
+                        <a class="nav-link text-white" href="/gym-php/admin/schedule">
                             <i class="fas fa-calendar-alt"></i> Lịch tập
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/gym-php/admin/Revenue">
+                        <a class="nav-link text-white" href="/gym-php/admin/revenue">
                             <i class="fas fa-chart-line"></i> Doanh thu
                         </a>
                     </li>
