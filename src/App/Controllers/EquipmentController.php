@@ -47,6 +47,15 @@ class EquipmentController extends BaseController
         ]);
     }
 
+    public function listEquipment()
+    {
+        $equipment = $this->equipmentModel->findActiveEquipment();
+        $this->view('EquipmentRevies/Equipment', [
+            'title' => 'Các thiết bị tập của chúng tôi',
+            'equipment' => $equipment
+        ]);
+    }
+
     public function create()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

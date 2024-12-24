@@ -28,16 +28,48 @@ error_log('User data in header: ' . print_r($user ?? [], true));
         .navbar-brand {
             font-weight: bold;
             color: #ff4d4d !important;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
         }
 
         .nav-link {
             color: #ffffff !important;
             font-weight: 500;
             margin: 0 15px;
+            position: relative;
+            transition: all 0.3s ease;
         }
 
         .nav-link:hover {
             color: #ff4d4d !important;
+            transform: translateY(-2px);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #ff4d4d;
+            left: 0;
+            bottom: -5px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link i {
+            margin-right: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            transform: scale(1.2);
         }
 
         .btn-login {
@@ -46,15 +78,33 @@ error_log('User data in header: ' . print_r($user ?? [], true));
             border: none;
             padding: 8px 20px;
             border-radius: 5px;
+            transition: all 0.3s ease;
         }
 
         .btn-login:hover {
             background-color: #ff3333;
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
         }
 
         .navbar-brand img {
             border-radius: 25px;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover img {
+            transform: rotate(5deg);
+        }
+
+        .dropdown-item {
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #ff4d4d;
+            color: white;
+            padding-left: 25px;
         }
     </style>
 </head>
@@ -72,16 +122,19 @@ error_log('User data in header: ' . print_r($user ?? [], true));
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/gym-php">Trang Chủ</a>
+                        <a class="nav-link" href="/gym-php"><i class="fas fa-home"></i>Trang Chủ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/gym-php/list-trainers">Huấn Luyện Viên</a>
+                        <a class="nav-link" href="/gym-php/list-trainers"><i class="fas fa-user-friends"></i>Huấn Luyện Viên</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/gym-php/list-packages">Gói tập</a>
+                        <a class="nav-link" href="/gym-php/list-packages"><i class="fas fa-cube"></i>Gói tập</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/gym-php/contact">Liên Hệ</a>
+                        <a class="nav-link" href="/gym-php/list-equipment"><i class="fas fa-dumbbell"></i>Thiết bị</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/gym-php/contact"><i class="fas fa-envelope"></i>Liên Hệ</a>
                     </li>
                 </ul>
             </div>
@@ -103,22 +156,21 @@ error_log('User data in header: ' . print_r($user ?? [], true));
                         <span class="ms-2 text-white"><?= htmlspecialchars($userName) ?></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="/gym-php/user/profile">Hồ Sơ Cá Nhân</a></li>
-                        <li><a class="dropdown-item" href="/gym-php/user/training">Lịch Tập</a></li>
-                        <li><a class="dropdown-item" href="/gym-php/user/progress">Theo Dõi Tiến Độ</a></li>
+                        <li><a class="dropdown-item" href="/gym-php/user/profile"><i class="fas fa-user me-2"></i>Hồ Sơ Cá Nhân</a></li>
+                        <li><a class="dropdown-item" href="/gym-php/user/training"><i class="fas fa-calendar-alt me-2"></i>Lịch Tập</a></li>
+                        <li><a class="dropdown-item" href="/gym-php/user/progress"><i class="fas fa-chart-line me-2"></i>Theo Dõi Tiến Độ</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="/gym-php/logout">Đăng Xuất</a></li>
+                        <li><a class="dropdown-item" href="/gym-php/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng Xuất</a></li>
                     </ul>
                 </div>
             <?php else: ?>
                 <a href="/gym-php/login" class="btn btn-login">
-                    <i class="fa fa-user"></i>
+                    <i class="fas fa-sign-in-alt"></i>
                     <span class="ms-2">Đăng Nhập</span>
                 </a>
             <?php endif; ?>
-
             <!-- Toggle Button -->
             <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
@@ -126,8 +178,39 @@ error_log('User data in header: ' . print_r($user ?? [], true));
         </div>
     </nav>
 
-    <!-- Thêm Bootstrap JS để dropdown hoạt động -->
+    <!-- Thêm Bootstrap JS và custom JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add smooth scrolling to nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'scale(1.2) rotate(360deg)';
+                    setTimeout(() => {
+                        icon.style.transform = 'scale(1) rotate(0)';
+                    }, 300);
+                }
+            });
+        });
+
+        // Add hover effect to dropdown items
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'scale(1.2)';
+                }
+            });
+
+            item.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.style.transform = 'scale(1)';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -157,4 +157,17 @@ class Equipment extends BaseModel
             return [];
         }
     }
+
+    public function findActiveEquipment()
+    {
+        try {
+            $sql = "SELECT * FROM {$this->table} WHERE status = 'active' ORDER BY created_at DESC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            error_log("Error fetching active equipment: " . $e->getMessage());
+            return [];
+        }
+    }
 }
