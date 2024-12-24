@@ -49,8 +49,20 @@ class EquipmentController extends BaseController
 
     public function listEquipment()
     {
+        $equipments = $this->equipmentModel->getAllActiveEquipment();
+        // Debug output
+        echo "<!-- Debug: " . print_r($equipments, true) . " -->";
+        
+        $this->view('equipmentreviews/equipment', [
+            'title' => 'Thiết Bị Phòng Gym',
+            'equipments' => $equipments
+        ]);
+    }
+
+    public function listEquipmentForUsers()
+    {
         $equipment = $this->equipmentModel->findActiveEquipment();
-        $this->view('EquipmentRevies/Equipment', [
+        $this->view('EquipmentReviews/Equipment', [
             'title' => 'Các thiết bị tập của chúng tôi',
             'equipment' => $equipment
         ]);

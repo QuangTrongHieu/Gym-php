@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
-use Core\Model;
+use App\Models\BaseModel;
 use PDO;
 
-class Schedule extends Model
+class Schedule extends BaseModel
 {
+    protected $table = 'schedules';
+
     public function getAllSchedulesWithNames()
     {
         $sql = "SELECT s.*, u.fullName as user_name, t.fullName as trainer_name 
-                FROM schedules s
+                FROM {$this->table} s
                 LEFT JOIN users u ON s.user_id = u.id
                 LEFT JOIN trainers t ON s.trainer_id = t.id
                 ORDER BY s.training_date DESC, s.start_time ASC";
@@ -23,7 +25,7 @@ class Schedule extends Model
 
     public function create($data)
     {
-        $sql = "INSERT INTO schedules (user_id, trainer_id, training_date, start_time, end_time, notes, status) 
+        $sql = "INSERT INTO {$this->table} (user_id, trainer_id, training_date, start_time, end_time, notes, status) 
                 VALUES (:user_id, :trainer_id, :training_date, :start_time, :end_time, :notes, :status)";
         
         $stmt = $this->db->prepare($sql);
@@ -41,7 +43,7 @@ class Schedule extends Model
 
     public function update($id, $data)
     {
-        $sql = "UPDATE schedules 
+        $sql = "UPDATE {$this->table} 
                 SET user_id = :user_id,
                     trainer_id = :trainer_id,
                     training_date = :training_date,
@@ -67,7 +69,7 @@ class Schedule extends Model
 
     public function delete($id)
     {
-        $sql = "DELETE FROM schedules WHERE id = :id";
+        $sql = "DELETE FROM {$this->table} WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }

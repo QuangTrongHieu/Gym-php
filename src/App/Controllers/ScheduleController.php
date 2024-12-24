@@ -9,33 +9,34 @@ use Core\View;
 
 class ScheduleController extends BaseController
 {
-    private $scheduleModel;
-    private $userModel;
-    private $trainerModel;
-
-    public function __construct($route_params = [])
+    public function index()
     {
-        parent::__construct($route_params);
-        $this->scheduleModel = new Schedule();
-        $this->userModel = new User();
-        $this->trainerModel = new Trainer();
-    }
+        // Kiểm tra quyền admin
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+            header('Location: /gym-php/login');
+            exit();
+        }
 
-    public function indexAction()
-    {
         $schedules = $this->scheduleModel->getAllSchedulesWithNames();
         $users = $this->userModel->getAllUsers();
         $trainers = $this->trainerModel->getAllTrainers();
 
-        View::render('admin/Schedule/index.php', [
+        $this->view('admin/Schedule/index', [
+            'title' => 'Quản lý Lịch Tập',
             'schedules' => $schedules,
             'users' => $users,
             'trainers' => $trainers
         ]);
     }
 
-    public function createAction()
+    public function create()
     {
+        // Kiểm tra quyền admin
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+            header('Location: /gym-php/login');
+            exit();
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'user_id' => $_POST['user_id'],
@@ -58,9 +59,14 @@ class ScheduleController extends BaseController
         }
     }
 
-    public function updateAction()
+    public function update($id)
     {
-        $id = $this->route_params['id'];
+        // Kiểm tra quyền admin
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+            header('Location: /gym-php/login');
+            exit();
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'user_id' => $_POST['user_id'],
@@ -83,9 +89,14 @@ class ScheduleController extends BaseController
         }
     }
 
-    public function deleteAction()
+    public function delete($id)
     {
-        $id = $this->route_params['id'];
+        // Kiểm tra quyền admin
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+            header('Location: /gym-php/login');
+            exit();
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($this->scheduleModel->delete($id)) {
                 $_SESSION['success'] = 'Xóa lịch tập thành công';

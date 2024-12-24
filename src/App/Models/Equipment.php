@@ -170,4 +170,21 @@ class Equipment extends BaseModel
             return [];
         }
     }
+
+    public function getAllActiveEquipment()
+    {
+        try {
+            // Temporarily remove status filter to check all equipment
+            $sql = "SELECT * FROM {$this->table} ORDER BY name ASC";
+            error_log("SQL Query: " . $sql);
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
+            error_log("Result count: " . count($result));
+            return $result;
+        } catch (PDOException $e) {
+            error_log("Error fetching active equipment: " . $e->getMessage());
+            return [];
+        }
+    }
 }

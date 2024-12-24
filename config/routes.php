@@ -7,6 +7,8 @@ $router->add('/', ['controller' => 'Home', 'action' => 'index']);
 $router->add('/home', ['controller' => 'Home', 'action' => 'index']);
 $router->add('/list-trainers', ['controller' => 'Trainer', 'action' => 'list']);
 $router->add('/list-packages', ['controller' => 'Packages', 'action' => 'listpackages']);
+$router->add('/list-equipment', ['controller' => 'Equipment', 'action' => 'listEquipment']);
+// $router->add('/equipment', ['controller' => 'Equipment', 'action' => 'listEquipment']);
 
 // Admin routes
 $router->add("/admin", ["controller" => "admin", "action" => "index"]);
