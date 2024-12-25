@@ -3,29 +3,41 @@
 namespace App\Controllers;
 
 use App\Models\Admin;
+use App\Models\Package;
 
 class AdminController extends BaseController
 {
     private $model;
+    private $packageModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->checkRole(['ADMIN']);
         $this->model = new Admin();
+        $this->packageModel = new Package();
     }
 
-    
     public function index()
     {
         // Điều hướng từ /admin sang /admin/dashboard
-        header('Location: /admin/dashboard');
+        header('Location: gym-php/admin/dashboard');
         exit();
     }
 
     public function dashboard()
     {
-        // TODO: nao sửa thống kê ở đây
+        $packageStatistics = $this->packageModel->getPackageStatistics();
+        $monthlyRevenue = $this->packageModel->getMonthlyRevenue();
+
+        // Format data for the chart
+        $chartData = [
+            'labels' => ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 
+                        'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+            'revenue' => array_map(function($item) { return $item['total_revenue']; }, $monthlyRevenue),
+            'users' => array_map(function($item) { return $item['total_users']; }, $monthlyRevenue)
+        ];
+
         $content = '<div class="container mt-4">
             <h1>Chào mừng đến với Trang quản trị</h1>
             <div class="row mt-4">
@@ -62,7 +74,9 @@ class AdminController extends BaseController
         // Render view với layout dashboard
         $this->view('admin/dashboard', [
             'title' => 'Admin Dashboard',
-            'content' => $content
+            'content' => $content,
+            'revenueData' => $packageStatistics,
+            'monthlyRevenue' => $chartData
         ]);
     }
 
@@ -74,7 +88,6 @@ class AdminController extends BaseController
             'admins' => $admins
         ]);
     }
-
 
     public function create()
     {

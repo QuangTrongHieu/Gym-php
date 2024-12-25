@@ -72,11 +72,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/gym-php/admin/revenue">
-                            <i class="fas fa-chart-line"></i> Doanh thu
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link text-white" href="/gym-php/admin/logout">
                             <i class="bi bi-box-arrow-right"></i> Đăng xuất
                         </a>
