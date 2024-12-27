@@ -14,6 +14,15 @@ class TrainerController extends BaseController
         $this->trainerModel = new Trainer();
     }
 
+    // public function trainerDetail($id)
+    // {
+    //     $trainer = $this->trainerModel->getTrainerById($id);
+    //     $this->view('admin/trainer/trainerDetail', [
+    //         'title' => 'Chi tiết huấn luyện viên',
+    //         'trainer' => $trainer
+    //     ]);
+    // }
+
     public function index()
     {
         $trainer = $this->trainerModel->getAllTrainers();
@@ -213,5 +222,118 @@ class TrainerController extends BaseController
             'title' => 'Đội ngũ Huấn luyện viên',
             'trainers' => $trainers
         ]);
+    }
+
+    public function editProfile()
+    {
+        // Get current trainer's information
+        $trainerId = $_SESSION['trainer_id'];
+        $trainer = $this->trainerModel->getTrainerById($trainerId);
+        
+        if (!$trainer) {
+            $_SESSION['error'] = 'Không tìm thấy thông tin huấn luyện viên.';
+            $this->redirect('trainer/dashboard');
+        }
+
+        $this->view('Trainer/Profile/edit', [
+            'title' => 'Chỉnh sửa thông tin cá nhân',
+            'trainer' => $trainer
+        ]);
+    }
+
+    public function updateProfile()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('trainer/profile/edit');
+        }
+
+        $trainerId = $_SESSION['trainer_id'];
+        $data = [
+            'fullName' => $_POST['fullName'],
+            'email' => $_POST['email'],
+            'phone' => $_POST['phone'],
+            'specialization' => $_POST['specialization'],
+            'experience' => $_POST['experience']
+        ];
+
+        // Handle password update if provided
+        if (!empty($_POST['password'])) {
+            if ($_POST['password'] !== $_POST['password_confirm']) {
+                $_SESSION['error'] = 'Mật khẩu xác nhận không khớp.';
+                $this->redirect('trainer/profile/edit');
+            }
+            $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        }
+
+        if ($this->trainerModel->updateTrainer($trainerId, $data)) {
+            $_SESSION['success'] = 'Cập nhật thông tin thành công.';
+            $this->redirect('trainer/dashboard');
+        } else {
+            $_SESSION['error'] = 'Có lỗi xảy ra khi cập nhật thông tin.';
+            $this->redirect('trainer/profile/edit');
+        }
+    }
+
+    public function login()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = $_POST['username'] ?? '';
+            $password = $_POST['password'] ?? '';
+
+            $trainer = $this->trainerModel->getTrainerByUsername($username);
+
+            if ($trainer && password_verify($password, $trainer->password)) {
+                // Set session variables
+                $_SESSION['trainer_id'] = $trainer->id;
+                $_SESSION['trainer_name'] = $trainer->fullName;
+                $_SESSION['trainer_role'] = 'trainer';
+
+                // Redirect to dashboard
+                $this->redirect('/trainer/dashboard');
+            } else {
+                $this->view('Trainer/login', [
+                    'error' => 'Tên đăng nhập hoặc mật khẩu không đúng'
+                ]);
+            }
+        } else {
+            $this->view('Trainer/login');
+        }
+    }
+
+    public function dashboard()
+    {
+        // Check if trainer is logged in
+        if (!isset($_SESSION['trainer_id']) || $_SESSION['trainer_role'] !== 'trainer') {
+            $this->redirect('/trainer/login');
+            return;
+        }
+
+        $trainerId = $_SESSION['trainer_id'];
+        $trainer = $this->trainerModel->getTrainerById($trainerId);
+
+        if (!$trainer) {
+            $_SESSION['error'] = 'Không tìm thấy thông tin huấn luyện viên.';
+            $this->redirect('/trainer/login');
+            return;
+        }
+
+        // Get training schedule
+        $trainingSchedule = $this->trainerModel->getTrainingSchedule($trainerId);
+
+        $this->view('Trainer/dashboard', [
+            'title' => 'Bảng điều khiển',
+            'trainer' => $trainer,
+            'trainingSchedule' => $trainingSchedule
+        ]);
+    }
+
+    public function logout()
+    {
+        // Clear all session variables
+        session_unset();
+        // Destroy the session
+        session_destroy();
+        // Redirect to login page
+        $this->redirect('trainer/login');
     }
 }

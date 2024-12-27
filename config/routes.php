@@ -73,7 +73,7 @@ $router->add('/schedule/create', ['controller' => 'Schedule', 'action' => 'creat
 
 
 // Trainer routes
-$router->add('/trainers', ['controller' => 'Trainer', 'action' => 'index']);
+$router->add('/trainers', ['controller' => 'Trainer', 'action' => 'dashboard']);
 $router->add('/trainers/create', ['controller' => 'Trainer', 'action' => 'create']);
 $router->add('/trainers/update/{id:\d+}', ['controller' => 'Trainer', 'action' => 'update']);
 $router->add('/trainers/delete/{id:\d+}', ['controller' => 'Trainer', 'action' => 'delete']);
@@ -82,6 +82,9 @@ $router->add('/trainers/{id:\d+}/sessions', ['controller' => 'Trainer', 'action'
 $router->add('/trainers/sessions/{id:\d+}/status', ['controller' => 'Trainer', 'action' => 'updateSessionStatus']);
 $router->add('/trainers/{id:\d+}/performance', ['controller' => 'Trainer', 'action' => 'getPerformanceStats']);
 $router->add('/trainers/{id:\d+}/clients', ['controller' => 'Trainer', 'action' => 'getClients']);
+$router->add('/trainer/trainers-login', ['controller' => 'Trainer', 'action' => 'login']);
+$router->add('/trainer/login', ['controller' => 'Auth', 'action' => 'login']);
+$router->add('/trainer/logout', ['controller' => 'Auth', 'action' => 'logout']); 
 
 // User routes
 $router->add('/user', ['controller' => 'User', 'action' => 'index']);
@@ -93,13 +96,6 @@ $router->add('/user/address/create', ['controller' => 'User', 'action' => 'creat
 $router->add('/user/address/delete/{id:\d+}', ['controller' => 'User', 'action' => 'deleteAddress']);
 $router->add('/user/address/{id:\d+}/default', ['controller' => 'User', 'action' => 'setDefaultAddress']);
 
-// Trainer panel routes
-$router->add('/trainer/dashboard', ['controller' => 'TrainerPanel', 'action' => 'dashboard']);
-$router->add('/trainer/schedule', ['controller' => 'TrainerPanel', 'action' => 'schedule']); 
-$router->add('/trainer/clients', ['controller' => 'TrainerPanel', 'action' => 'clients']);
-$router->add('/trainer/programs', ['controller' => 'TrainerPanel', 'action' => 'programs']);
-$router->add('/trainer/profile', ['controller' => 'TrainerPanel', 'action' => 'profile']);
-
 // RegisTrainer routes
 $router->add('/trainers-list', ['controller' => 'RegisTrainer', 'action' => 'index']);
 $router->add('/trainer/{id:\d+}', ['controller' => 'RegisTrainer', 'action' => 'trainerDetail']);
@@ -108,11 +104,9 @@ $router->add('/trainer/{id:\d+}', ['controller' => 'RegisTrainer', 'action' => '
 $router->add("/admin-login", ["controller" => "Auth", "action" => "adminLogin"]);
 $router->add("/admin/logout", ["controller" => "Auth", "action" => "logout"]);
 
-// Trainer auth routes
-$router->add("/trainer-login", ["controller" => "Auth", "action" => "trainerLogin"]);
-$router->add("/trainer/logout", ["controller" => "Auth", "action" => "logout"]);
-
 // Contact route
 $router->add('/contact', ['controller' => 'Contact', 'action' => 'index']);
+
+// Trainer authentication routes
 
 return $router;

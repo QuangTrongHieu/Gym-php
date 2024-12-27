@@ -52,11 +52,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/gym-php/trainer/programs">
-                            <i class="bi bi-clipboard-check"></i> Chương trình tập
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link text-white" href="/gym-php/trainer/profile">
                             <i class="bi bi-person"></i> Thông tin cá nhân
                         </a>

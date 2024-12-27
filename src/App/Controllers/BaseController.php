@@ -49,12 +49,15 @@ abstract class BaseController
             if (strpos($view, 'admin/') === 0) {
                 // Nếu view có prefix 'admin/', sử dụng layout admin
                 $defaultLayout = 'layouts/admin_layout.php';
+            } else if (strpos($view, 'Trainer/') === 0) {
+                // Nếu view có prefix 'Trainer/', sử dụng layout trainer
+                $defaultLayout = 'layouts/Trainer_layout.php';
             } else if (strpos($view, 'user/') === 0) {
                 // Nếu view có prefix 'user/', sử dụng layout user
                 $defaultLayout = 'layouts/user_layout.php';
             } else {
                 // Nếu không có prefix nào, sử dụng layout mặc định
-              $defaultLayout = 'layouts/default_layout.php';
+                $defaultLayout = 'layouts/default_layout.php';
             }
             // Load layout mặc định
             require_once ROOT_PATH . "/src/App/Views/" . $defaultLayout;

@@ -137,4 +137,65 @@ class Trainer extends BaseModel
             return [];
         }
     }
+
+    public function getTrainerByUsername($username)
+    {
+        $sql = "SELECT * FROM {$this->table} WHERE username = :username AND status = 'ACTIVE'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['username' => $username]);
+        return $stmt->fetch(\PDO::FETCH_OBJ);
+    }
+
+    public function getTrainerById($id)
+    {
+        $sql = "SELECT * FROM {$this->table} WHERE id = :id AND status = 'ACTIVE'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(\PDO::FETCH_OBJ);
+    }
+
+    public function updateTrainer($id, $data)
+    {
+        $fields = [];
+        foreach ($data as $key => $value) {
+            $fields[] = "$key = :$key";
+        }
+        
+        $sql = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :id";
+        $data['id'] = $id;
+        
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($data);
+    }
+
+    public function getTrainingSchedule($trainerId)
+    {
+        $sql = "SELECT s.*, m.fullName as memberName 
+                FROM schedules s 
+                JOIN members m ON s.memberId = m.id 
+                WHERE s.trainerId = :trainerId 
+                AND s.date >= CURRENT_DATE 
+                ORDER BY s.date, s.startTime";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['trainerId' => $trainerId]);
+        $schedules = $stmt->fetchAll(\PDO::FETCH_OBJ);
+
+        if (empty($schedules)) {
+            return "Không có lịch tập nào sắp tới";
+        }
+
+        $formattedSchedule = "";
+        foreach ($schedules as $schedule) {
+            $date = date('d/m/Y', strtotime($schedule->date));
+            $startTime = date('H:i', strtotime($schedule->startTime));
+            $endTime = date('H:i', strtotime($schedule->endTime));
+            
+            $formattedSchedule .= "Ngày: {$date}\n";
+            $formattedSchedule .= "Thời gian: {$startTime} - {$endTime}\n";
+            $formattedSchedule .= "Học viên: {$schedule->memberName}\n\n";
+        }
+
+        return rtrim($formattedSchedule);
+    }
 }
