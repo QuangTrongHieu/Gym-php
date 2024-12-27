@@ -11,12 +11,12 @@ $router->add('/list-equipment', ['controller' => 'Equipment', 'action' => 'listE
 // $router->add('/equipment', ['controller' => 'Equipment', 'action' => 'listEquipment']);
 
 // Admin routes
-$router->add("/admin", ["controller" => "admin", "action" => "index"]);
-$router->add("/admin/dashboard", ["controller" => "admin", "action" => "dashboard"]);
-$router->add("/admin/admin-management", ["controller" => "admin", "action" => "adminManagement"]);
-$router->add("/admin/admin-management/create", ["controller" => "admin", "action" => "create"]);
-$router->add("/admin/admin-management/edit/{id:\d+}", ["controller" => "admin", "action" => "edit"]);
-$router->add("/admin/admin-management/delete/{id:\d+}", ["controller" => "admin", "action" => "delete"]);
+$router->add("/admin", ["controller" => "Admin", "action" => "index"]);
+$router->add("/admin/dashboard", ["controller" => "Admin", "action" => "dashboard"]);
+$router->add("/admin/admin-management", ["controller" => "Admin", "action" => "adminManagement"]);
+$router->add("/admin/admin-management/create", ["controller" => "Admin", "action" => "create"]);
+$router->add("/admin/admin-management/edit/{id:\d+}", ["controller" => "Admin", "action" => "edit"]);
+$router->add("/admin/admin-management/delete/{id:\d+}", ["controller" => "Admin", "action" => "delete"]);
 
 $router->add('/admin/trainer', ['controller' => 'Trainer', 'action' => 'index']);
 $router->add('/admin/trainer/create', ['controller' => 'Trainer', 'action' => 'create']);
@@ -70,7 +70,6 @@ $router->add('/pt-registration/delete/{id:\d+}', ['controller' => 'PTRegistratio
 // Schedule routes
 $router->add('/schedule', ['controller' => 'Schedule', 'action' => 'index']);
 $router->add('/schedule/create', ['controller' => 'Schedule', 'action' => 'create']);
-
 
 
 // Trainer routes

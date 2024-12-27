@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\Admin;
 use App\Models\Package;
 
+
 class AdminController extends BaseController
 {
     private $model;
@@ -21,8 +22,7 @@ class AdminController extends BaseController
     public function index()
     {
         // Điều hướng từ /admin sang /admin/dashboard
-        header('Location: gym-php/admin/dashboard');
-        exit();
+        $this->redirect('admin/dashboard');
     }
 
     public function dashboard()

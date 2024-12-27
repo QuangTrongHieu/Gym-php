@@ -1,4 +1,3 @@
-<?php require_once __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="container py-5">
     <h1 class="text-center mb-5"><?= $title ?></h1>
@@ -26,5 +25,3 @@
         <?php endforeach; ?>
     </div>
 </div>
-
-<?php require_once __DIR__ . '/../layouts/footer.php'; ?>
