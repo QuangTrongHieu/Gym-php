@@ -18,6 +18,10 @@ $router->add("/admin/admin-management/create", ["controller" => "Admin", "action
 $router->add("/admin/admin-management/edit/{id:\d+}", ["controller" => "Admin", "action" => "edit"]);
 $router->add("/admin/admin-management/delete/{id:\d+}", ["controller" => "Admin", "action" => "delete"]);
 
+// Admin auth routes
+$router->add("/admin-login", ["controller" => "Auth", "action" => "adminLogin"]);
+$router->add("/admin/logout", ["controller" => "Auth", "action" => "logout"]);
+
 // Admin Schedule routes
 $router->add("/admin/schedule", ["controller" => "Schedule", "action" => "index"]);
 $router->add("/admin/schedule/create", ["controller" => "Schedule", "action" => "create"]);
@@ -43,15 +47,10 @@ $router->add('/admin/packages/delete/{id:\d+}', ['controller' => 'packages', 'ac
 $router->add('/admin/member', ['controller' => 'member', 'action' => 'index']);
 $router->add('/admin/member/create', ['controller' => 'member', 'action' => 'create']);
 $router->add('/admin/member/edit/{id:\d+}', ['controller' => 'member', 'action' => 'edit']);
-$router->add('/admin/member/delete/{id:\d+}', ['controller' => 'member', 'action' => 'delete']);
+$router->add('/admin/member/update/{id:\d+}', ['controller' => 'member', 'action' => 'update']);
+$router->add('/admin/member/export', ['controller' => 'member', 'action' => 'export']);
 
 $router->add('/admin/revenue', ['controller' => 'revenue', 'action' => 'index']);
-
-// // Package management routes
-// $router->add('/admin/packages', ['controller' => 'Packages', 'action' => 'index']);
-// $router->add('/admin/packages/create', ['controller' => 'Packages', 'action' => 'create']);
-// $router->add('/admin/packages/edit/{id:\d+}', ['controller' => 'Packages', 'action' => 'edit']);
-// $router->add('/admin/packages/delete/{id:\d+}', ['controller' => 'Packages', 'action' => 'delete']);
 
 // Auth routes
 $router->add("/login", ["controller" => "Auth", "action" => "login"]);
@@ -71,7 +70,6 @@ $router->add('/pt-registration/delete/{id:\d+}', ['controller' => 'PTRegistratio
 // Schedule routes
 $router->add('/schedule', ['controller' => 'Schedule', 'action' => 'index']);
 $router->add('/schedule/create', ['controller' => 'Schedule', 'action' => 'create']);
-
 
 // Trainer routes
 $router->add('/trainers', ['controller' => 'Trainer', 'action' => 'dashboard']);
@@ -100,10 +98,6 @@ $router->add('/user/address/{id:\d+}/default', ['controller' => 'User', 'action'
 // RegisTrainer routes
 $router->add('/trainers-list', ['controller' => 'RegisTrainer', 'action' => 'index']);
 $router->add('/trainer/{id:\d+}', ['controller' => 'RegisTrainer', 'action' => 'trainerDetail']);
-
-// Admin auth routes
-$router->add("/admin-login", ["controller" => "Auth", "action" => "adminLogin"]);
-$router->add("/admin/logout", ["controller" => "Auth", "action" => "logout"]);
 
 // Contact route
 $router->add('/contact', ['controller' => 'Contact', 'action' => 'index']);

@@ -3,15 +3,18 @@
 namespace App\Controllers;
 
 use App\Models\Trainer;
+use Core\Helpers\FileUploader;
 
 class TrainerController extends BaseController
 {
     private $trainerModel;
+    private $uploader;
 
     public function __construct()
     {
         parent::__construct();
         $this->trainerModel = new Trainer();
+        $this->uploader = new FileUploader();
     }
 
     // public function trainerDetail($id)
@@ -88,21 +91,51 @@ class TrainerController extends BaseController
                 'certification' => $_POST['certification'],
                 'salary' => $_POST['salary']
             ];
-            
+
+            // Handle password update
             if (!empty($_POST['password'])) {
                 $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
-            
+
+            // Handle avatar upload
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                try {
+                    $uploadDir = ROOT_PATH . '/public/uploads/trainers/';
+                    if (!file_exists($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+
+                    // Delete old avatar if exists
+                    $oldTrainer = $this->trainerModel->getTrainerById($id);
+                    if (!empty($oldTrainer['avatar']) && $oldTrainer['avatar'] !== 'default.jpg') {
+                        $oldAvatarPath = $uploadDir . $oldTrainer['avatar'];
+                        if (file_exists($oldAvatarPath)) {
+                            unlink($oldAvatarPath);
+                        }
+                    }
+
+                    // Upload new avatar
+                    $filename = $this->uploader->upload($_FILES['avatar'], 'trainers');
+                    if ($filename) {
+                        $data['avatar'] = $filename;
+                    }
+                } catch (\Exception $e) {
+                    $_SESSION['error'] = 'Có lỗi khi tải lên ảnh: ' . $e->getMessage();
+                    header('Location: /gym-php/admin/trainer');
+                    exit;
+                }
+            }
+
             try {
                 if ($this->trainerModel->update($id, $data)) {
                     $_SESSION['success'] = 'Cập nhật thông tin huấn luyện viên thành công';
                 } else {
-                    $_SESSION['error'] = 'Có lỗi xảy ra khi cập nhật thông tin';
+                    throw new \Exception('Không thể cập nhật thông tin huấn luyện viên');
                 }
             } catch (\Exception $e) {
                 $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
             }
-            
+
             header('Location: /gym-php/admin/trainer');
             exit;
         }
@@ -145,75 +178,75 @@ class TrainerController extends BaseController
         $this->redirect('admin/trainer');
     }
 
-    public function export()
-    {
-        require ROOT_PATH . '/vendor/autoload.php';
+    // public function export()
+    // {
+    //     require ROOT_PATH . '/vendor/autoload.php';
         
-        $trainers = $this->trainerModel->getAllTrainers();
+    //     $trainers = $this->trainerModel->getAllTrainers();
         
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+    //     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    //     $sheet = $spreadsheet->getActiveSheet();
         
-        // Set headers
-        $sheet->setCellValue('A1', 'ID');
-        $sheet->setCellValue('B1', 'Họ tên');
-        $sheet->setCellValue('C1', 'Username');
-        $sheet->setCellValue('D1', 'Email');
-        $sheet->setCellValue('E1', 'Ngày sinh');
-        $sheet->setCellValue('F1', 'Giới tính');
-        $sheet->setCellValue('G1', 'Số điện thoại');
-        $sheet->setCellValue('H1', 'Chuyên môn');
-        $sheet->setCellValue('I1', 'Kinh nghiệm');
-        $sheet->setCellValue('J1', 'Chứng chỉ');
-        $sheet->setCellValue('K1', 'Lương');
+    //     // Set headers
+    //     $sheet->setCellValue('A1', 'ID');
+    //     $sheet->setCellValue('B1', 'Họ tên');
+    //     $sheet->setCellValue('C1', 'Username');
+    //     $sheet->setCellValue('D1', 'Email');
+    //     $sheet->setCellValue('E1', 'Ngày sinh');
+    //     $sheet->setCellValue('F1', 'Giới tính');
+    //     $sheet->setCellValue('G1', 'Số điện thoại');
+    //     $sheet->setCellValue('H1', 'Chuyên môn');
+    //     $sheet->setCellValue('I1', 'Kinh nghiệm');
+    //     $sheet->setCellValue('J1', 'Chứng chỉ');
+    //     $sheet->setCellValue('K1', 'Lương');
         
-        // Style the header
-        $headerStyle = [
-            'font' => [
-                'bold' => true,
-            ],
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => [
-                    'rgb' => 'E2EFDA',
-                ],
-            ],
-        ];
-        $sheet->getStyle('A1:K1')->applyFromArray($headerStyle);
+    //     // Style the header
+    //     $headerStyle = [
+    //         'font' => [
+    //             'bold' => true,
+    //         ],
+    //         'fill' => [
+    //             'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+    //             'startColor' => [
+    //                 'rgb' => 'E2EFDA',
+    //             ],
+    //         ],
+    //     ];
+    //     $sheet->getStyle('A1:K1')->applyFromArray($headerStyle);
         
-        // Add data
-        $row = 2;
-        foreach ($trainers as $trainer) {
-            $sheet->setCellValue('A' . $row, $trainer['id']);
-            $sheet->setCellValue('B' . $row, $trainer['fullName']);
-            $sheet->setCellValue('C' . $row, $trainer['username']);
-            $sheet->setCellValue('D' . $row, $trainer['email']);
-            $sheet->setCellValue('E' . $row, $trainer['dateOfBirth']);
-            $sheet->setCellValue('F' . $row, $trainer['sex']);
-            $sheet->setCellValue('G' . $row, $trainer['phone']);
-            $sheet->setCellValue('H' . $row, $trainer['specialization']);
-            $sheet->setCellValue('I' . $row, $trainer['experience']);
-            $sheet->setCellValue('J' . $row, $trainer['certification']);
-            $sheet->setCellValue('K' . $row, $trainer['salary']);
-            $row++;
-        }
+    //     // Add data
+    //     $row = 2;
+    //     foreach ($trainers as $trainer) {
+    //         $sheet->setCellValue('A' . $row, $trainer['id']);
+    //         $sheet->setCellValue('B' . $row, $trainer['fullName']);
+    //         $sheet->setCellValue('C' . $row, $trainer['username']);
+    //         $sheet->setCellValue('D' . $row, $trainer['email']);
+    //         $sheet->setCellValue('E' . $row, $trainer['dateOfBirth']);
+    //         $sheet->setCellValue('F' . $row, $trainer['sex']);
+    //         $sheet->setCellValue('G' . $row, $trainer['phone']);
+    //         $sheet->setCellValue('H' . $row, $trainer['specialization']);
+    //         $sheet->setCellValue('I' . $row, $trainer['experience']);
+    //         $sheet->setCellValue('J' . $row, $trainer['certification']);
+    //         $sheet->setCellValue('K' . $row, $trainer['salary']);
+    //         $row++;
+    //     }
         
-        // Auto size columns
-        foreach (range('A', 'K') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
+    //     // Auto size columns
+    //     foreach (range('A', 'K') as $col) {
+    //         $sheet->getColumnDimension($col)->setAutoSize(true);
+    //     }
         
-        // Create Excel file
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    //     // Create Excel file
+    //     $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         
-        // Set headers for download
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="danh_sach_hlv.xlsx"');
-        header('Cache-Control: max-age=0');
+    //     // Set headers for download
+    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    //     header('Content-Disposition: attachment;filename="danh_sach_hlv.xlsx"');
+    //     header('Cache-Control: max-age=0');
         
-        $writer->save('php://output');
-        exit;
-    }
+    //     $writer->save('php://output');
+    //     exit;
+    // }
 
     public function list()
     {
@@ -248,6 +281,8 @@ class TrainerController extends BaseController
         }
 
         $trainerId = $_SESSION['trainer_id'];
+        $trainer = $this->trainerModel->getTrainerById($trainerId);
+        
         $data = [
             'fullName' => $_POST['fullName'],
             'email' => $_POST['email'],
@@ -256,20 +291,28 @@ class TrainerController extends BaseController
             'experience' => $_POST['experience']
         ];
 
-        // Handle password update if provided
-        if (!empty($_POST['password'])) {
-            if ($_POST['password'] !== $_POST['password_confirm']) {
-                $_SESSION['error'] = 'Mật khẩu xác nhận không khớp.';
-                $this->redirect('trainer/profile/edit');
+        try {
+            // Xử lý upload ảnh nếu có
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                $data['avatar'] = $this->uploader->handleProfileImage($_FILES['avatar'], $trainer['avatar']);
             }
-            $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        }
 
-        if ($this->trainerModel->updateTrainer($trainerId, $data)) {
-            $_SESSION['success'] = 'Cập nhật thông tin thành công.';
-            $this->redirect('trainer/dashboard');
-        } else {
-            $_SESSION['error'] = 'Có lỗi xảy ra khi cập nhật thông tin.';
+            // Xử lý password nếu có
+            if (!empty($_POST['password'])) {
+                if ($_POST['password'] !== $_POST['password_confirm']) {
+                    throw new \Exception('Mật khẩu xác nhận không khớp.');
+                }
+                $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            }
+
+            if ($this->trainerModel->updateTrainer($trainerId, $data)) {
+                $_SESSION['success'] = 'Cập nhật thông tin thành công.';
+                $this->redirect('trainer/dashboard');
+            } else {
+                throw new \Exception('Có lỗi xảy ra khi cập nhật thông tin.');
+            }
+        } catch (\Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
             $this->redirect('trainer/profile/edit');
         }
     }
@@ -282,10 +325,10 @@ class TrainerController extends BaseController
 
             $trainer = $this->trainerModel->getTrainerByUsername($username);
 
-            if ($trainer && password_verify($password, $trainer->password)) {
+            if ($trainer && password_verify($password, $trainer['password'])) {
                 // Set session variables
-                $_SESSION['trainer_id'] = $trainer->id;
-                $_SESSION['trainer_name'] = $trainer->fullName;
+                $_SESSION['trainer_id'] = $trainer['id'];
+                $_SESSION['trainer_name'] = $trainer['fullName'];
                 $_SESSION['trainer_role'] = 'trainer';
 
                 // Redirect to dashboard
@@ -335,5 +378,14 @@ class TrainerController extends BaseController
         session_destroy();
         // Redirect to login page
         $this->redirect('trainer/login');
+    }
+
+    // Hàm mới để lấy danh sách huấn luyện viên
+    public function getTrainers() {
+        // Lấy dữ liệu từ cơ sở dữ liệu
+        $trainers = $this->trainerModel->getAllTrainers();
+        
+        // Trả về dữ liệu dưới dạng JSON
+        echo json_encode($trainers);
     }
 }

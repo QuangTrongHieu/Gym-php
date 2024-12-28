@@ -4,7 +4,7 @@ namespace App\Models;
 
 use PDO;
 use PDOException;
-use Core\ImageUploader;
+use Core\Helpers\FileUploader;
 
 class User extends BaseModel
 {
@@ -173,42 +173,28 @@ class User extends BaseModel
 
     public function uploadAvatar($file) {
         try {
-            $uploader = new ImageUploader($this->uploadPath);
-            return $uploader->upload($file);
-        } catch (\RuntimeException $e) {
-            throw new \RuntimeException('Avatar upload failed: ' . $e->getMessage());
+            $uploader = new FileUploader();
+            return $uploader->handleProfileImage($file);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Không thể tải lên ảnh: ' . $e->getMessage());
         }
     }
 
-    public function updateAvatar($id, $file) {
+    public function updateAvatar($userId, $file)
+    {
         try {
-            // Get current avatar
-            $user = $this->getById($id);
-            $oldAvatar = $user['avatar'] ?? null;
-
-            // Upload new avatar
-            $uploader = new ImageUploader($this->uploadPath);
-            $newAvatar = $uploader->upload($file);
-
-            // Delete old avatar if exists
-            if ($oldAvatar) {
-                $uploader->delete($oldAvatar);
-            }
-
-            // Update avatar in database
-            $this->update($id, ['avatar' => $newAvatar]);
+            $uploader = new FileUploader();
+            $avatarPath = $uploader->handleProfileImage($file);
             
-            return $newAvatar;
-        } catch (\RuntimeException $e) {
-            throw new \RuntimeException('Avatar update failed: ' . $e->getMessage());
+            $sql = "UPDATE users SET avatar = ? WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$avatarPath, $userId]);
+            
+            return $avatarPath;
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Không thể cập nhật ảnh đại diện: ' . $e->getMessage());
         }
     }
-
-    public function deleteAvatar($fileName) {
-        $uploader = new ImageUploader($this->uploadPath);
-        return $uploader->delete($fileName);
-    }
-
     public function getById($id)
     {
         try {

@@ -171,3 +171,8 @@ document.getElementById('filterType').addEventListener('change', function() {
     filterIdContainer.style.display = this.value === 'all' ? 'none' : 'block';
 });
 </script>
+<?php 
+require_once ROOT_PATH . '/src/App/Views/admin/Schedule/edit.php';
+require_once ROOT_PATH . '/src/App/Views/admin/Schedule/create.php';
+require_once ROOT_PATH . '/src/App/Views/admin/Schedule/delete.php';
+?>

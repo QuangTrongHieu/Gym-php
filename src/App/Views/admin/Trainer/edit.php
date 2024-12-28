@@ -1,7 +1,5 @@
 <?php if (isset($trainer)): ?>
     <div class="container-fluid px-4">
-        <!-- <h1 class="mt-4">Sửa thông tin huấn luyện viên: <?= htmlspecialchars($trainer['fullName']) ?></h1> -->
-        
         <?php if(isset($_SESSION['error'])): ?>
             <div class="alert alert-danger">
                 <?= $_SESSION['error']; unset($_SESSION['error']); ?>
@@ -17,7 +15,30 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="/gym-php/admin/trainer/edit/<?= $item['id'] ?>" method="POST">
+                            <form action="/gym-php/admin/trainer/edit/<?= $item['id'] ?>" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3 text-center">
+                                    <?php
+                                    $avatarPath = '/gym-php/public/uploads/trainers/' . ($item['avatar'] ?? 'default.jpg');
+                                    $defaultPath = '/gym-php/public/assets/images/default-avatar.png';
+                                    $fullPath = ROOT_PATH . '/public/uploads/trainers/' . ($item['avatar'] ?? 'default.jpg');
+                                    $imgSrc = file_exists($fullPath) ? $avatarPath : $defaultPath;
+                                    ?>
+                                    <img src="<?= htmlspecialchars($imgSrc) ?>" 
+                                         alt="Avatar" 
+                                         class="rounded-circle mb-3"
+                                         style="width: 150px; height: 150px; object-fit: cover;"
+                                         id="avatarPreview<?= $item['id'] ?>">
+                                    <div class="mb-3">
+                                        <label class="form-label">Ảnh đại diện</label>
+                                        <input type="file" 
+                                               name="avatar" 
+                                               class="form-control" 
+                                               accept="image/*"
+                                               onchange="previewImage(this, 'avatarPreview<?= $item['id'] ?>')">
+                                        <div class="form-text">Để trống nếu không muốn thay đổi ảnh</div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3">
                                     <label class="form-label">Username</label>
                                     <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($item['username']) ?>" required>
@@ -76,9 +97,24 @@
                 </div>
             </div>
         <?php endforeach; ?>
-        <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal<?= $trainer['id'] ?>">Sửa thông tin huấn luyện viên</button> -->
     </div>
 <?php else: ?>
     <div class="alert alert-danger">
+        Không tìm thấy thông tin huấn luyện viên
     </div>
 <?php endif; ?>
+
+<script>
+function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    const file = input.files[0];
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+}
+</script>

@@ -25,6 +25,7 @@
     <thead>
         <tr>
             <th>ID</th>
+            <th>Ảnh</th>
             <th>Họ tên</th>
             <th>Username</th>
             <th>Email</th>
@@ -39,6 +40,20 @@
             <?php foreach($trainer as $item): ?>
             <tr>
                 <td><?= $item['id'] ?></td>
+                <td>
+                    <?php
+                    $avatar = $item['avatar'] ?? 'default.jpg';
+                    $avatarFullPath = ROOT_PATH . '/public/uploads/trainers/' . $avatar;
+                    $avatarUrl = file_exists($avatarFullPath) 
+                        ? '/gym-php/public/uploads/trainers/' . $avatar 
+                        : '/gym-php/public/assets/images/default-avatar.png';
+                    ?>
+                    <div class="avatar-container">
+                        <img src="<?= htmlspecialchars($avatarUrl) ?>" 
+                             class="trainer-avatar" 
+                             alt="<?= htmlspecialchars($item['fullName']) ?>">
+                    </div>
+                </td>
                 <td><?= htmlspecialchars($item['fullName']) ?></td>
                 <td><?= htmlspecialchars($item['username']) ?></td>
                 <td><?= htmlspecialchars($item['email']) ?></td>
@@ -64,7 +79,19 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="/gym-php/admin/trainer/edit/<?= $item['id'] ?>" method="POST">
+                            <form action="/gym-php/admin/trainer/edit/<?= $item['id'] ?>" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label class="form-label">Ảnh đại diện</label>
+                                    <input type="file" name="avatar" class="form-control" accept="image/*">
+                                    <?php if (!empty($item['avatar'])): ?>
+                                        <div class="mt-2">
+                                            <img src="<?= htmlspecialchars($avatarUrl) ?>" 
+                                                 alt="Current avatar" 
+                                                 class="trainer-avatar"
+                                                 style="width: 100px; height: 100px;">
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label">Username</label>
                                     <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($item['username']) ?>" required>
@@ -125,7 +152,7 @@
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="8">Không có dữ liệu</td>
+                <td colspan="9">Không có dữ liệu</td>
             </tr>
         <?php endif; ?>
     </tbody>
@@ -175,6 +202,31 @@ function submitDeleteForm() {
     document.getElementById('deleteTrainerForm').submit();
 }
 </script>
+
+<style>
+.avatar-container {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.trainer-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease-in-out;
+}
+
+.avatar-container:hover .trainer-avatar {
+    transform: scale(1.1);
+}
+</style>
 
 <?php 
 require_once ROOT_PATH . '/src/App/Views/admin/Trainer/edit.php';

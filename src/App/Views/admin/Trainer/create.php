@@ -6,7 +6,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="/gym-php/admin/trainer/create" method="POST">
+                <form action="/gym-php/admin/trainer/create" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Ảnh đại diện</label>
+                        <input type="file" name="avatar" class="form-control" accept="image/*">
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">Username</label>
                         <input type="text" name="username" class="form-control" required>

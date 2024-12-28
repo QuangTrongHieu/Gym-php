@@ -99,7 +99,7 @@ class Package extends BaseModel
     public function findActivePackages()
     {
         try {
-            $stmt = $this->db->query("SELECT * FROM {$this->table} WHERE status = 'active' ORDER BY price ASC");
+            $stmt = $this->db->query("SELECT * FROM {$this->table} WHERE status = 'ACTIVE' ORDER BY price ASC");
             return $stmt->fetchAll();
         } catch (PDOException $e) {
             error_log("Error in findActivePackages: " . $e->getMessage());

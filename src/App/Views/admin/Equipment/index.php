@@ -1,4 +1,3 @@
-
 <div class="container-fluid px-4">
     <h1 class="mt-4">Quản lý Thiết bị</h1>
     
@@ -51,10 +50,10 @@
                                 <td><?= $equipment['id'] ?></td>
                                 <td class="text-center">
                                     <?php if (!empty($equipment['image_path'])): ?>
-                                        <img src="<?= $equipment['image_path'] ?>" 
+                                        <img src="/gym-php<?= $equipment['image_path'] ?>" 
                                              alt="<?= htmlspecialchars($equipment['name']) ?>" 
                                              class="img-thumbnail"
-                                             style="max-width: 100px; max-height: 100px;">
+                                             style="max-width: 100px; max-height: 100px; object-fit: cover;">
                                     <?php else: ?>
                                         <span class="text-muted">Không có ảnh</span>
                                     <?php endif; ?>
@@ -133,4 +132,3 @@
         });
     });
 </script>
-

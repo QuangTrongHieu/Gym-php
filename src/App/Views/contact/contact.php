@@ -1,243 +1,213 @@
-<title>Liên Hệ - PowerGym</title>
-   <!-- CSS Links -->
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-   <style>
-       body {
-           background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-       }
-       
-       .contact-section {
-           padding: 100px 0;
-       }
-       
-       .contact-header {
-           text-align: center;
-           margin-bottom: 60px;
-           color: #2c3e50;
-       }
-       
-       .contact-header h1 {
-           font-weight: 700;
-           margin-bottom: 25px;
-           position: relative;
-           display: inline-block;
-           font-size: 2.5rem;
-       }
-       
-       .contact-header h1:after {
-           content: '';
-           position: absolute;
-           width: 80px;
-           height: 3px;
-           background: #007bff;
-           bottom: -10px;
-           left: calc(50% - 40px);
-       }
-       
-       .contact-form {
-           background: white;
-           padding: 50px;
-           border-radius: 15px;
-           box-shadow: 0 0 30px rgba(0,0,0,0.1);
-           max-width: 1000px;
-           margin: auto;
-       }
-       
-       .contact-info {
-           margin-bottom: 50px;
-       }
-       
-       .contact-info-item {
-           display: flex;
-           align-items: center;
-           margin-bottom: 20px;
-           padding: 25px;
-           background: #f8f9fa;
-           border-radius: 10px;
-           transition: all 0.3s ease;
-           height: 100%;
-       }
-       
-       .contact-info-item:hover {
-           transform: translateY(-5px);
-           box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-       }
-       
-       .contact-icon {
-           width: 60px;
-           height: 60px;
-           background: #007bff;
-           border-radius: 50%;
-           display: flex;
-           align-items: center;
-           justify-content: center;
-           margin-right: 15px;
-           color: white;
-           font-size: 1.2rem;
-       }
-       
-       .form-control {
-           border: 2px solid #e9ecef;
-           padding: 15px;
-           margin-bottom: 25px;
-           transition: all 0.3s ease;
-           border-radius: 8px;
-       }
-       
-       .form-control:focus {
-           border-color: #007bff;
-           box-shadow: none;
-       }
-       
-       .btn-submit {
-           background: #007bff;
-           color: white;
-           padding: 15px 40px;
-           border: none;
-           border-radius: 30px;
-           font-weight: 600;
-           transition: all 0.3s ease;
-           font-size: 1.1rem;
-       }
-       
-       .btn-submit:hover {
-           background: #0056b3;
-           transform: translateY(-2px);
-       }
-       
-       .success-message {
-           display: none;
-           text-align: center;
-           color: #28a745;
-           margin-top: 20px;
-           padding: 30px;
-           border-radius: 10px;
-           background: #f8fff8;
-           border: 2px solid #28a745;
-       }
-       
-       .form-group {
-           position: relative;
-           margin-bottom: 25px;
-       }
-       
-       .form-group label {
-           font-weight: 500;
-           margin-bottom: 10px;
-           display: block;
-       }
-   </style>
-</head>
-<body>
-   <div class="container contact-section">
-       <div class="contact-header">
-           <h1>Liên Hệ Với Chúng Tôi</h1>
-           <p>Hãy để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất</p>
-       </div>
-       
-       <div class="contact-form">
-           <div class="contact-info">
-               <div class="row">
-                   <div class="col-md-4">
-                       <div class="contact-info-item">
-                           <div class="contact-icon">
-                               <i class="fas fa-map-marker-alt"></i>
-                           </div>
-                           <div>
-                               <h5>Địa Chỉ</h5>
-                               <p>19 Lê Duẩn, Quyết tâm, TP-Sơn La</p>
-                           </div>
-                       </div>
-                   </div>
-                   <div class="col-md-4">
-                       <div class="contact-info-item">
-                           <div class="contact-icon">
-                               <i class="fas fa-phone"></i>
-                           </div>
-                           <div>
-                               <h5>Điện Thoại</h5>
-                               <p>+84 899 813 764</p>
-                           </div>
-                       </div>
-                   </div>
-                   <div class="col-md-4">
-                       <div class="contact-info-item">
-                           <div class="contact-icon">
-                               <i class="fas fa-envelope"></i>
-                           </div>
-                           <div>
-                               <h5>Email</h5>
-                               <p>info@powergym.com</p>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
-            <form id="contactForm">
-               <div class="row">
-                   <div class="col-md-6">
-                       <div class="form-group">
-                           <label for="name">Họ Tên</label>
-                           <input type="text" class="form-control" id="name" required>
-                       </div>
-                   </div>
-                   <div class="col-md-6">
-                       <div class="form-group">
-                           <label for="email">Email</label>
-                           <input type="email" class="form-control" id="email" required>
-                       </div>
-                   </div>
-               </div>
-               <div class="form-group">
-                   <label for="subject">Tiêu Đề</label>
-                   <input type="text" class="form-control" id="subject" required>
-               </div>
-               <div class="form-group">
-                   <label for="message">Tin Nhắn</label>
-                   <textarea class="form-control" id="message" rows="5" required></textarea>
-               </div>
-               <div class="text-center mt-4">
-                   <button type="submit" class="btn btn-submit">
-                       <i class="fas fa-paper-plane me-2"></i>Gửi Tin Nhắn
-                   </button>
-               </div>
-           </form>
-           <div class="success-message" id="successMessage">
-               <i class="fas fa-check-circle fa-3x mb-3"></i>
-               <h4>Cảm ơn bạn đã liên hệ!</h4>
-               <p>Chúng tôi sẽ phản hồi trong thời gian sớm nhất.</p>
-           </div>
-       </div>
-   </div>
-    <!-- Scripts -->
-   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-   <script>
-       $(document).ready(function() {
-           // Form submission
-           $('#contactForm').on('submit', function(e) {
-               e.preventDefault();
-               
-               // Thêm hiệu ứng loading
-               $('.btn-submit').prop('disabled', true).html(
-                   '<span class="spinner-border spinner-border-sm me-2"></span>Đang gửi...'
-               );
-               
-               // Giả lập gửi form (thay thế bằng AJAX thực tế)
-               setTimeout(function() {
-                   $('#contactForm').slideUp();
-                   $('#successMessage').fadeIn();
-               }, 1500);
-           });
-            // Hiệu ứng cho input
-           $('.form-control').focus(function() {
-               $(this).parent().addClass('focused');
-           }).blur(function() {
-               if ($(this).val() === '') {
-                   $(this).parent().removeClass('focused');
-               }
-           });
-       });
-   </script>
+
+
+<div class="container contact-section py-5">
+    <div class="contact-header text-center mb-5">
+        <h1 class="display-4 fw-bold">Liên Hệ Với Chúng Tôi</h1>
+        <p class="lead text-muted">Hãy để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất</p>
+    </div>
+    
+    <div class="contact-form">
+        <div class="contact-info mb-5">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="contact-info-item h-100 p-4 bg-white rounded-3 shadow-sm">
+                        <div class="contact-icon mb-3">
+                            <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold">Địa Chỉ</h5>
+                            <p class="mb-0 text-muted">19 Lê Duẩn, Quyết tâm, TP-Sơn La</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-info-item h-100 p-4 bg-white rounded-3 shadow-sm">
+                        <div class="contact-icon mb-3">
+                            <i class="fas fa-phone fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold">Điện Thoại</h5>
+                            <p class="mb-0 text-muted">+84 899 813 764</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-info-item h-100 p-4 bg-white rounded-3 shadow-sm">
+                        <div class="contact-icon mb-3">
+                            <i class="fas fa-envelope fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold">Email</h5>
+                            <p class="mb-0 text-muted">info@powergym.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <form id="contactForm" class="needs-validation" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="name" placeholder="Họ tên" required>
+                                        <label for="name">Họ Tên</label>
+                                        <div class="invalid-feedback">
+                                            Vui lòng nhập họ tên của bạn
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="email" class="form-control" id="email" placeholder="Email" required>
+                                        <label for="email">Email</label>
+                                        <div class="invalid-feedback">
+                                            Vui lòng nhập email hợp lệ
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="subject" placeholder="Tiêu đề" required>
+                                <label for="subject">Tiêu Đề</label>
+                                <div class="invalid-feedback">
+                                    Vui lòng nhập tiêu đề
+                                </div>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <textarea class="form-control" id="message" style="height: 150px" placeholder="Tin nhắn" required></textarea>
+                                <label for="message">Tin Nhắn</label>
+                                <div class="invalid-feedback">
+                                    Vui lòng nhập nội dung tin nhắn
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    <i class="fas fa-paper-plane me-2"></i>Gửi Tin Nhắn
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <i class="fas fa-check-circle fa-3x mb-3"></i>
+            <h4>Cảm ơn bạn đã liên hệ!</h4>
+            <p>Chúng tôi sẽ phản hồi trong thời gian sớm nhất.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+.contact-section {
+    background-color: #f8f9fa;
+}
+
+.contact-info-item {
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.contact-info-item:hover {
+    transform: translateY(-5px);
+}
+
+.contact-icon {
+    color: var(--bs-primary);
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary {
+    padding: 0.8rem 2rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.success-message {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 500px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.5s ease-out;
+}
+
+.success-message i {
+    color: #28a745;
+    margin-bottom: 1.5rem;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.success-message h4 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.success-message p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+</style>
+
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            } else {
+                event.preventDefault()
+                // Show success message
+                form.style.display = 'none'
+                document.getElementById('successMessage').style.display = 'block'
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>

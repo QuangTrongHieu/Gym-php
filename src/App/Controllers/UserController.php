@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Models\User;
 use App\Models\Address;
 use Core\Database;
-
+use Core\Helpers\FileUploader;
 use Exception;
 
 class UserController extends BaseController
@@ -13,6 +13,7 @@ class UserController extends BaseController
     private $userModel;
     private $addressModel;
     private $db;
+    private $uploader;
 
     public function __construct()
     {
@@ -20,12 +21,13 @@ class UserController extends BaseController
         $this->userModel = new User();
         $this->addressModel = new Address();
         $this->db = Database::getInstance()->getConnection();
+        $this->uploader = new FileUploader();
     }
 
     public function index()
     {
         // Điều hướng từ /user sang /user/profile
-        header('Location: /ecommerce-php/user/profile');
+        header('Location: /gym-php/user/profile');
         exit();
     }
 
@@ -57,54 +59,49 @@ class UserController extends BaseController
 
     public function updateProfile()
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('user/profile');
+        }
+
+        $userId = $_SESSION['user_id'];
+        $user = $this->userModel->findById($userId);
+
         try {
-            if (!$this->auth->isLoggedIn()) {
-                throw new Exception('Vui lòng đăng nhập');
-            }
-
-            $userId = $this->auth->getUserId();
-
-            // Validate dữ liệu
-            $fullName = $_POST['fullName'] ?? '';
-            $sex = $_POST['sex'] ?? '';
-            $dateOfBirth = $_POST['dateOfBirth'] ?? '';
-
-            if (empty($fullName) || empty($sex) || empty($dateOfBirth)) {
-                throw new Exception('Vui lòng điền đầy đủ thông tin');
-            }
-
-            // Cập nhật thông tin
-            $updateData = [
-                'fullName' => $fullName,
-                'sex' => $sex,
-                'dateOfBirth' => $dateOfBirth
+            $data = [
+                'fullName' => $_POST['fullName'],
+                'email' => $_POST['email'],
+                'phone' => $_POST['phone']
+                // thêm các trường khác nếu cần
             ];
 
-            $this->userModel->update($userId, $updateData);
+            // Xử lý upload ảnh
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                $data['avatar'] = $this->uploader->handleProfileImage($_FILES['avatar'], $user['avatar']);
+            }
 
-            echo json_encode([
-                'success' => true,
-                'message' => 'Cập nhật thông tin thành công'
-            ]);
-
-        } catch (Exception $e) {
-            echo json_encode([
-                'success' => false,
-                'error' => $e->getMessage()
-            ]);
+            if ($this->userModel->update($userId, $data)) {
+                $_SESSION['success'] = 'Cập nhật thông tin thành công.';
+            } else {
+                throw new \Exception('Có lỗi xảy ra khi cập nhật thông tin.');
+            }
+        } catch (\Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
         }
+
+        $this->redirect('user/profile');
     }
 
     public function updateAvatar()
     {
         try {
             if (!$this->auth->isLoggedIn()) {
-                throw new Exception('Unauthorized');
+                throw new Exception('Vui lòng đăng nhập');
             }
 
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 throw new Exception('Invalid request method');
             }
+
 
             $userId = $this->auth->getUserId();
 
@@ -114,60 +111,40 @@ class UserController extends BaseController
             }
 
             $file = $_FILES['avatar'];
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            
+            // Validate file size (max 1MB)
+            if ($file['size'] > 1048576) {
+                throw new Exception('Kích thước file không được vượt quá 1MB');
+            }
 
+            // Validate file type
+            $allowedTypes = ['image/jpeg', 'image/png'];
             if (!in_array($file['type'], $allowedTypes)) {
-                throw new Exception('Chỉ chấp nhận file ảnh (JPG, PNG, GIF)');
+                throw new Exception('Chỉ chấp nhận file ảnh JPG hoặc PNG');
             }
 
-            // Tạo tên file mới
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $newFileName = 'avatar_' . $userId . '_' . time() . '.' . $extension;
-            $uploadPath = ROOT_PATH . '/public/uploads/avatars/' . $newFileName;
+            try {
+                // Upload avatar using User model method
+                $avatarPath = $this->userModel->updateAvatar($userId, $file);
+                
+                // Update session
+                $_SESSION['user']['avatar'] = $avatarPath;
 
-            // Di chuyển file
-            if (!move_uploaded_file($file['tmp_name'], $uploadPath)) {
-                throw new Exception('Không thể lưu file');
+                $this->json([
+                    'success' => true,
+                    'message' => 'Cập nhật ảnh đại diện thành công',
+                    'avatar' => $avatarPath
+                ]);
+            } catch (\RuntimeException $e) {
+                throw new Exception($e->getMessage());
             }
-
-            // Cập nhật DB
-            $data = ['avatar' => '/uploads/avatars/' . $newFileName];
-            $this->userModel->update($userId, $data);
-
-            // Cập nhật session
-            $_SESSION['avatar'] = $data['avatar'];
-
-            $this->json([
-                'success' => true,
-                'message' => 'Cập nhật avatar thành công',
-                'avatar' => $data['avatar']
-            ]);
 
         } catch (Exception $e) {
-            $this->error($e->getMessage());
+            $this->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
         }
-    }
-
-    protected function maskEmail($email)
-    {
-        if (!$email)
-            return '';
-
-        $parts = explode('@', $email);
-        if (count($parts) !== 2)
-            return $email;
-
-        $name = $parts[0];
-        $domain = $parts[1];
-        $maskedName = substr($name, 0, 2) . str_repeat('*', max(strlen($name) - 2, 0));
-        return $maskedName . '@' . $domain;
-    }
-
-    protected function maskPhone($phone)
-    {
-        if (!$phone)
-            return '';
-        return substr($phone, 0, 3) . str_repeat('*', max(strlen($phone) - 5, 0)) . substr($phone, -2);
     }
 
     public function updateEmail()
@@ -338,7 +315,7 @@ class UserController extends BaseController
 
             // Cập nhật địa chỉ
             $updateData = [
-                'userId' => $userId, // Cần thiết cho việc kiểm tra quyền sở hữu
+                'userId' => $userId, // Cần thiết cho việc kiểm tra quyền sở hữ
                 'fullName' => $fullName,
                 'phoneNumber' => $phoneNumber,
                 'address' => $address
@@ -399,5 +376,27 @@ class UserController extends BaseController
         } catch (Exception $e) {
             $this->error($e->getMessage());
         }
+    }
+
+    protected function maskEmail($email)
+    {
+        if (!$email)
+            return '';
+
+        $parts = explode('@', $email);
+        if (count($parts) !== 2)
+            return $email;
+
+        $name = $parts[0];
+        $domain = $parts[1];
+        $maskedName = substr($name, 0, 2) . str_repeat('*', max(strlen($name) - 2, 0));
+        return $maskedName . '@' . $domain;
+    }
+
+    protected function maskPhone($phone)
+    {
+        if (!$phone)
+            return '';
+        return substr($phone, 0, 3) . str_repeat('*', max(strlen($phone) - 5, 0)) . substr($phone, -2);
     }
 }

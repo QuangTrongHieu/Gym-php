@@ -4,7 +4,8 @@
 
     <div class="row">
         <div class="col-md-8">
-            <form id="profileForm" action="/gym-php/user/profile/update" method="POST">
+            <form id="profileForm" action="/gym-php/user/updateProfile" method="POST">
+                <input type="hidden" name="csrf_token" value="<?= $this->csrf_token ?>" />
                 <div class="mb-3">
                     <label class="form-label">Tên đăng nhập</label>
                     <input type="text" 
@@ -17,7 +18,7 @@
                     <label class="form-label">Họ và tên</label>
                     <input type="text" 
                            name="fullName" 
-                           value="<?= isset($fullName) ? htmlspecialchars($fullName) : '' ?>"
+                           value="<?= isset($fullName) ? htmlspecialchars($fullName) : '' ?>" 
                            required />
                 </div>
 
@@ -45,7 +46,7 @@
                                value="<?= isset($phone) ? htmlspecialchars($phone) : '' ?>" 
                                readonly />
                         <button type="button" 
-                                class="btn btn-outline-primary"
+                                class="btn btn-outline-primary" 
                                 data-bs-toggle="modal" 
                                 data-bs-target="#changePhoneModal">
                             Thay đổi
@@ -62,12 +63,12 @@
                             <label class="form-check-label">Nam</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="sex" value="Female"
+                            <input class="form-check-input" type="radio" name="sex" value="Female" 
                                 <?= (isset($sex) && $sex == 'Female') ? 'checked' : '' ?> />
                             <label class="form-check-label">Nữ</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="sex" value="Other"
+                            <input class="form-check-input" type="radio" name="sex" value="Other" 
                                 <?= (isset($sex) && $sex == 'Other') ? 'checked' : '' ?> />
                             <label class="form-check-label">Khác</label>
                         </div>
@@ -89,13 +90,14 @@
         <div class="col-md-4">
             <div class="text-center">
                 <div class="mb-3">
-                    <img src="<?= isset($user['avatar']) ? '/gym-php/public' . $user['avatar'] : 'https://placehold.co/200x200?text=Avatar' ?>" 
+                    <img src="<?= isset($user['avatar']) ? '/gym-php/public' . $user['avatar'] : '/gym-php/public/assets/images/default-avatar.png' ?>" 
                          alt="Avatar" 
-                         class="rounded-circle img-thumbnail"
+                         class="rounded-circle img-thumbnail" 
                          style="width: 200px; height: 200px; object-fit: cover;" />
                 </div>
                 
-                <form id="avatarForm" action="/gym-php/user/profile/update-avatar" method="POST" enctype="multipart/form-data">
+                <form id="avatarForm" action="/gym-php/user/updateAvatar" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="<?= $this->csrf_token ?>" />
                     <input type="file" 
                            name="avatar" 
                            id="avatarInput" 
@@ -125,7 +127,8 @@ document.getElementById('avatarInput').addEventListener('change', function() {
         
         fetch(form.action, {
             method: 'POST',
-            body: formData
+            body: formData,
+            credentials: 'same-origin'
         })
         .then(response => response.json())
         .then(data => {
@@ -148,7 +151,8 @@ document.getElementById('profileForm').addEventListener('submit', async function
     try {
         const response = await fetch(this.action, {
             method: 'POST',
-            body: new FormData(this)
+            body: new FormData(this),
+            credentials: 'same-origin'
         });
         
         const data = await response.json();

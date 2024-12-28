@@ -6,7 +6,7 @@
                 <h5 class="text-primary fw-bold mb-4 border-bottom pb-2">MENU</h5>
                 <ul class="list-unstyled footer-links">
                     <li class="mb-3">
-                        <a href="../programs.php" class="text-light hover-effect">
+                        <a href="gym-php/programs" class="text-light hover-effect">
                             <i class="fas fa-dumbbell me-2"></i>Chương Trình Tập
                         </a>
                     </li>
@@ -16,19 +16,19 @@
                         </a>
                     </li>
                     <li class="mb-3">
-                        <a href="../schedule.php" class="text-light hover-effect">
+                        <a href="gym-php/user/training" class="text-light hover-effect">
                             <i class="far fa-calendar-alt me-2"></i>Lịch Tập
                         </a>
                     </li>
                     <li class="mb-3">
-                        <a href="my_account.php" class="text-light hover-effect">
+                        <a href="gym-php/user/profile" class="text-light hover-effect">
                             <i class="fas fa-user-circle me-2"></i>Tài Khoản
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <!-- Cột 2: Dịch vụ -->
+            <!-- Cột 2: Dịch vụ
             <div class="col-md-3 col-sm-6 mb-4">
                 <h5 class="text-primary fw-bold mb-4 border-bottom pb-2">DỊCH VỤ</h5>
                 <ul class="list-unstyled footer-services">
@@ -38,7 +38,7 @@
                     <li class="mb-3"><i class="fas fa-fire-alt me-2"></i>CrossFit</li>
                     <li class="mb-3"><i class="fas fa-apple-alt me-2"></i>Dinh Dưỡng Thể Thao</li>
                 </ul>
-            </div>
+            </div> -->
 
             <!-- Cột 3: Thông tin liên hệ -->
             <div class="col-md-3 col-sm-6 mb-4">

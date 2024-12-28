@@ -6,13 +6,13 @@
             <?= $_SESSION['success']; unset($_SESSION['success']); ?>
         </div>
     <?php endif; ?>
-
+    
     <?php if(isset($_SESSION['error'])): ?>
         <div class="alert alert-danger">
             <?= $_SESSION['error']; unset($_SESSION['error']); ?>
         </div>
     <?php endif; ?>
-
+    
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-table me-1"></i>
@@ -60,11 +60,6 @@
                             <a href="/gym-php/admin/member/edit/<?= $member['id'] ?>" class="btn btn-sm btn-primary">
                                 <i class="fas fa-edit"></i> Sửa
                             </a>
-                            <form action="/gym-php/admin/member/delete/<?= $member['id'] ?>" method="POST" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">
-                                    <i class="fas fa-trash"></i> Xóa
-                                </button>
-                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>

@@ -4,11 +4,13 @@ namespace App\Controllers;
 
 use App\Models\User;
 use App\Models\MembershipRegistration;
+use App\Models\Package;
 
 class MemberController extends BaseController
 {
     private $userModel;
     private $membershipModel;
+    private $packageModel;
 
     public function __construct()
     {
@@ -16,6 +18,7 @@ class MemberController extends BaseController
         $this->checkRole(['ADMIN']);
         $this->userModel = new User();
         $this->membershipModel = new MembershipRegistration();
+        $this->packageModel = new Package();
     }
 
     public function index()
@@ -55,98 +58,123 @@ class MemberController extends BaseController
     {
         try {
             $member = $this->userModel->findById($id);
+            $packages = $this->packageModel->findAll();
+            
             if (!$member) {
                 $_SESSION['error'] = 'Không tìm thấy thành viên';
                 $this->redirect('admin/member');
                 return;
             }
 
+            // Get membership data for display
+            $membership = $this->membershipModel->findByUserId($id);
+            if ($membership) {
+                $member['package'] = $membership['packageId'];
+                $member['startDate'] = date('Y-m-d', strtotime($membership['startDate']));
+                $member['endDate'] = date('Y-m-d', strtotime($membership['endDate']));
+            }
+
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Validate input
-                if (empty($_POST['fullName']) || empty($_POST['email']) || empty($_POST['phone']) || 
-                    empty($_POST['package']) || empty($_POST['startDate']) || empty($_POST['endDate'])) {
-                    throw new \Exception('Vui lòng điền đầy đủ thông tin');
+                if (empty($_POST['fullName']) || empty($_POST['email']) || empty($_POST['phone'])) {
+                    $_SESSION['error'] = 'Vui lòng điền đầy đủ thông tin bắt buộc';
+                    $this->view('admin/members/edit', [
+                        'member' => array_merge($member, $_POST),
+                        'packages' => $packages
+                    ]);
+                    return;
                 }
 
                 // Validate email format
                 if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-                    throw new \Exception('Email không hợp lệ');
+                    $_SESSION['error'] = 'Email không hợp lệ';
+                    $this->view('admin/members/edit', [
+                        'member' => array_merge($member, $_POST),
+                        'packages' => $packages
+                    ]);
+                    return;
                 }
 
                 // Validate phone number
                 if (!preg_match('/^[0-9]{10}$/', $_POST['phone'])) {
-                    throw new \Exception('Số điện thoại không hợp lệ');
+                    $_SESSION['error'] = 'Số điện thoại không hợp lệ';
+                    $this->view('admin/members/edit', [
+                        'member' => array_merge($member, $_POST),
+                        'packages' => $packages
+                    ]);
+                    return;
                 }
 
-                // Validate dates
-                $startDate = strtotime($_POST['startDate']);
-                $endDate = strtotime($_POST['endDate']);
-                if ($endDate <= $startDate) {
-                    throw new \Exception('Ngày kết thúc phải sau ngày bắt đầu');
+                // Check if email exists for other users
+                $existingUser = $this->userModel->findByEmail($_POST['email']);
+                if ($existingUser && $existingUser['id'] != $id) {
+                    $_SESSION['error'] = 'Email đã được sử dụng';
+                    $this->view('admin/members/edit', [
+                        'member' => array_merge($member, $_POST),
+                        'packages' => $packages
+                    ]);
+                    return;
+                }
+
+                // Check if phone exists for other users
+                $existingUser = $this->userModel->findByPhone($_POST['phone']);
+                if ($existingUser && $existingUser['id'] != $id) {
+                    $_SESSION['error'] = 'Số điện thoại đã được sử dụng';
+                    $this->view('admin/members/edit', [
+                        'member' => array_merge($member, $_POST),
+                        'packages' => $packages
+                    ]);
+                    return;
                 }
 
                 // Update user data
                 $userData = [
+                    'id' => $id,
                     'fullName' => $_POST['fullName'],
                     'email' => $_POST['email'],
                     'phone' => $_POST['phone'],
                     'status' => $_POST['status']
                 ];
 
-                // Update membership data
-                $membershipData = [
-                    'package' => $_POST['package'],
-                    'startDate' => $_POST['startDate'],
-                    'endDate' => $_POST['endDate']
-                ];
+                $success = $this->userModel->update($userData);
 
-                $this->userModel->beginTransaction();
-                
-                try {
-                    // Update user
-                    if (!$this->userModel->update($id, $userData)) {
-                        throw new \Exception('Không thể cập nhật thông tin thành viên');
-                    }
+                if ($success) {
+                    // Update membership data
+                    $membershipData = [
+                        'userId' => $id,
+                        'packageId' => $_POST['package'],
+                        'startDate' => $_POST['startDate'],
+                        'endDate' => $_POST['endDate']
+                    ];
 
-                    // Update or create membership
-                    $membership = $this->membershipModel->findByUserId($id);
                     if ($membership) {
-                        if (!$this->membershipModel->update($membership['id'], $membershipData)) {
-                            throw new \Exception('Không thể cập nhật thông tin gói tập');
-                        }
+                        // Update existing membership
+                        $this->membershipModel->update($membershipData);
                     } else {
-                        $membershipData['userId'] = $id;
-                        if (!$this->membershipModel->create($membershipData)) {
-                            throw new \Exception('Không thể tạo gói tập mới');
-                        }
+                        // Create new membership
+                        $this->membershipModel->create($membershipData);
                     }
 
-                    $this->userModel->commit();
-                    $_SESSION['success'] = 'Cập nhật thành viên thành công';
+                    $_SESSION['success'] = 'Cập nhật thông tin thành công';
                     $this->redirect('admin/member');
                     return;
-
-                } catch (\Exception $e) {
-                    $this->userModel->rollback();
-                    throw $e;
+                } else {
+                    $_SESSION['error'] = 'Có lỗi xảy ra khi cập nhật thông tin';
+                    $this->view('admin/members/edit', [
+                        'member' => array_merge($member, $_POST),
+                        'packages' => $packages
+                    ]);
+                    return;
                 }
             }
 
-            // Get membership data for display
-            $membership = $this->membershipModel->findByUserId($id);
-            if ($membership) {
-                $member['package'] = $membership['package'];
-                $member['startDate'] = $membership['startDate'];
-                $member['endDate'] = $membership['endDate'];
-            }
-
             $this->view('admin/members/edit', [
-                'title' => 'Sửa thông tin thành viên',
-                'member' => $member
+                'member' => $member,
+                'packages' => $packages
             ]);
 
-        } catch (\Exception $e) {
-            $_SESSION['error'] = $e->getMessage();
+        } catch (Exception $e) {
+            $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
             $this->redirect('admin/member');
         }
     }
@@ -270,7 +298,20 @@ class MemberController extends BaseController
 
     public function destroy($id)
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['error'] = 'Phương thức không hợp lệ';
+            $this->redirect('admin/member');
+            return;
+        }
+
         try {
+            $member = $this->userModel->findById($id);
+            if (!$member) {
+                $_SESSION['error'] = 'Không tìm thấy hội viên';
+                $this->redirect('admin/member');
+                return;
+            }
+
             $this->userModel->beginTransaction();
 
             // Delete membership registration first
