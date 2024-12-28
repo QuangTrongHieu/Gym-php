@@ -4,12 +4,18 @@ namespace App\Controllers;
 
 use App\Models\Admin;
 use App\Models\Package;
-
+use App\Models\User;
+use App\Models\Trainer;
+use App\Models\Schedule;
+use Core\View;
 
 class AdminController extends BaseController
 {
     private $model;
     private $packageModel;
+    private $userModel;
+    private $trainerModel;
+    private $scheduleModel;
 
     public function __construct()
     {
@@ -17,6 +23,9 @@ class AdminController extends BaseController
         $this->checkRole(['ADMIN']);
         $this->model = new Admin();
         $this->packageModel = new Package();
+        $this->userModel = new User();
+        $this->trainerModel = new Trainer();
+        $this->scheduleModel = new Schedule();
     }
 
     public function index()
@@ -152,4 +161,6 @@ class AdminController extends BaseController
             exit;
         }
     }
+
+    
 }

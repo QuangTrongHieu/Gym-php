@@ -18,6 +18,13 @@ $router->add("/admin/admin-management/create", ["controller" => "Admin", "action
 $router->add("/admin/admin-management/edit/{id:\d+}", ["controller" => "Admin", "action" => "edit"]);
 $router->add("/admin/admin-management/delete/{id:\d+}", ["controller" => "Admin", "action" => "delete"]);
 
+// Admin Schedule routes
+$router->add("/admin/schedule", ["controller" => "Schedule", "action" => "index"]);
+$router->add("/admin/schedule/create", ["controller" => "Schedule", "action" => "create"]);
+$router->add("/admin/schedule/update/{id:\d+}", ["controller" => "Schedule", "action" => "update"]);
+$router->add("/admin/schedule/delete/{id:\d+}", ["controller" => "Schedule", "action" => "delete"]);
+
+// Admin Trainer routes
 $router->add('/admin/trainer', ['controller' => 'Trainer', 'action' => 'index']);
 $router->add('/admin/trainer/create', ['controller' => 'Trainer', 'action' => 'create']);
 $router->add('/admin/trainer/edit/{id:\d+}', ['controller' => 'Trainer', 'action' => 'edit']);
@@ -40,17 +47,11 @@ $router->add('/admin/member/delete/{id:\d+}', ['controller' => 'member', 'action
 
 $router->add('/admin/revenue', ['controller' => 'revenue', 'action' => 'index']);
 
-// Admin Schedule routes
-$router->add('/admin/schedule', ['controller' => 'Schedule', 'action' => 'index']);
-$router->add('/admin/schedule/create', ['controller' => 'Schedule', 'action' => 'create']);
-$router->add('/admin/schedule/update/{id:\d+}', ['controller' => 'Schedule', 'action' => 'update']);
-$router->add('/admin/schedule/delete/{id:\d+}', ['controller' => 'Schedule', 'action' => 'delete']);
-
-// Package management routes
-$router->add('/admin/packages', ['controller' => 'Packages', 'action' => 'index']);
-$router->add('/admin/packages/create', ['controller' => 'Packages', 'action' => 'create']);
-$router->add('/admin/packages/edit/{id:\d+}', ['controller' => 'Packages', 'action' => 'edit']);
-$router->add('/admin/packages/delete/{id:\d+}', ['controller' => 'Packages', 'action' => 'delete']);
+// // Package management routes
+// $router->add('/admin/packages', ['controller' => 'Packages', 'action' => 'index']);
+// $router->add('/admin/packages/create', ['controller' => 'Packages', 'action' => 'create']);
+// $router->add('/admin/packages/edit/{id:\d+}', ['controller' => 'Packages', 'action' => 'edit']);
+// $router->add('/admin/packages/delete/{id:\d+}', ['controller' => 'Packages', 'action' => 'delete']);
 
 // Auth routes
 $router->add("/login", ["controller" => "Auth", "action" => "login"]);
