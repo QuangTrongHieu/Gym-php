@@ -8,7 +8,7 @@
         <p class="mb-0">Hành động này không thể hoàn tác.</p>
     </div>
 
-    <form action="/gym-php/admin/member/delete/<?= $member['id'] ?>" method="POST">
+    <form action="/gym-php/admin/member-management/delete/<?= $member['id'] ?>" method="POST">
         <input type="hidden" name="id" value="<?= $member['id'] ?>">
         
         <div class="mb-3">

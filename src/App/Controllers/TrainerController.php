@@ -9,56 +9,101 @@ class TrainerController extends BaseController
 {
     private $trainerModel;
     private $uploader;
-    private const UPLOAD_DIR = 'trainers'; // Consistent upload directory
+    private const UPLOAD_DIR = 'public/uploads/trainers';
+    private const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    private const ALLOWED_TYPES = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif',
+        'image/webp' => 'webp'
+    ];
 
     public function __construct()
     {
         parent::__construct();
         $this->trainerModel = new Trainer();
         $this->uploader = new FileUploader();
+        
+        // Ensure upload directory exists
+        $uploadPath = ROOT_PATH . '/' . self::UPLOAD_DIR;
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
     }
 
     private function handleImageUpload($file, $oldAvatar = null) {
         if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
-            return false;
+            if ($file['error'] === UPLOAD_ERR_NO_FILE) {
+                return false; // No file uploaded, not an error
+            }
+            throw new \Exception($this->getFileErrorMessage($file['error']));
         }
 
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!in_array($file['type'], $allowedTypes)) {
+        // Validate file size
+        if ($file['size'] > self::MAX_FILE_SIZE) {
+            throw new \Exception('Kích thước file quá lớn. Giới hạn ' . (self::MAX_FILE_SIZE / 1024 / 1024) . 'MB');
+        }
+
+        // Validate MIME type
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        if (!array_key_exists($mimeType, self::ALLOWED_TYPES)) {
             throw new \Exception('Loại file không được hỗ trợ. Chỉ chấp nhận file ảnh (JPG, PNG, GIF, WEBP)');
         }
 
-        $uploadDir = ROOT_PATH . '/public/uploads/trainers/';
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
+        $uploadDir = ROOT_PATH . '/' . self::UPLOAD_DIR . '/';
 
-        // Xóa ảnh cũ nếu có và không phải ảnh mặc định
+        // Delete old avatar if exists
         if ($oldAvatar && $oldAvatar !== 'default.jpg') {
             $oldAvatarPath = $uploadDir . $oldAvatar;
-            if (file_exists($oldAvatarPath)) {
+            if (file_exists($oldAvatarPath) && is_file($oldAvatarPath)) {
                 unlink($oldAvatarPath);
             }
         }
 
-        $fileName = uniqid() . '_' . time() . '_' . basename($file['name']);
+        // Generate safe filename
+        $extension = self::ALLOWED_TYPES[$mimeType];
+        $fileName = 'trainer_' . uniqid() . '_' . time() . '.' . $extension;
         $targetPath = $uploadDir . $fileName;
 
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            return $fileName;
+        // Validate image dimensions and content
+        $imageInfo = getimagesize($file['tmp_name']);
+        if ($imageInfo === false) {
+            throw new \Exception('File không phải là hình ảnh hợp lệ');
         }
 
-        return false;
+        // Move uploaded file
+        if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+            throw new \Exception('Không thể lưu file. Vui lòng kiểm tra quyền thư mục');
+        }
+
+        // Set secure permissions
+        chmod($targetPath, 0644);
+
+        return $fileName;
     }
 
-    // public function trainerDetail($id)
-    // {
-    //     $trainer = $this->trainerModel->getTrainerById($id);
-    //     $this->view('admin/trainer/trainerDetail', [
-    //         'title' => 'Chi tiết huấn luyện viên',
-    //         'trainer' => $trainer
-    //     ]);
-    // }
+    private function getFileErrorMessage($error) {
+        switch ($error) {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                return 'File vượt quá kích thước cho phép (' . (self::MAX_FILE_SIZE / 1024 / 1024) . 'MB)';
+            case UPLOAD_ERR_PARTIAL:
+                return 'File chỉ được tải lên một phần. Vui lòng thử lại';
+            case UPLOAD_ERR_NO_FILE:
+                return 'Không có file nào được tải lên';
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return 'Thiếu thư mục tạm. Vui lòng liên hệ quản trị viên';
+            case UPLOAD_ERR_CANT_WRITE:
+                return 'Không thể ghi file. Vui lòng kiểm tra quyền thư mục';
+            case UPLOAD_ERR_EXTENSION:
+                return 'Upload bị chặn bởi extension';
+            default:
+                return 'Lỗi không xác định (' . $error . ')';
+        }
+    }
 
     public function index()
     {
@@ -113,40 +158,53 @@ class TrainerController extends BaseController
     public function edit($id)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = [
-                'username' => $_POST['username'],
-                'fullName' => $_POST['fullName'],
-                'email' => $_POST['email'],
-                'dateOfBirth' => $_POST['dateOfBirth'],
-                'sex' => $_POST['sex'],
-                'phone' => $_POST['phone'],
-                'specialization' => $_POST['specialization'],
-                'experience' => $_POST['experience'],
-                'certification' => $_POST['certification'],
-                'salary' => $_POST['salary']
-            ];
-
-            // Handle password update
-            if (!empty($_POST['password'])) {
-                $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            }
-
             try {
+                // Validate trainer exists
+                $trainer = $this->trainerModel->getTrainerById($id);
+                if (!$trainer) {
+                    throw new \Exception('Không tìm thấy huấn luyện viên');
+                }
+
+                $data = [
+                    'username' => $_POST['username'],
+                    'fullName' => $_POST['fullName'],
+                    'email' => $_POST['email'],
+                    'dateOfBirth' => $_POST['dateOfBirth'],
+                    'sex' => $_POST['sex'],
+                    'phone' => $_POST['phone'],
+                    'specialization' => $_POST['specialization'],
+                    'experience' => $_POST['experience'],
+                    'certification' => $_POST['certification'],
+                    'salary' => $_POST['salary']
+                ];
+
+                // Handle password update
+                if (!empty($_POST['password'])) {
+                    $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                }
+
                 // Handle avatar upload
-                if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-                    $oldTrainer = $this->trainerModel->getTrainerById($id);
-                    $fileName = $this->handleImageUpload($_FILES['avatar'], $oldTrainer['avatar'] ?? null);
+                if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] !== UPLOAD_ERR_NO_FILE) {
+                    $fileName = $this->handleImageUpload($_FILES['avatar'], $trainer['avatar'] ?? null);
                     if ($fileName) {
                         $data['avatar'] = $fileName;
                     }
                 }
 
-                if ($this->trainerModel->update($id, $data)) {
-                    $_SESSION['success'] = 'Cập nhật thông tin huấn luyện viên thành công';
-                } else {
+                // Start transaction
+                $this->trainerModel->beginTransaction();
+
+                if (!$this->trainerModel->update($id, $data)) {
                     throw new \Exception('Không thể cập nhật thông tin huấn luyện viên');
                 }
+
+                $this->trainerModel->commit();
+                $_SESSION['success'] = 'Cập nhật thông tin huấn luyện viên thành công';
+
             } catch (\Exception $e) {
+                if ($this->trainerModel->inTransaction()) {
+                    $this->trainerModel->rollBack();
+                }
                 $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
             }
 
@@ -161,11 +219,24 @@ class TrainerController extends BaseController
     public function delete($id)
     {
         try {
+            if (empty($id)) {
+                throw new \Exception('ID huấn luyện viên không hợp lệ');
+            }
+
+            // Fetch trainer with validation
             $trainer = $this->trainerModel->findById($id);
             if (!$trainer) {
-                $_SESSION['error'] = 'Không tìm thấy huấn luyện viên';
-                $this->redirect('admin/trainer');
-                return;
+                throw new \Exception('Không tìm thấy huấn luyện viên');
+            }
+
+            // Check if trainer has active assignments or schedules
+            $hasActiveSchedules = $this->trainerModel->hasActiveSchedules($id);
+            if ($hasActiveSchedules) {
+                throw new \Exception('Không thể xóa huấn luyện viên đang có lịch huấn luyện');
+            }
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                return $this->destroy($id);
             }
 
             $this->view('admin/Trainer/delete', [
@@ -181,86 +252,51 @@ class TrainerController extends BaseController
     public function destroy($id)
     {
         try {
-            if ($this->trainerModel->delete($id)) {
-                $_SESSION['success'] = 'Xóa huấn luyện viên thành công';
-            } else {
-                throw new \Exception('Không thể xóa huấn luyện viên');
+            if (empty($id)) {
+                throw new \Exception('ID huấn luyện viên không hợp lệ');
             }
+
+            // Get trainer info before deletion for file cleanup
+            $trainer = $this->trainerModel->findById($id);
+            if (!$trainer) {
+                throw new \Exception('Không tìm thấy huấn luyện viên');
+            }
+
+            // Start transaction if available
+            if (method_exists($this->trainerModel->db, 'beginTransaction')) {
+                $this->trainerModel->db->beginTransaction();
+            }
+
+            // Delete trainer's avatar if it exists and is not the default
+            if (!empty($trainer['avatar']) && $trainer['avatar'] !== 'default.jpg') {
+                $avatarPath = ROOT_PATH . '/public/uploads/trainers/' . $trainer['avatar'];
+                if (file_exists($avatarPath)) {
+                    unlink($avatarPath);
+                }
+            }
+
+            // Delete trainer record
+            if (!$this->trainerModel->delete($id)) {
+                throw new \Exception('Không thể xóa thông tin huấn luyện viên');
+            }
+
+            // Commit transaction if available
+            if (method_exists($this->trainerModel->db, 'commit')) {
+                $this->trainerModel->db->commit();
+            }
+
+            $_SESSION['success'] = 'Xóa huấn luyện viên thành công';
+
         } catch (\Exception $e) {
+            // Rollback transaction if available
+            if (method_exists($this->trainerModel->db, 'rollBack')) {
+                $this->trainerModel->db->rollBack();
+            }
             $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
         }
+
         $this->redirect('admin/trainer');
     }
-
-    // public function export()
-    // {
-    //     require ROOT_PATH . '/vendor/autoload.php';
-        
-    //     $trainers = $this->trainerModel->getAllTrainers();
-        
-    //     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-    //     $sheet = $spreadsheet->getActiveSheet();
-        
-    //     // Set headers
-    //     $sheet->setCellValue('A1', 'ID');
-    //     $sheet->setCellValue('B1', 'Họ tên');
-    //     $sheet->setCellValue('C1', 'Username');
-    //     $sheet->setCellValue('D1', 'Email');
-    //     $sheet->setCellValue('E1', 'Ngày sinh');
-    //     $sheet->setCellValue('F1', 'Giới tính');
-    //     $sheet->setCellValue('G1', 'Số điện thoại');
-    //     $sheet->setCellValue('H1', 'Chuyên môn');
-    //     $sheet->setCellValue('I1', 'Kinh nghiệm');
-    //     $sheet->setCellValue('J1', 'Chứng chỉ');
-    //     $sheet->setCellValue('K1', 'Lương');
-        
-    //     // Style the header
-    //     $headerStyle = [
-    //         'font' => [
-    //             'bold' => true,
-    //         ],
-    //         'fill' => [
-    //             'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-    //             'startColor' => [
-    //                 'rgb' => 'E2EFDA',
-    //             ],
-    //         ],
-    //     ];
-    //     $sheet->getStyle('A1:K1')->applyFromArray($headerStyle);
-        
-    //     // Add data
-    //     $row = 2;
-    //     foreach ($trainers as $trainer) {
-    //         $sheet->setCellValue('A' . $row, $trainer['id']);
-    //         $sheet->setCellValue('B' . $row, $trainer['fullName']);
-    //         $sheet->setCellValue('C' . $row, $trainer['username']);
-    //         $sheet->setCellValue('D' . $row, $trainer['email']);
-    //         $sheet->setCellValue('E' . $row, $trainer['dateOfBirth']);
-    //         $sheet->setCellValue('F' . $row, $trainer['sex']);
-    //         $sheet->setCellValue('G' . $row, $trainer['phone']);
-    //         $sheet->setCellValue('H' . $row, $trainer['specialization']);
-    //         $sheet->setCellValue('I' . $row, $trainer['experience']);
-    //         $sheet->setCellValue('J' . $row, $trainer['certification']);
-    //         $sheet->setCellValue('K' . $row, $trainer['salary']);
-    //         $row++;
-    //     }
-        
-    //     // Auto size columns
-    //     foreach (range('A', 'K') as $col) {
-    //         $sheet->getColumnDimension($col)->setAutoSize(true);
-    //     }
-        
-    //     // Create Excel file
-    //     $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        
-    //     // Set headers for download
-    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    //     header('Content-Disposition: attachment;filename="danh_sach_hlv.xlsx"');
-    //     header('Cache-Control: max-age=0');
-        
-    //     $writer->save('php://output');
-    //     exit;
-    // }
 
     public function list()
     {
@@ -307,7 +343,7 @@ class TrainerController extends BaseController
 
         try {
             // Handle avatar upload
-            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] !== UPLOAD_ERR_NO_FILE) {
                 $fileName = $this->handleImageUpload($_FILES['avatar'], $trainer['avatar'] ?? null);
                 if ($fileName) {
                     $data['avatar'] = $fileName;

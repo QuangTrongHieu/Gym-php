@@ -9,18 +9,41 @@ class Trainer extends BaseModel
     public function __construct()
     {
         parent::__construct();
+        // Set default fetch mode to FETCH_ASSOC
+        $this->db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+    }
+
+    // Transaction methods
+    public function beginTransaction()
+    {
+        return $this->db->beginTransaction();
+    }
+
+    public function commit()
+    {
+        return $this->db->commit();
+    }
+
+    public function rollBack()
+    {
+        return $this->db->rollBack();
+    }
+
+    public function inTransaction()
+    {
+        return $this->db->inTransaction();
     }
 
     public function getAllTrainers() {
         $sql = "SELECT * FROM trainers WHERE status = 'active'";
-        return $this->db->query($sql)->fetchAll();
+        return $this->db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getById($id) {
         $sql = "SELECT * FROM trainers WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id]);
-        return $stmt->fetch();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function create($data) {
@@ -68,7 +91,7 @@ class Trainer extends BaseModel
                 GROUP BY t.id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['trainerId' => $trainerId]);
-        return $stmt->fetch();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function count($whereClause = '', $params = [])
@@ -76,7 +99,7 @@ class Trainer extends BaseModel
         $sql = "SELECT COUNT(*) as total FROM trainers t " . $whereClause;
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
-        $result = $stmt->fetch();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         return (int)$result['total'];
     }
 
@@ -91,7 +114,7 @@ class Trainer extends BaseModel
             $stmt->bindValue($key, $value);
         }
         $stmt->execute();
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getSpecialties($trainerId)
@@ -106,15 +129,12 @@ class Trainer extends BaseModel
     public function findAll()
     {
         $stmt = $this->db->query("SELECT * FROM trainers");
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function findById($id)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch();
+        return $this->getById($id);
     }
 
     public function findByUsername($username)
@@ -122,7 +142,7 @@ class Trainer extends BaseModel
         $sql = "SELECT * FROM {$this->table} WHERE username = :username AND status = 'active'";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['username' => $username]);
-        return $stmt->fetch();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function findActiveTrainers()
@@ -143,7 +163,7 @@ class Trainer extends BaseModel
         $sql = "SELECT * FROM {$this->table} WHERE username = :username AND status = 'ACTIVE'";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['username' => $username]);
-        return $stmt->fetch(\PDO::FETCH_OBJ);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function getTrainerById($id)
@@ -151,7 +171,7 @@ class Trainer extends BaseModel
         $sql = "SELECT * FROM {$this->table} WHERE id = :id AND status = 'ACTIVE'";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id]);
-        return $stmt->fetch(\PDO::FETCH_OBJ);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function updateTrainer($id, $data)
@@ -179,7 +199,7 @@ class Trainer extends BaseModel
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['trainerId' => $trainerId]);
-        $schedules = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        $schedules = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         if (empty($schedules)) {
             return "Không có lịch tập nào sắp tới";
@@ -187,13 +207,13 @@ class Trainer extends BaseModel
 
         $formattedSchedule = "";
         foreach ($schedules as $schedule) {
-            $date = date('d/m/Y', strtotime($schedule->date));
-            $startTime = date('H:i', strtotime($schedule->startTime));
-            $endTime = date('H:i', strtotime($schedule->endTime));
+            $date = date('d/m/Y', strtotime($schedule['date']));
+            $startTime = date('H:i', strtotime($schedule['startTime']));
+            $endTime = date('H:i', strtotime($schedule['endTime']));
             
             $formattedSchedule .= "Ngày: {$date}\n";
             $formattedSchedule .= "Thời gian: {$startTime} - {$endTime}\n";
-            $formattedSchedule .= "Học viên: {$schedule->memberName}\n\n";
+            $formattedSchedule .= "Học viên: {$schedule['memberName']}\n\n";
         }
 
         return rtrim($formattedSchedule);

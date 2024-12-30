@@ -8,9 +8,9 @@ class Package extends BaseModel
 {
     protected $table = 'membership_packages';
 
-    public function __construct()
+    public function __construct($db = null)
     {
-        parent::__construct();
+        parent::__construct($db);
     }
 
     public function findAll()

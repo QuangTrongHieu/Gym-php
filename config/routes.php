@@ -52,6 +52,13 @@ $router->add('/admin/member/export', ['controller' => 'member', 'action' => 'exp
 
 $router->add('/admin/revenue', ['controller' => 'revenue', 'action' => 'index']);
 
+// Admin Member routes
+$router->add('/admin/member-management', ['controller' => 'Member', 'action' => 'index']);
+$router->add('/admin/member-management/create', ['controller' => 'Member', 'action' => 'create']);
+$router->add('/admin/member-management/update/{id:\d+}', ['controller' => 'Member', 'action' => 'edit']);
+$router->add('/admin/member-management/delete/{id:\d+}', ['controller' => 'Member', 'action' => 'delete']);
+$router->add('/admin/member-management/export', ['controller' => 'Member', 'action' => 'export']);
+
 // Auth routes
 $router->add("/login", ["controller" => "Auth", "action" => "login"]);
 $router->add("/register", ["controller" => "Auth", "action" => "register"]);

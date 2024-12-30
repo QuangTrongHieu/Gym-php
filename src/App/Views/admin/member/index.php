@@ -13,7 +13,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Quản lý Hội viên</h1>
     <div>
-        <a href="/gym-php/admin/member/export" class="btn btn-success me-2">
+        <a href="/gym-php/admin/member-management/export" class="btn btn-success me-2">
             <i class="fas fa-file-excel"></i> Xuất Excel
         </a>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
@@ -43,9 +43,9 @@
                 <td>
                     <?php
                     $avatar = $item['avatar'] ?? 'default.jpg';
-                    $avatarFullPath = ROOT_PATH . '/public/uploads/members/' . $avatar;
+                    $avatarFullPath = ROOT_PATH . '/public/uploads/users/' . $avatar;
                     $avatarUrl = file_exists($avatarFullPath) 
-                        ? '/gym-php/public/uploads/members/' . $avatar 
+                        ? '/gym-php/public/uploads/users/' . $avatar 
                         : '/gym-php/public/assets/images/default-avatar.png';
                     ?>
                     <div class="avatar-container">
@@ -80,12 +80,15 @@
                     <?php endif; ?>
                 </td>
                 <td>
-                    <a href="/gym-php/admin/member/edit/<?= $item['id'] ?>" class="btn btn-primary btn-sm">
-                        <i class="fas fa-edit"></i> Sửa
-                    </a>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="showDeleteModal(<?= $item['id'] ?>, '<?= htmlspecialchars($item['fullName']) ?>')">
-                        <i class="fas fa-trash"></i> Xóa
-                    </button>
+                    <div class="btn-group">
+                        <a href="/gym-php/admin/member-management/update/<?= $item['id'] ?>" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-danger" 
+                                onclick="confirmDelete(<?= $item['id'] ?>)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -108,7 +111,7 @@
             <div class="modal-body">
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Bạn có chắc chắn muốn xóa hội viên <strong id="deleteMemberName"></strong> không?
+                    Bạn có chắc chắn muốn xóa hội viên này không?
                     <br>
                     <small class="text-muted">Hành động này không thể hoàn tác.</small>
                 </div>
@@ -120,7 +123,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Hủy
                 </button>
-                <button type="button" class="btn btn-danger" onclick="submitDeleteForm()">
+                <button type="submit" class="btn btn-danger" form="deleteMemberForm">
                     <i class="fas fa-trash-alt"></i> Xác nhận xóa
                 </button>
             </div>
@@ -129,10 +132,13 @@
 </div>
 
 <script>
-function showDeleteModal(id, name) {
-    document.getElementById('deleteMemberName').textContent = name;
+function confirmDelete(id) {
+    showDeleteModal(id);
+}
+
+function showDeleteModal(id) {
     document.getElementById('deleteMemberId').value = id;
-    document.getElementById('deleteMemberForm').action = `/gym-php/admin/member/delete/${id}`;
+    document.getElementById('deleteMemberForm').action = `/gym-php/admin/member-management/delete/${id}`;
     var deleteModal = new bootstrap.Modal(document.getElementById('deleteMemberModal'));
     deleteModal.show();
 }
@@ -189,4 +195,5 @@ function submitDeleteForm() {
 
 <?php 
 require_once ROOT_PATH . '/src/App/Views/admin/member/create.php';
+
 ?>

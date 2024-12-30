@@ -14,9 +14,13 @@ class BaseModel
     protected $primaryKey = 'id';
 
     // Khởi tạo kết nối database
-    public function __construct()
+    public function __construct($db = null)
     {
-        $this->db = Database::getInstance()->getConnection();
+        if ($db instanceof PDO) {
+            $this->db = $db;
+        } else {
+            $this->db = Database::getInstance()->getConnection();
+        }
     }
 
     // Lấy tất cả các bản ghi
@@ -52,34 +56,61 @@ class BaseModel
     // Get database connection
     public function getConnection()
     {
-        if (!$this->db instanceof PDO) {
-            $this->db = Database::getInstance()->getConnection();
-        }
         return $this->db;
+    }
+
+    // Set database connection
+    public function setConnection($connection)
+    {
+        if ($connection instanceof PDO) {
+            $this->db = $connection;
+        }
     }
 
     // Cập nhật bản ghi
     public function update($id, $data)
     {
-        $setClause = '';
-        foreach ($data as $key => $value) {
-            $setClause .= "$key = :$key, ";
+        try {
+            $this->db->beginTransaction();
+            $setClause = '';
+            foreach ($data as $key => $value) {
+                $setClause .= "$key = :$key, ";
+            }
+            $setClause = rtrim($setClause, ', ');
+            
+            $sql = "UPDATE {$this->table} SET $setClause WHERE {$this->primaryKey} = :id";
+            $stmt = $this->db->prepare($sql);
+            
+            $data['id'] = $id;
+            if (!$stmt->execute($data)) {
+                throw new \PDOException("Error updating record");
+            }
+            $this->db->commit();
+            return true;
+        } catch (\PDOException $e) {
+            $this->db->rollBack();
+            error_log("Error updating record: " . $e->getMessage());
+            throw new \Exception("Không thể cập nhật dữ liệu");
         }
-        $setClause = rtrim($setClause, ', ');
-        
-        $sql = "UPDATE {$this->table} SET $setClause WHERE {$this->primaryKey} = :id";
-        $stmt = $this->db->prepare($sql);
-        
-        $data['id'] = $id;
-        return $stmt->execute($data);
     }
 
     // Xóa bản ghi
     public function delete($id)
     {
-        $sql = "DELETE FROM {$this->table} WHERE {$this->primaryKey} = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute(['id' => $id]);
+        try {
+            $this->db->beginTransaction();
+            $sql = "DELETE FROM {$this->table} WHERE {$this->primaryKey} = :id";
+            $stmt = $this->db->prepare($sql);
+            if (!$stmt->execute(['id' => $id])) {
+                throw new \PDOException("Error deleting record");
+            }
+            $this->db->commit();
+            return true;
+        } catch (\PDOException $e) {
+            $this->db->rollBack();
+            error_log("Error deleting record: " . $e->getMessage());
+            throw new \Exception("Không thể xóa dữ liệu");
+        }
     }
 
     public function getById($id)

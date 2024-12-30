@@ -11,9 +11,9 @@ class User extends BaseModel
     protected $table = 'users';
     protected $uploadPath = 'public/uploads/users';
 
-    public function __construct()
+    public function __construct($db = null)
     {
-        parent::__construct();
+        parent::__construct($db);
     }
 
     public function findByUsername($username)

@@ -10,9 +10,9 @@ class Membership extends BaseModel
     protected $table = 'membership_registrations';
     protected $primaryKey = 'id';
 
-    public function __construct()
+    public function __construct($db = null)
     {
-        parent::__construct();
+        parent::__construct($db);
     }
 
     public function findAll()
@@ -119,10 +119,19 @@ class Membership extends BaseModel
     public function update($id, $data)
     {
         try {
+            if (empty($id) || empty($data)) {
+                throw new \InvalidArgumentException("Invalid input data");
+            }
+
             $this->db->beginTransaction();
 
-            // Get the current membership to get the payment ID
-            $stmt = $this->db->prepare("SELECT paymentId FROM membership_registrations WHERE id = :id");
+            // Validate membership exists and get current data
+            $stmt = $this->db->prepare("
+                SELECT mr.*, p.paymentStatus 
+                FROM membership_registrations mr
+                JOIN payments p ON mr.paymentId = p.id 
+                WHERE mr.id = :id
+            ");
             $stmt->execute([':id' => $id]);
             $membership = $stmt->fetch();
 
@@ -130,50 +139,129 @@ class Membership extends BaseModel
                 throw new \Exception("Membership not found");
             }
 
-            // Update payment information
-            $paymentStmt = $this->db->prepare("
-                UPDATE payments 
-                SET amount = :amount,
-                    paymentMethod = :paymentMethod,
-                    qrImage = :qrImage,
-                    paymentStatus = :paymentStatus,
-                    updatedAt = NOW()
-                WHERE id = :id
-            ");
-            
-            $paymentSuccess = $paymentStmt->execute([
-                ':id' => $membership['paymentId'],
-                ':amount' => $data['amount'],
-                ':paymentMethod' => $data['paymentMethod'],
-                ':qrImage' => $data['qrImage'] ?? null,
-                ':paymentStatus' => $data['paymentStatus']
-            ]);
+            // Don't allow updates if payment is already completed
+            if ($membership['paymentStatus'] === 'COMPLETED' && isset($data['amount'])) {
+                throw new \Exception("Cannot modify amount for completed payments");
+            }
 
-            if (!$paymentSuccess) {
-                throw new \Exception("Failed to update payment");
+            // Update payment information if provided
+            if (isset($data['amount']) || isset($data['paymentMethod']) || isset($data['paymentStatus'])) {
+                $paymentStmt = $this->db->prepare("
+                    UPDATE payments 
+                    SET amount = COALESCE(:amount, amount),
+                        paymentMethod = COALESCE(:paymentMethod, paymentMethod),
+                        paymentStatus = COALESCE(:paymentStatus, paymentStatus),
+                        qrImage = COALESCE(:qrImage, qrImage),
+                        updatedAt = NOW()
+                    WHERE id = :id
+                ");
+                
+                $paymentSuccess = $paymentStmt->execute([
+                    ':id' => $membership['paymentId'],
+                    ':amount' => $data['amount'] ?? null,
+                    ':paymentMethod' => $data['paymentMethod'] ?? null,
+                    ':qrImage' => $data['qrImage'] ?? null,
+                    ':paymentStatus' => $data['paymentStatus'] ?? null
+                ]);
+
+                if (!$paymentSuccess) {
+                    throw new \Exception("Failed to update payment");
+                }
             }
 
             // Update membership registration
-            $membershipStmt = $this->db->prepare("
-                UPDATE membership_registrations 
-                SET packageId = :packageId,
-                    startDate = :startDate,
-                    endDate = :endDate,
-                    status = :status,
-                    updatedAt = NOW()
-                WHERE id = :id
-            ");
-            
-            $membershipSuccess = $membershipStmt->execute([
-                ':id' => $id,
-                ':packageId' => $data['packageId'],
-                ':startDate' => $data['startDate'],
-                ':endDate' => $data['endDate'],
-                ':status' => $data['status']
-            ]);
+            $updateFields = [];
+            $params = [':id' => $id];
 
-            if (!$membershipSuccess) {
-                throw new \Exception("Failed to update membership");
+            // Build dynamic update query based on provided data
+            if (isset($data['packageId'])) {
+                $updateFields[] = "packageId = :packageId";
+                $params[':packageId'] = $data['packageId'];
+            }
+            if (isset($data['startDate'])) {
+                $updateFields[] = "startDate = :startDate";
+                $params[':startDate'] = $data['startDate'];
+            }
+            if (isset($data['endDate'])) {
+                $updateFields[] = "endDate = :endDate";
+                $params[':endDate'] = $data['endDate'];
+            }
+            if (isset($data['status'])) {
+                $updateFields[] = "status = :status";
+                $params[':status'] = $data['status'];
+            }
+
+            if (!empty($updateFields)) {
+                $updateFields[] = "updatedAt = NOW()";
+                $query = "UPDATE membership_registrations SET " . implode(", ", $updateFields) . " WHERE id = :id";
+                
+                $membershipStmt = $this->db->prepare($query);
+                $membershipSuccess = $membershipStmt->execute($params);
+
+                if (!$membershipSuccess) {
+                    throw new \Exception("Failed to update membership");
+                }
+            }
+
+            $this->db->commit();
+            return true;
+
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            if (empty($id)) {
+                throw new \InvalidArgumentException("Invalid membership ID");
+            }
+
+            $this->db->beginTransaction();
+
+            // Get membership and payment information
+            $stmt = $this->db->prepare("
+                SELECT mr.*, p.paymentStatus 
+                FROM membership_registrations mr
+                JOIN payments p ON mr.paymentId = p.id 
+                WHERE mr.id = :id
+            ");
+            $stmt->execute([':id' => $id]);
+            $membership = $stmt->fetch();
+
+            if (!$membership) {
+                throw new \Exception("Membership not found");
+            }
+
+            // Check if deletion is allowed based on payment status
+            if ($membership['paymentStatus'] === 'COMPLETED') {
+                // For completed payments, we might want to soft delete or keep records
+                $softDeleteStmt = $this->db->prepare("
+                    UPDATE membership_registrations 
+                    SET status = 'DELETED', 
+                        updatedAt = NOW() 
+                    WHERE id = :id
+                ");
+                $success = $softDeleteStmt->execute([':id' => $id]);
+            } else {
+                // For pending or failed payments, we can hard delete
+                // Delete membership registration first
+                $membershipStmt = $this->db->prepare("DELETE FROM membership_registrations WHERE id = :id");
+                $membershipSuccess = $membershipStmt->execute([':id' => $id]);
+
+                if (!$membershipSuccess) {
+                    throw new \Exception("Failed to delete membership registration");
+                }
+
+                // Then delete associated payment
+                $paymentStmt = $this->db->prepare("DELETE FROM payments WHERE id = :paymentId");
+                $paymentSuccess = $paymentStmt->execute([':paymentId' => $membership['paymentId']]);
+
+                if (!$paymentSuccess) {
+                    throw new \Exception("Failed to delete payment record");
+                }
             }
 
             $this->db->commit();
@@ -199,37 +287,6 @@ class Membership extends BaseModel
             ':id' => $paymentId,
             ':status' => $status
         ]);
-    }
-
-    public function delete($id)
-    {
-        try {
-            $this->db->beginTransaction();
-
-            // Get payment ID first
-            $stmt = $this->db->prepare("SELECT paymentId FROM membership_registrations WHERE id = :id");
-            $stmt->bindParam(':id', $id);
-            $stmt->execute();
-            $membership = $stmt->fetch();
-
-            if ($membership) {
-                // Delete membership registration
-                $deleteStmt = $this->db->prepare("DELETE FROM membership_registrations WHERE id = :id");
-                $deleteStmt->bindParam(':id', $id);
-                $deleteStmt->execute();
-
-                // Delete associated payment
-                $paymentStmt = $this->db->prepare("DELETE FROM payments WHERE id = :paymentId");
-                $paymentStmt->bindParam(':paymentId', $membership['paymentId']);
-                $paymentStmt->execute();
-            }
-
-            $this->db->commit();
-            return true;
-        } catch (\Exception $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
     }
 
     public function hasActiveOrPendingMembership($userId)

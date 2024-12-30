@@ -7,7 +7,7 @@
 
 <div class="container">
     <h1>Sửa thông tin hội viên</h1>
-    <form action="/gym-php/admin/member/update/<?= $member['id'] ?>" method="POST" enctype="multipart/form-data">
+    <form action="/gym-php/admin/member-management/update/<?= $member['id'] ?>" method="POST" enctype="multipart/form-data">
         <div class="mb-3">
             <label class="form-label">Ảnh đại diện</label>
             <input type="file" name="avatar" class="form-control" accept="image/*">
