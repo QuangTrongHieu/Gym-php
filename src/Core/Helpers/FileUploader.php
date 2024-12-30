@@ -41,7 +41,7 @@ class FileUploader {
             @chmod($targetFile, 0644);
 
             // Trả về đường dẫn relative để lưu vào DB
-            return $fileName;
+            return '/uploads/' . ($folder ? $folder . '/' : '') . $fileName;
 
         } catch (\Exception $e) {
             throw new \Exception('Upload thất bại: ' . $e->getMessage());

@@ -2,11 +2,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Thêm Huấn luyện viên Mới</h5>
+                <h5 class="modal-title">Thêm Hội viên Mới</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="/gym-php/admin/trainer/create" method="POST" enctype="multipart/form-data">
+                <form action="/gym-php/admin/member/create" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label class="form-label">Ảnh đại diện</label>
                         <input type="file" name="avatar" class="form-control" accept="image/*">
@@ -44,20 +44,24 @@
                         <input type="tel" name="phone" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Chuyên môn</label>
-                        <textarea name="specialization" class="form-control" required></textarea>
+                        <label class="form-label">Gói tập</label>
+                        <select name="package_id" class="form-select">
+                            <option value="">Chọn gói tập</option>
+                            <?php foreach($packages as $package): ?>
+                                <option value="<?= $package['id'] ?>">
+                                    <?= htmlspecialchars($package['name']) ?> 
+                                    (<?= $package['duration'] ?> tháng - <?= number_format($package['price'], 0, ',', '.') ?> VNĐ)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Kinh nghiệm (năm)</label>
-                        <input type="number" name="experience" class="form-control" required>
+                        <label class="form-label">Ngày bắt đầu</label>
+                        <input type="date" name="startDate" class="form-control">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Chứng chỉ</label>
-                        <textarea name="certification" class="form-control" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Lương</label>
-                        <input type="number" name="salary" class="form-control" required>
+                        <label class="form-label">Ngày kết thúc</label>
+                        <input type="date" name="endDate" class="form-control">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>

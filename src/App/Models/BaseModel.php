@@ -49,6 +49,15 @@ class BaseModel
         return $stmt->execute($data);
     }
 
+    // Get database connection
+    public function getConnection()
+    {
+        if (!$this->db instanceof PDO) {
+            $this->db = Database::getInstance()->getConnection();
+        }
+        return $this->db;
+    }
+
     // Cập nhật bản ghi
     public function update($id, $data)
     {

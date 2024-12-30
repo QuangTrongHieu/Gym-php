@@ -9,12 +9,46 @@ class TrainerController extends BaseController
 {
     private $trainerModel;
     private $uploader;
+    private const UPLOAD_DIR = 'trainers'; // Consistent upload directory
 
     public function __construct()
     {
         parent::__construct();
         $this->trainerModel = new Trainer();
         $this->uploader = new FileUploader();
+    }
+
+    private function handleImageUpload($file, $oldAvatar = null) {
+        if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
+            return false;
+        }
+
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            throw new \Exception('Loại file không được hỗ trợ. Chỉ chấp nhận file ảnh (JPG, PNG, GIF, WEBP)');
+        }
+
+        $uploadDir = ROOT_PATH . '/public/uploads/trainers/';
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        // Xóa ảnh cũ nếu có và không phải ảnh mặc định
+        if ($oldAvatar && $oldAvatar !== 'default.jpg') {
+            $oldAvatarPath = $uploadDir . $oldAvatar;
+            if (file_exists($oldAvatarPath)) {
+                unlink($oldAvatarPath);
+            }
+        }
+
+        $fileName = uniqid() . '_' . time() . '_' . basename($file['name']);
+        $targetPath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            return $fileName;
+        }
+
+        return false;
     }
 
     // public function trainerDetail($id)
@@ -97,36 +131,16 @@ class TrainerController extends BaseController
                 $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
 
-            // Handle avatar upload
-            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-                try {
-                    $uploadDir = ROOT_PATH . '/public/uploads/trainers/';
-                    if (!file_exists($uploadDir)) {
-                        mkdir($uploadDir, 0777, true);
-                    }
-
-                    // Delete old avatar if exists
-                    $oldTrainer = $this->trainerModel->getTrainerById($id);
-                    if (!empty($oldTrainer['avatar']) && $oldTrainer['avatar'] !== 'default.jpg') {
-                        $oldAvatarPath = $uploadDir . $oldTrainer['avatar'];
-                        if (file_exists($oldAvatarPath)) {
-                            unlink($oldAvatarPath);
-                        }
-                    }
-
-                    // Upload new avatar
-                    $filename = $this->uploader->upload($_FILES['avatar'], 'trainers');
-                    if ($filename) {
-                        $data['avatar'] = $filename;
-                    }
-                } catch (\Exception $e) {
-                    $_SESSION['error'] = 'Có lỗi khi tải lên ảnh: ' . $e->getMessage();
-                    header('Location: /gym-php/admin/trainer');
-                    exit;
-                }
-            }
-
             try {
+                // Handle avatar upload
+                if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                    $oldTrainer = $this->trainerModel->getTrainerById($id);
+                    $fileName = $this->handleImageUpload($_FILES['avatar'], $oldTrainer['avatar'] ?? null);
+                    if ($fileName) {
+                        $data['avatar'] = $fileName;
+                    }
+                }
+
                 if ($this->trainerModel->update($id, $data)) {
                     $_SESSION['success'] = 'Cập nhật thông tin huấn luyện viên thành công';
                 } else {
@@ -292,12 +306,15 @@ class TrainerController extends BaseController
         ];
 
         try {
-            // Xử lý upload ảnh nếu có
+            // Handle avatar upload
             if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-                $data['avatar'] = $this->uploader->handleProfileImage($_FILES['avatar'], $trainer['avatar']);
+                $fileName = $this->handleImageUpload($_FILES['avatar'], $trainer['avatar'] ?? null);
+                if ($fileName) {
+                    $data['avatar'] = $fileName;
+                }
             }
 
-            // Xử lý password nếu có
+            // Handle password update
             if (!empty($_POST['password'])) {
                 if ($_POST['password'] !== $_POST['password_confirm']) {
                     throw new \Exception('Mật khẩu xác nhận không khớp.');
@@ -385,7 +402,7 @@ class TrainerController extends BaseController
         // Lấy dữ liệu từ cơ sở dữ liệu
         $trainers = $this->trainerModel->getAllTrainers();
         
-        // Trả về dữ liệu dưới dạng JSON
+        // Trả về dữ liệu dướidạng JSON
         echo json_encode($trainers);
     }
 }

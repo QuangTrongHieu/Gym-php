@@ -20,6 +20,11 @@ abstract class BaseController
 
     public function view($view, $data = [], $layout = null)
     {
+        // Đảm bảo session được khởi tạo trước khi làm bất cứ điều gì
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         // Thêm thông tin user vào data để view có thể sử dụng
         $data['user'] = [
             'isLoggedIn' => isset($_SESSION['user_id']),
@@ -36,7 +41,11 @@ abstract class BaseController
         ob_start();
 
         // Load nội dung view
-        require_once ROOT_PATH . "/src/App/Views/{$view}.php";
+        $viewPath = ROOT_PATH . "/src/App/Views/{$view}.php";
+        if (!file_exists($viewPath)) {
+            throw new \Exception("View not found: {$view}");
+        }
+        require_once $viewPath;
         $content = ob_get_clean();
 
         // Nếu layout được cung cấp, sử dụng layout đó
@@ -48,19 +57,22 @@ abstract class BaseController
             // Kiểm tra prefix của view để xác định layout
             if (strpos($view, 'admin/') === 0) {
                 // Nếu view có prefix 'admin/', sử dụng layout admin
-                $defaultLayout = 'layouts/admin_layout.php';
+                $layoutPath = ROOT_PATH . "/src/App/Views/layouts/admin_layout.php";
             } else if (strpos($view, 'Trainer/') === 0) {
                 // Nếu view có prefix 'Trainer/', sử dụng layout trainer
-                $defaultLayout = 'layouts/Trainer_layout.php';
+                $layoutPath = ROOT_PATH . "/src/App/Views/layouts/trainer_layout.php";
             } else if (strpos($view, 'user/') === 0) {
                 // Nếu view có prefix 'user/', sử dụng layout user
-                $defaultLayout = 'layouts/user_layout.php';
+                $layoutPath = ROOT_PATH . "/src/App/Views/layouts/user_layout.php";
             } else {
                 // Nếu không có prefix nào, sử dụng layout mặc định
-                $defaultLayout = 'layouts/default_layout.php';
+                $layoutPath = ROOT_PATH . "/src/App/Views/layouts/default_layout.php";
             }
-            // Load layout mặc định
-            require_once ROOT_PATH . "/src/App/Views/" . $defaultLayout;
+
+            if (!file_exists($layoutPath)) {
+                throw new \Exception("Layout not found: {$layoutPath}");
+            }
+            require_once $layoutPath;
         }
         
         return $content;

@@ -107,6 +107,18 @@ class Package extends BaseModel
         }
     }
 
+    public function findAllActive()
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE status = 'active' ORDER BY duration ASC");
+            $stmt->execute();
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Error finding active packages: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function getMonthlyRevenue() {
         $sql = "SELECT 
                     MONTH(mr.startDate) as month,

@@ -193,7 +193,7 @@
 function showDeleteModal(id, name) {
     document.getElementById('deleteTrainerName').textContent = name;
     document.getElementById('deleteTrainerId').value = id;
-    document.getElementById('deleteTrainerForm').action = `/gym-php/admin/trainer/destroy/${id}`;
+    document.getElementById('deleteTrainerForm').action = `/gym-php/admin/trainer/${id}`;
     var deleteModal = new bootstrap.Modal(document.getElementById('deleteTrainerModal'));
     deleteModal.show();
 }
