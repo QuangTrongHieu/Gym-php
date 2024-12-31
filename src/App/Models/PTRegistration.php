@@ -57,4 +57,4 @@ class PTRegistration extends BaseModel
         $stmt->execute(['trainer_id' => $trainerId]);
         return $stmt->fetchAll();
     }
-} 
+}

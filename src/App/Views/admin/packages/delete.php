@@ -11,7 +11,7 @@
                         <input type="hidden" name="id" value="<?= $Package['id'] ?>">
                         <p>Bạn có chắc muốn xóa gói tập này?</p> // Cập nhật thông điệp
                         <p><strong>Tên Gói:</strong> <?= $Package['name'] ?></p> // Cập nhật thông tin
-                        
+
                         <div class="modal-footer px-0 pb-0">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                             <button type="submit" class="btn btn-danger">Xóa</button>

@@ -46,17 +46,16 @@ class AuthController extends BaseController
 
                 // Thực hiện login và kiểm tra kết quả
                 $loginSuccess = $this->auth->login($user['id'], $user['username'], $user['avatar'], 'USER');
-                
-                
+
+
 
                 // Đảm bảo session được ghi trước khi redirect
                 session_write_close();
-                
+
                 // Thêm độ trễ nhỏ để đảm bảo session được ghi
                 usleep(100000); // 0.1 giây
-                
-                $this->redirect('');
 
+                $this->redirect('');
             } catch (Exception $e) {
                 $this->view('login', ['error' => $e->getMessage()]);
                 return;
@@ -80,7 +79,7 @@ class AuthController extends BaseController
                 $password = $_POST['password'] ?? '';
 
                 $admin = $this->adminModel->findByUsername($username);
-                
+
                 if (!$admin) {
                     throw new Exception('Thông tin đăng nhập không đúng');
                 }
@@ -95,7 +94,6 @@ class AuthController extends BaseController
 
                 $this->auth->login($admin['id'], $admin['username'], null, 'ADMIN');
                 $this->redirect('admin');
-
             } catch (Exception $e) {
                 $this->view('admin/login', ['error' => $e->getMessage()], 'default_layout');
                 return;
@@ -106,10 +104,10 @@ class AuthController extends BaseController
     }
 
     // Login cho Trainer 
-    public function TrainerLogin()
+    public function trainerLogin()
     {
         if ($this->auth->isLoggedIn()) {
-            $this->redirect('trainer');
+            $this->redirect('trainer/dashboard');
             return;
         }
 
@@ -120,24 +118,31 @@ class AuthController extends BaseController
 
                 $trainer = $this->trainerModel->findByUsername($username);
 
-                if (!$trainer || !password_verify($password, $trainer['password'])) {
+                if (!$trainer) {
                     throw new Exception('Thông tin đăng nhập không đúng');
                 }
 
-                if ($trainer['eRole'] !== 'TRAINER') {
-                    throw new Exception('Bạn không có quyền truy cập');
+                if (!password_verify($password, $trainer['password'])) {
+                    throw new Exception('Thông tin đăng nhập không đúng');
                 }
 
-                $this->auth->login($trainer['id'], $trainer['username'], $trainer['avatar'], 'TRAINER');
-                $this->redirect('trainer');
+                // Set session data
+                $_SESSION['trainer_id'] = $trainer['id'];
+                $_SESSION['trainer_name'] = $trainer['fullName'];
+                $_SESSION['trainer_role'] = 'TRAINER';
+                $_SESSION['trainer_avatar'] = $trainer['avatar'];
 
+                $this->redirect('trainer/dashboard');
             } catch (Exception $e) {
-                $this->view('trainer/login', ['error' => $e->getMessage()], 'default_layout');
+                $this->view('Trainer/login', [
+                    'error' => $e->getMessage()
+                ]);
                 return;
             }
         }
 
-        $this->view('trainer/login', [], 'default_layout');
+        // Show login form
+        $this->view('Trainer/login', [], 'default_layout');
     }
 
     // Đăng ký chỉ dành cho user thường
@@ -189,7 +194,6 @@ class AuthController extends BaseController
                 $userId = $this->userModel->create($data);
                 $this->auth->login($userId, $data['username'], null, 'USER');
                 $this->redirect('');
-
             } catch (Exception $e) {
                 // Hiển thị form với thông báo lỗi và giữ lại dữ liệu cũ
                 $this->view('register', [
@@ -214,7 +218,7 @@ class AuthController extends BaseController
             case 'ADMIN':
                 $this->redirect('');
                 break;
-        case 'TRAINNER':
+            case 'TRAINNER':
                 $this->redirect('');
                 break;
             default:

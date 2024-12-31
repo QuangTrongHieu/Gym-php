@@ -1,7 +1,7 @@
 <div class="container mt-4">
     <h1>Chào mừng đến với Trang quản trị</h1>
     <div class="row mt-4">
-        
+
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
@@ -47,7 +47,7 @@
                         Thống kê gói tập
                     </h5>
                     <ul class="list-group">
-                        <?php 
+                        <?php
                         $revenueData = $revenueData ?? [];
                         foreach ($revenueData as $revenue): ?>
                             <li class="list-group-item">
@@ -81,77 +81,77 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: <?php echo json_encode($monthlyRevenue['labels'] ?? []); ?>,
-            datasets: [{
-                label: 'Doanh thu (VNĐ)',
-                data: <?php echo json_encode($monthlyRevenue['revenue'] ?? []); ?>,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgb(75, 192, 192)',
-                borderWidth: 1,
-                yAxisID: 'y'
-            }, {
-                label: 'Số người đăng ký',
-                data: <?php echo json_encode($monthlyRevenue['users'] ?? []); ?>,
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgb(255, 99, 132)',
-                borderWidth: 1,
-                type: 'line',
-                yAxisID: 'y1'
-            }]
-        },
-        options: {
-            responsive: true,
-            interaction: {
-                mode: 'index',
-                intersect: false,
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode($monthlyRevenue['labels'] ?? []); ?>,
+                datasets: [{
+                    label: 'Doanh thu (VNĐ)',
+                    data: <?php echo json_encode($monthlyRevenue['revenue'] ?? []); ?>,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Số người đăng ký',
+                    data: <?php echo json_encode($monthlyRevenue['users'] ?? []); ?>,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    borderWidth: 1,
+                    type: 'line',
+                    yAxisID: 'y1'
+                }]
             },
-            scales: {
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: {
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
                         display: true,
-                        text: 'Doanh thu (VNĐ)'
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Doanh thu (VNĐ)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('vi-VN').format(value) + ' VNĐ';
+                            }
+                        }
                     },
-                    ticks: {
-                        callback: function(value) {
-                            return new Intl.NumberFormat('vi-VN').format(value) + ' VNĐ';
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Số người đăng ký'
+                        },
+                        grid: {
+                            drawOnChartArea: false
                         }
                     }
                 },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Số người đăng ký'
-                    },
-                    grid: {
-                        drawOnChartArea: false
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            if (context.dataset.yAxisID === 'y') {
-                                return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.raw) + ' VNĐ';
-                            } else {
-                                return 'Số người đăng ký: ' + context.raw;
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if (context.dataset.yAxisID === 'y') {
+                                    return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.raw) + ' VNĐ';
+                                } else {
+                                    return 'Số người đăng ký: ' + context.raw;
+                                }
                             }
                         }
                     }
                 }
             }
-        }
+        });
     });
-});
 </script>

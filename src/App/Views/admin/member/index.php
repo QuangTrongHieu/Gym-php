@@ -1,19 +1,28 @@
 <?php if (isset($_SESSION['success'])): ?>
-    <div class="alert alert-success">
+    <div class="alert alert-success alert-dismissible fade show">
         <?= $_SESSION['success']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         <?php unset($_SESSION['success']); ?>
     </div>
 <?php endif; ?>
+
 <?php if (isset($_SESSION['error'])): ?>
-    <div class="alert alert-danger">
+    <div class="alert alert-danger alert-dismissible fade show">
         <?= $_SESSION['error']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         <?php unset($_SESSION['error']); ?>
     </div>
 <?php endif; ?>
+
+<?php
+// Base64 encoded default avatar - simple user icon
+$defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlOWVjZWYiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjM1IiByPSIyMCIgZmlsbD0iI2FkYjViZCIvPjxwYXRoIGQ9Ik0xNSw4NWMwLTIwLDE1LTM1LDM1LTM1czM1LDE1LDM1LDM1IiBmaWxsPSIjYWRiNWJkIi8+PC9zdmc+';
+?>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Quản lý Hội viên</h1>
+    <h1 class="h3 mb-0">Quản lý Hội viên</h1>
     <div>
-        <a href="/gym-php/admin/member-management/export" class="btn btn-success me-2">
+        <a href="/gym-php/admin/member/export" class="btn btn-success me-2">
             <i class="fas fa-file-excel"></i> Xuất Excel
         </a>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
@@ -21,179 +30,124 @@
         </button>
     </div>
 </div>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Ảnh</th>
-            <th>Họ tên</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>SĐT</th>
-            <th>Gói tập</th>
-            <th>Trạng thái</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if (!empty($members)): ?>
-            <?php foreach($members as $item): ?>
-            <tr>
-                <td><?= $item['id'] ?></td>
-                <td>
-                    <?php
-                    $avatar = $item['avatar'] ?? 'default.jpg';
-                    $avatarFullPath = ROOT_PATH . '/public/uploads/users/' . $avatar;
-                    $avatarUrl = file_exists($avatarFullPath) 
-                        ? '/gym-php/public/uploads/users/' . $avatar 
-                        : '/gym-php/public/assets/images/default-avatar.png';
-                    ?>
-                    <div class="avatar-container">
-                        <img src="<?= htmlspecialchars($avatarUrl) ?>" 
-                             class="member-avatar" 
-                             alt="<?= htmlspecialchars($item['fullName']) ?>">
-                    </div>
-                </td>
-                <td><?= htmlspecialchars($item['fullName']) ?></td>
-                <td><?= htmlspecialchars($item['username']) ?></td>
-                <td><?= htmlspecialchars($item['email']) ?></td>
-                <td><?= htmlspecialchars($item['phone']) ?></td>
-                <td>
-                    <?php if (!empty($item['package_name'])): ?>
-                        <?= htmlspecialchars($item['package_name']) ?>
-                        <br>
-                        <small class="text-muted">
-                            <?= date('d/m/Y', strtotime($item['startDate'])) ?> - 
-                            <?= date('d/m/Y', strtotime($item['endDate'])) ?>
-                        </small>
-                    <?php else: ?>
-                        <span class="badge bg-secondary">Chưa đăng ký</span>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <?php if (!empty($item['membership_status'])): ?>
-                        <span class="badge <?= $item['membership_status'] == 'active' ? 'bg-success' : 'bg-danger' ?>">
-                            <?= $item['membership_status'] == 'active' ? 'Đang hoạt động' : 'Hết hạn' ?>
-                        </span>
-                    <?php else: ?>
-                        <span class="badge bg-secondary">Chưa đăng ký</span>
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <div class="btn-group">
-                        <a href="/gym-php/admin/member-management/update/<?= $item['id'] ?>" class="btn btn-sm btn-warning">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-danger" 
-                                onclick="confirmDelete(<?= $item['id'] ?>)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="9">Không có dữ liệu</td>
-            </tr>
-        <?php endif; ?>
-    </tbody>
-</table>
 
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteMemberModal" tabindex="-1" aria-labelledby="deleteMemberModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteMemberModalLabel">Xóa Hội viên</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Bạn có chắc chắn muốn xóa hội viên này không?
-                    <br>
-                    <small class="text-muted">Hành động này không thể hoàn tác.</small>
-                </div>
-                <form id="deleteMemberForm" method="POST">
-                    <input type="hidden" id="deleteMemberId" name="id">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Hủy
-                </button>
-                <button type="submit" class="btn btn-danger" form="deleteMemberForm">
-                    <i class="fas fa-trash-alt"></i> Xác nhận xóa
-                </button>
-            </div>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Ảnh</th>
+                        <th>Họ tên</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>SĐT</th>
+                        <th>Gói tập</th>
+                        <th>Trạng thái</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($members)): ?>
+                        <?php foreach ($members as $item): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($item['id']) ?></td>
+                                <td>
+                                    <img src="<?= $item['avatarUrl'] ?? $defaultAvatarBase64 ?>"
+                                        class="member-avatar"
+                                        alt="<?= htmlspecialchars($item['fullName']) ?>"
+                                        loading="lazy">
+                                </td>
+                                <td><?= htmlspecialchars($item['fullName']) ?></td>
+                                <td><?= htmlspecialchars($item['username']) ?></td>
+                                <td><?= htmlspecialchars($item['email']) ?></td>
+                                <td><?= htmlspecialchars($item['phone']) ?></td>
+                                <td>
+                                    <?php if (!empty($item['package_name'])): ?>
+                                        <div class="package-info">
+                                            <span class="package-name"><?= htmlspecialchars($item['package_name']) ?></span>
+                                            <small class="text-muted d-block">
+                                                <?= date('d/m/Y', strtotime($item['startDate'])) ?> -
+                                                <?= date('d/m/Y', strtotime($item['endDate'])) ?>
+                                            </small>
+                                        </div>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Chưa đăng ký</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if (!empty($item['membership_status'])): ?>
+                                        <span class="badge <?= $item['membership_status'] == 'active' ? 'bg-success' : 'bg-danger' ?>">
+                                            <?= $item['membership_status'] == 'active' ? 'Đang hoạt động' : 'Hết hạn' ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Chưa đăng ký</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button type="button"
+                                            class="btn btn-warning btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editModal<?= $item['id'] ?>"
+                                            title="Sửa thông tin">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="showDeleteModal(<?= $item['id'] ?>, '<?= htmlspecialchars(addslashes($item['fullName'])) ?>')"
+                                            title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="9" class="text-center py-4">
+                                <i class="fas fa-info-circle text-info me-2"></i>
+                                Không có dữ liệu hội viên
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-<script>
-function confirmDelete(id) {
-    showDeleteModal(id);
-}
-
-function showDeleteModal(id) {
-    document.getElementById('deleteMemberId').value = id;
-    document.getElementById('deleteMemberForm').action = `/gym-php/admin/member-management/delete/${id}`;
-    var deleteModal = new bootstrap.Modal(document.getElementById('deleteMemberModal'));
-    deleteModal.show();
-}
-
-function submitDeleteForm() {
-    document.getElementById('deleteMemberForm').submit();
-}
-</script>
-
 <style>
-.avatar-container {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #dee2e6;
-    background-color: #f8f9fa;
-}
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
 
-.member-avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.2s ease-in-out;
-}
+    .action-buttons .btn {
+        padding: 0.25rem 0.5rem;
+    }
 
-.avatar-container:hover .member-avatar {
-    transform: scale(1.1);
-}
+    .table td {
+        vertical-align: middle;
+    }
 
-.badge {
-    font-size: 0.875rem;
-    padding: 0.5em 0.75em;
-}
+    .package-info {
+        line-height: 1.2;
+    }
 
-.table th {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-}
+    .package-name {
+        font-weight: 500;
+    }
 
-.modal-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.modal-footer {
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
-}
+    .badge {
+        padding: 0.5em 0.75em;
+    }
 </style>
 
-<?php 
+<?php
+require_once ROOT_PATH . '/src/App/Views/admin/member/edit.php';
 require_once ROOT_PATH . '/src/App/Views/admin/member/create.php';
-
+require_once ROOT_PATH . '/src/App/Views/admin/member/delete.php';
 ?>

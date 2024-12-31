@@ -13,7 +13,8 @@ class EquipmentController extends BaseController
         $this->equipmentModel = new Equipment();
     }
 
-    private function handleImageUpload($file) {
+    private function handleImageUpload($file)
+    {
         if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
             return false;
         }
@@ -52,7 +53,7 @@ class EquipmentController extends BaseController
         $equipments = $this->equipmentModel->getAllActiveEquipment();
         // Debug output
         echo "<!-- Debug: " . print_r($equipments, true) . " -->";
-        
+
         $this->view('equipmentreviews/equipment', [
             'title' => 'Thiết Bị Phòng Gym',
             'equipments' => $equipments
@@ -92,18 +93,18 @@ class EquipmentController extends BaseController
 
             // Kiểm tra validate
             $errors = [];
-            if(empty($data['name'])) {
+            if (empty($data['name'])) {
                 $errors['name'] = 'Vui lòng nhập tên thiết bị';
             }
-            if(empty($data['purchaseDate'])) {
+            if (empty($data['purchaseDate'])) {
                 $errors['purchaseDate'] = 'Vui lòng nhập ngày mua';
             }
-            if($data['price'] <= 0) {
+            if ($data['price'] <= 0) {
                 $errors['price'] = 'Giá phải lớn hơn 0';
             }
 
-            if(empty($errors)) {
-                if($this->equipmentModel->create($data)) {
+            if (empty($errors)) {
+                if ($this->equipmentModel->create($data)) {
                     $_SESSION['success'] = 'Thêm thiết bị thành công';
                     header('Location: /gym-php/admin/equipment');
                     exit();
@@ -125,7 +126,7 @@ class EquipmentController extends BaseController
     public function edit($id)
     {
         $equipment = $this->equipmentModel->findById($id);
-        if(!$equipment) {
+        if (!$equipment) {
             $_SESSION['error'] = 'Không tìm thấy thiết bị';
             header('Location: /gym-php/admin/equipment');
             exit();
@@ -160,18 +161,18 @@ class EquipmentController extends BaseController
 
             // Kiểm tra validate
             $errors = [];
-            if(empty($data['name'])) {
+            if (empty($data['name'])) {
                 $errors['name'] = 'Vui lòng nhập tên thiết bị';
             }
-            if(empty($data['purchaseDate'])) {
+            if (empty($data['purchaseDate'])) {
                 $errors['purchaseDate'] = 'Vui lòng nhập ngày mua';
             }
-            if($data['price'] <= 0) {
+            if ($data['price'] <= 0) {
                 $errors['price'] = 'Giá phải lớn hơn 0';
             }
 
-            if(empty($errors)) {
-                if($this->equipmentModel->update($id, $data)) {
+            if (empty($errors)) {
+                if ($this->equipmentModel->update($id, $data)) {
                     $_SESSION['success'] = 'Cập nhật thiết bị thành công';
                     header('Location: /gym-php/admin/equipment');
                     exit();
@@ -200,7 +201,7 @@ class EquipmentController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Get equipment details before deletion
             $equipment = $this->equipmentModel->findById($id);
-            
+
             if ($equipment && $this->equipmentModel->delete($id)) {
                 // Delete associated image if it exists
                 if (!empty($equipment['image_path'])) {

@@ -35,24 +35,24 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="training_date<?= $schedule['id'] ?>" class="form-label">Ngày tập</label>
-                                <input type="date" class="form-control" id="training_date<?= $schedule['id'] ?>" 
-                                       name="training_date" value="<?= $schedule['training_date'] ?>" required>
+                                <input type="date" class="form-control" id="training_date<?= $schedule['id'] ?>"
+                                    name="training_date" value="<?= $schedule['training_date'] ?>" required>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="start_time<?= $schedule['id'] ?>" class="form-label">Giờ bắt đầu</label>
-                                <input type="time" class="form-control" id="start_time<?= $schedule['id'] ?>" 
-                                       name="start_time" value="<?= $schedule['start_time'] ?>" required>
+                                <input type="time" class="form-control" id="start_time<?= $schedule['id'] ?>"
+                                    name="start_time" value="<?= $schedule['start_time'] ?>" required>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="end_time<?= $schedule['id'] ?>" class="form-label">Giờ kết thúc</label>
-                                <input type="time" class="form-control" id="end_time<?= $schedule['id'] ?>" 
-                                       name="end_time" value="<?= $schedule['end_time'] ?>" required>
+                                <input type="time" class="form-control" id="end_time<?= $schedule['id'] ?>"
+                                    name="end_time" value="<?= $schedule['end_time'] ?>" required>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="notes<?= $schedule['id'] ?>" class="form-label">Ghi chú</label>
-                            <textarea class="form-control" id="notes<?= $schedule['id'] ?>" 
-                                      name="notes" rows="3"><?= $schedule['notes'] ?></textarea>
+                            <textarea class="form-control" id="notes<?= $schedule['id'] ?>"
+                                name="notes" rows="3"><?= $schedule['notes'] ?></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="status<?= $schedule['id'] ?>" class="form-label">Trạng thái</label>

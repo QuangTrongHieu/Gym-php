@@ -10,16 +10,16 @@
                     <div class="modal-body">
                         <p>Bạn có chắc chắn muốn xóa thiết bị "<strong><?= htmlspecialchars($equipment['name']) ?></strong>" không?</p>
                         <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Lưu ý: Hành động này không thể hoàn tác!</p>
-                        
+
                         <?php if (!empty($equipment['image_path'])): ?>
                             <div class="text-center mb-3">
-                                <img src="<?= $equipment['image_path'] ?>" 
-                                     alt="<?= htmlspecialchars($equipment['name']) ?>" 
-                                     class="img-thumbnail"
-                                     style="max-height: 200px">
+                                <img src="<?= $equipment['image_path'] ?>"
+                                    alt="<?= htmlspecialchars($equipment['name']) ?>"
+                                    class="img-thumbnail"
+                                    style="max-height: 200px">
                             </div>
                         <?php endif; ?>
-                        
+
                         <div class="table-responsive">
                             <table class="table table-sm">
                                 <tr>

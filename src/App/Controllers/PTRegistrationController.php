@@ -61,4 +61,4 @@ class PTRegistrationController
         // Logic để lấy thông tin đăng ký PT
         return $this->model->findById($id);
     }
-} 
+}

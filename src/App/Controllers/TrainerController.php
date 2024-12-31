@@ -21,9 +21,12 @@ class TrainerController extends BaseController
     public function __construct()
     {
         parent::__construct();
-        $this->trainerModel = new Trainer();
+        $this->trainerModel = new Trainer(); // UserController.php - updateProfile()
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $data['avatar'] = $this->handleImageUpload($_FILES['avatar'], $user['avatar'] ?? null);
+        }
         $this->uploader = new FileUploader();
-        
+
         // Ensure upload directory exists
         $uploadPath = ROOT_PATH . '/' . self::UPLOAD_DIR;
         if (!file_exists($uploadPath)) {
@@ -31,7 +34,8 @@ class TrainerController extends BaseController
         }
     }
 
-    private function handleImageUpload($file, $oldAvatar = null) {
+    private function handleImageUpload($file, $oldAvatar = null)
+    {
         if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
             if ($file['error'] === UPLOAD_ERR_NO_FILE) {
                 return false; // No file uploaded, not an error
@@ -85,7 +89,8 @@ class TrainerController extends BaseController
         return $fileName;
     }
 
-    private function getFileErrorMessage($error) {
+    private function getFileErrorMessage($error)
+    {
         switch ($error) {
             case UPLOAD_ERR_INI_SIZE:
             case UPLOAD_ERR_FORM_SIZE:
@@ -136,7 +141,7 @@ class TrainerController extends BaseController
                 'status' => 'ACTIVE',
                 'avatar' => 'default.jpg'
             ];
-            
+
             try {
                 if ($this->trainerModel->create($data)) {
                     $_SESSION['success'] = 'Thêm huấn luyện viên thành công';
@@ -192,18 +197,17 @@ class TrainerController extends BaseController
                 }
 
                 // Start transaction
-                $this->trainerModel->beginTransaction();
+                $this->trainerModel->db->beginTransaction();
 
                 if (!$this->trainerModel->update($id, $data)) {
                     throw new \Exception('Không thể cập nhật thông tin huấn luyện viên');
                 }
 
-                $this->trainerModel->commit();
+                $this->trainerModel->db->commit();
                 $_SESSION['success'] = 'Cập nhật thông tin huấn luyện viên thành công';
-
             } catch (\Exception $e) {
-                if ($this->trainerModel->inTransaction()) {
-                    $this->trainerModel->rollBack();
+                if ($this->trainerModel->db->inTransaction()) {
+                    $this->trainerModel->db->rollBack();
                 }
                 $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
             }
@@ -211,7 +215,7 @@ class TrainerController extends BaseController
             header('Location: /gym-php/admin/trainer');
             exit;
         }
-        
+
         header('Location: /gym-php/admin/trainer');
         exit;
     }
@@ -286,7 +290,6 @@ class TrainerController extends BaseController
             }
 
             $_SESSION['success'] = 'Xóa huấn luyện viên thành công';
-
         } catch (\Exception $e) {
             // Rollback transaction if available
             if (method_exists($this->trainerModel->db, 'rollBack')) {
@@ -312,7 +315,7 @@ class TrainerController extends BaseController
         // Get current trainer's information
         $trainerId = $_SESSION['trainer_id'];
         $trainer = $this->trainerModel->getTrainerById($trainerId);
-        
+
         if (!$trainer) {
             $_SESSION['error'] = 'Không tìm thấy thông tin huấn luyện viên.';
             $this->redirect('trainer/dashboard');
@@ -332,7 +335,7 @@ class TrainerController extends BaseController
 
         $trainerId = $_SESSION['trainer_id'];
         $trainer = $this->trainerModel->getTrainerById($trainerId);
-        
+
         $data = [
             'fullName' => $_POST['fullName'],
             'email' => $_POST['email'],
@@ -379,50 +382,26 @@ class TrainerController extends BaseController
             $trainer = $this->trainerModel->getTrainerByUsername($username);
 
             if ($trainer && password_verify($password, $trainer['password'])) {
-                // Set session variables
                 $_SESSION['trainer_id'] = $trainer['id'];
                 $_SESSION['trainer_name'] = $trainer['fullName'];
-                $_SESSION['trainer_role'] = 'trainer';
+                $_SESSION['trainer_role'] = 'TRAINER';
+                $_SESSION['trainer_avatar'] = $trainer['avatar'];
 
-                // Redirect to dashboard
-                $this->redirect('/trainer/dashboard');
+                $this->redirect('trainer/dashboard');
             } else {
                 $this->view('Trainer/login', [
                     'error' => 'Tên đăng nhập hoặc mật khẩu không đúng'
-                ]);
+                ], 'auth_layout');
             }
         } else {
-            $this->view('Trainer/login');
+            $this->view('Trainer/login', [], 'auth_layout');
         }
     }
 
     public function dashboard()
     {
-        // Check if trainer is logged in
-        if (!isset($_SESSION['trainer_id']) || $_SESSION['trainer_role'] !== 'trainer') {
-            $this->redirect('/trainer/login');
-            return;
-        }
-
-        $trainerId = $_SESSION['trainer_id'];
-        $trainer = $this->trainerModel->getTrainerById($trainerId);
-
-        if (!$trainer) {
-            $_SESSION['error'] = 'Không tìm thấy thông tin huấn luyện viên.';
-            $this->redirect('/trainer/login');
-            return;
-        }
-
-        // Get training schedule
-        $trainingSchedule = $this->trainerModel->getTrainingSchedule($trainerId);
-
-        $this->view('Trainer/dashboard', [
-            'title' => 'Bảng điều khiển',
-            'trainer' => $trainer,
-            'trainingSchedule' => $trainingSchedule
-        ]);
+        $this->redirect('trainer/dashboard');
     }
-
     public function logout()
     {
         // Clear all session variables
@@ -434,10 +413,11 @@ class TrainerController extends BaseController
     }
 
     // Hàm mới để lấy danh sách huấn luyện viên
-    public function getTrainers() {
+    public function getTrainers()
+    {
         // Lấy dữ liệu từ cơ sở dữ liệu
         $trainers = $this->trainerModel->getAllTrainers();
-        
+
         // Trả về dữ liệu dướidạng JSON
         echo json_encode($trainers);
     }

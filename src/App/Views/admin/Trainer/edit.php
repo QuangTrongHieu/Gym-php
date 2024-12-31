@@ -1,8 +1,9 @@
 <?php if (isset($trainer)): ?>
     <div class="container-fluid px-4">
-        <?php if(isset($_SESSION['error'])): ?>
+        <?php if (isset($_SESSION['error'])): ?>
             <div class="alert alert-danger">
-                <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+                <?= $_SESSION['error'];
+                unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
 
@@ -23,18 +24,18 @@
                                     $fullPath = ROOT_PATH . '/public/uploads/trainers/' . ($item['avatar'] ?? 'default.jpg');
                                     $imgSrc = file_exists($fullPath) ? $avatarPath : $defaultPath;
                                     ?>
-                                    <img src="<?= htmlspecialchars($imgSrc) ?>" 
-                                         alt="Avatar" 
-                                         class="rounded-circle mb-3"
-                                         style="width: 150px; height: 150px; object-fit: cover;"
-                                         id="avatarPreview<?= $item['id'] ?>">
+                                    <img src="<?= htmlspecialchars($imgSrc) ?>"
+                                        alt="Avatar"
+                                        class="rounded-circle mb-3"
+                                        style="width: 150px; height: 150px; object-fit: cover;"
+                                        id="avatarPreview<?= $item['id'] ?>">
                                     <div class="mb-3">
                                         <label class="form-label">Ảnh đại diện</label>
-                                        <input type="file" 
-                                               name="avatar" 
-                                               class="form-control" 
-                                               accept="image/*"
-                                               onchange="previewImage(this, 'avatarPreview<?= $item['id'] ?>')">
+                                        <input type="file"
+                                            name="avatar"
+                                            class="form-control"
+                                            accept="image/*"
+                                            onchange="previewImage(this, 'avatarPreview<?= $item['id'] ?>')">
                                         <div class="form-text">Để trống nếu không muốn thay đổi ảnh</div>
                                     </div>
                                 </div>
@@ -105,16 +106,16 @@
 <?php endif; ?>
 
 <script>
-function previewImage(input, previewId) {
-    const preview = document.getElementById(previewId);
-    const file = input.files[0];
-    
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.src = e.target.result;
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        const file = input.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
         }
-        reader.readAsDataURL(file);
     }
-}
 </script>

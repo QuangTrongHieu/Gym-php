@@ -74,41 +74,41 @@
     </div>
 
     <script>
-    document.getElementById('image<?= $equipment['id'] ?>').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const preview = document.getElementById('imagePreview<?= $equipment['id'] ?>');
-        
-        if (file) {
-            if (file.size > 2 * 1024 * 1024) {
-                alert('Kích thước file không được vượt quá 2MB');
-                this.value = '';
-                preview.innerHTML = '';
-                return;
-            }
+        document.getElementById('image<?= $equipment['id'] ?>').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview<?= $equipment['id'] ?>');
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.innerHTML = `
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Kích thước file không được vượt quá 2MB');
+                    this.value = '';
+                    preview.innerHTML = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
                     <img src="${e.target.result}" class="img-thumbnail" style="max-height: 200px">
                 `;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
             }
-            reader.readAsDataURL(file);
-        } else {
-            preview.innerHTML = '';
-        }
-    });
+        });
 
-    document.getElementById('editEquipmentForm<?= $equipment['id'] ?>').addEventListener('submit', function(e) {
-        const lastMaintenanceDate = document.getElementById('lastMaintenanceDate<?= $equipment['id'] ?>').value;
-        const nextMaintenanceDate = document.getElementById('nextMaintenanceDate<?= $equipment['id'] ?>').value;
-        
-        if (lastMaintenanceDate && nextMaintenanceDate) {
-            if (new Date(lastMaintenanceDate) >= new Date(nextMaintenanceDate)) {
-                e.preventDefault();
-                alert('Ngày bảo trì tiếp theo phải sau ngày bảo trì gần nhất');
+        document.getElementById('editEquipmentForm<?= $equipment['id'] ?>').addEventListener('submit', function(e) {
+            const lastMaintenanceDate = document.getElementById('lastMaintenanceDate<?= $equipment['id'] ?>').value;
+            const nextMaintenanceDate = document.getElementById('nextMaintenanceDate<?= $equipment['id'] ?>').value;
+
+            if (lastMaintenanceDate && nextMaintenanceDate) {
+                if (new Date(lastMaintenanceDate) >= new Date(nextMaintenanceDate)) {
+                    e.preventDefault();
+                    alert('Ngày bảo trì tiếp theo phải sau ngày bảo trì gần nhất');
+                }
             }
-        }
-    });
+        });
     </script>
 <?php else: ?>
 <?php endif; ?>

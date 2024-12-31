@@ -54,7 +54,7 @@ class PackagesController extends BaseController
     public function edit($id)
     {
         $package = $this->packageModel->findById($id);
-        
+
         if (!$package) {
             $_SESSION['error'] = 'Không tìm thấy gói tập';
             $this->redirect('admin/packages');

@@ -1,94 +1,106 @@
-<?php if (isset($_SESSION['error'])): ?>
+<?php if (isset($members)): ?>
+    <div class="container-fluid px-4">
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger">
+                <?= $_SESSION['error'];
+                unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php foreach ($members as $item): ?>
+            <div class="modal fade" id="editModal<?= $item['id'] ?>" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Sửa thông tin hội viên</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/gym-php/admin/member/edit/<?= $item['id'] ?>" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3 text-center">
+                                    <?php
+                                    if (!empty($item['avatar']) && $item['avatar'] !== 'default.jpg') {
+                                        $avatarPath = "/gym-php/public/uploads/members/avatars/" . $item['avatar'];
+                                    } else {
+                                        $avatarPath = $defaultAvatarBase64;
+                                    }
+                                    ?>
+                                    <img src="<?= htmlspecialchars($avatarPath) ?>"
+                                        alt="Avatar"
+                                        class="rounded-circle mb-3"
+                                        style="width: 150px; height: 150px; object-fit: cover;"
+                                        id="avatarPreview<?= $item['id'] ?>">
+                                    <div class="mb-3">
+                                        <label class="form-label">Ảnh đại diện</label>
+                                        <input type="file"
+                                            name="avatar"
+                                            class="form-control"
+                                            accept="image/*"
+                                            onchange="previewImage(this, 'avatarPreview<?= $item['id'] ?>')">
+                                        <div class="form-text">Để trống nếu không muốn thay đổi ảnh</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($item['username']) ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Họ tên</label>
+                                    <input type="text" name="fullName" class="form-control" value="<?= htmlspecialchars($item['fullName']) ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($item['email']) ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password (để trống nếu không thay đổi)</label>
+                                    <input type="password" name="password" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ngày sinh</label>
+                                    <input type="date" name="dateOfBirth" class="form-control" value="<?= htmlspecialchars($item['dateOfBirth']) ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giới tính</label>
+                                    <select name="sex" class="form-control" required>
+                                        <option value="Male" <?= $item['sex'] == 'Male' ? 'selected' : '' ?>>Nam</option>
+                                        <option value="Female" <?= $item['sex'] == 'Female' ? 'selected' : '' ?>>Nữ</option>
+                                        <option value="Other" <?= $item['sex'] == 'Other' ? 'selected' : '' ?>>Khác</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Số điện thoại</label>
+                                    <input type="tel" name="phone" class="form-control" value="<?= htmlspecialchars($item['phone']) ?>" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php else: ?>
     <div class="alert alert-danger">
-        <?= $_SESSION['error']; ?>
-        <?php unset($_SESSION['error']); ?>
+        Không tìm thấy thông tin hội viên
     </div>
 <?php endif; ?>
 
-<div class="container">
-    <h1>Sửa thông tin hội viên</h1>
-    <form action="/gym-php/admin/member-management/update/<?= $member['id'] ?>" method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label class="form-label">Ảnh đại diện</label>
-            <input type="file" name="avatar" class="form-control" accept="image/*">
-            <?php if (!empty($member['avatar'])): ?>
-                <div class="mt-2">
-                    <img src="/gym-php/public/uploads/members/<?= htmlspecialchars($member['avatar']) ?>" 
-                         alt="Current avatar" 
-                         class="member-avatar"
-                         style="width: 100px; height: 100px;">
-                </div>
-            <?php endif; ?>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Username</label>
-            <input type="text" name="username" class="form-control" value="<?= htmlspecialchars($member['username']) ?>" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Họ tên</label>
-            <input type="text" name="fullName" class="form-control" value="<?= htmlspecialchars($member['fullName']) ?>" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($member['email']) ?>" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Password (để trống nếu không thay đổi)</label>
-            <input type="password" name="password" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Ngày sinh</label>
-            <input type="date" name="dateOfBirth" class="form-control" value="<?= htmlspecialchars($member['dateOfBirth']) ?>" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Giới tính</label>
-            <select name="sex" class="form-control" required>
-                <option value="Male" <?= $member['sex'] == 'Male' ? 'selected' : '' ?>>Nam</option>
-                <option value="Female" <?= $member['sex'] == 'Female' ? 'selected' : '' ?>>Nữ</option>
-                <option value="Other" <?= $member['sex'] == 'Other' ? 'selected' : '' ?>>Khác</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Số điện thoại</label>
-            <input type="tel" name="phone" class="form-control" value="<?= htmlspecialchars($member['phone']) ?>" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Trạng thái</label>
-            <select name="status" class="form-control" required>
-                <option value="ACTIVE" <?= ($member['status'] ?? '') == 'ACTIVE' ? 'selected' : '' ?>>Hoạt động</option>
-                <option value="INACTIVE" <?= ($member['status'] ?? '') == 'INACTIVE' ? 'selected' : '' ?>>Không hoạt động</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Gói tập</label>
-            <select name="package_id" class="form-select" required>
-                <option value="">Chọn gói tập</option>
-                <?php foreach($packages as $package): ?>
-                    <option value="<?= $package['id'] ?>" <?= ($member['package_id'] ?? '') == $package['id'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($package['name']) ?> 
-                        (<?= $package['duration'] ?> tháng - <?= number_format($package['price'], 0, ',', '.') ?> VNĐ)
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Ngày bắt đầu</label>
-            <input type="date" name="startDate" class="form-control" value="<?= htmlspecialchars($member['startDate'] ?? '') ?>" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Ngày kết thúc</label>
-            <input type="date" name="endDate" class="form-control" value="<?= htmlspecialchars($member['endDate'] ?? '') ?>" required>
-        </div>
-        <div>
-            <a href="/gym-php/admin/member" class="btn btn-secondary">Hủy</a>
-            <button type="submit" class="btn btn-primary">Cập nhật</button>
-        </div>
-    </form>
-</div>
+<script>
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        const file = input.files[0];
 
-<style>
-.member-avatar {
-    border-radius: 50%;
-    object-fit: cover;
-}
-</style>
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+</script>

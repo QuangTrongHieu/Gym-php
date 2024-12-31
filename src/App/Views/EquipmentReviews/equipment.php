@@ -1,23 +1,23 @@
 <div class="container mt-4">
     <h2 class="text-center mb-4">Gym Equipment</h2>
-    
+
     <div class="row">
         <?php if (!empty($equipments)) : ?>
             <?php foreach ($equipments as $equipment) : ?>
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
                         <?php if (!empty($equipment['image_path'])) : ?>
-                            <img src="/gym-php<?php echo $equipment['image_path']; ?>" 
-                                 class="card-img-top" 
-                                 alt="<?php echo htmlspecialchars($equipment['name']); ?>"
-                                 style="height: 200px; object-fit: cover;">
+                            <img src="/gym-php<?php echo $equipment['image_path']; ?>"
+                                class="card-img-top"
+                                alt="<?php echo htmlspecialchars($equipment['name']); ?>"
+                                style="height: 200px; object-fit: cover;">
                         <?php else : ?>
-                            <img src="/gym-php/public/assets/images/default-equipment.jpg" 
-                                 class="card-img-top" 
-                                 alt="Default Equipment Image"
-                                 style="height: 200px; object-fit: cover;">
+                            <img src="/gym-php/public/assets/images/default-equipment.jpg"
+                                class="card-img-top"
+                                alt="Default Equipment Image"
+                                style="height: 200px; object-fit: cover;">
                         <?php endif; ?>
-                        
+
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($equipment['name']); ?></h5>
                             <p class="card-text"><?php echo htmlspecialchars($equipment['description']); ?></p>

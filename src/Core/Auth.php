@@ -41,7 +41,7 @@ class Auth
         return $_SESSION['user_role'] ?? null;
     }
 
-    public function getAvatar() 
+    public function getAvatar()
     {
         return $_SESSION['avatar'] ?? null;
     }

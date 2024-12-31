@@ -140,13 +140,13 @@ error_log('User data in header: ' . print_r($user ?? [], true));
             </div>
 
             <!-- User Account -->
-            <?php 
+            <?php
             // Kiểm tra session trực tiếp
             $isLoggedIn = isset($_SESSION['user_id']);
             $userName = $_SESSION['user_name'] ?? null;
             $userAvatar = $_SESSION['avatar'] ?? null;
-            
-            if ($isLoggedIn): 
+
+            if ($isLoggedIn):
             ?>
                 <!-- Hiển thị dropdown menu khi đã đăng nhập -->
                 <div class="dropdown">

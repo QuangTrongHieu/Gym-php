@@ -1,4 +1,3 @@
-
 <div class="container py-5">
     <h1 class="text-center mb-5"><?= $title ?></h1>
 
@@ -13,7 +12,7 @@
                             <strong>Thời hạn:</strong> <?= htmlspecialchars($package['duration']) ?> tháng<br>
                             <strong>Giá:</strong> <?= number_format($package['price'], 0, ',', '.') ?> VNĐ
                         </p>
-                        
+
                         <?php if (isset($_SESSION['user'])): ?>
                             <a href="/gym-php/membership/register/<?= $package['id'] ?>" class="btn btn-primary">Đăng ký ngay</a>
                         <?php else: ?>

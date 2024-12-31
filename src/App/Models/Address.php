@@ -95,7 +95,6 @@ class Address extends BaseModel
 
             $stmt = $this->db->prepare($sql);
             return $stmt->execute($params);
-
         } catch (PDOException $e) {
             error_log("Error updating address: " . $e->getMessage());
             throw new Exception("Không thể cập nhật địa chỉ. Vui lòng thử lại sau.");

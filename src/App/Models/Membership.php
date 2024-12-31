@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\BaseModel;
 
 use Core\Database;
@@ -76,14 +77,14 @@ class Membership extends BaseModel
                 VALUES 
                 (:amount, :paymentMethod, :qrImage, :paymentStatus, NOW())
             ");
-            
+
             $paymentStmt->execute([
                 ':amount' => $data['amount'],
                 ':paymentMethod' => $data['paymentMethod'],
                 ':qrImage' => $data['qrImage'] ?? null,
                 ':paymentStatus' => 'PENDING'
             ]);
-            
+
             $paymentId = $this->db->lastInsertId();
 
             // Create membership registration
@@ -93,7 +94,7 @@ class Membership extends BaseModel
                 VALUES 
                 (:userId, :packageId, :startDate, :endDate, :status, :paymentId, NOW())
             ");
-            
+
             $success = $stmt->execute([
                 ':userId' => $data['userId'],
                 ':packageId' => $data['packageId'],
@@ -155,7 +156,7 @@ class Membership extends BaseModel
                         updatedAt = NOW()
                     WHERE id = :id
                 ");
-                
+
                 $paymentSuccess = $paymentStmt->execute([
                     ':id' => $membership['paymentId'],
                     ':amount' => $data['amount'] ?? null,
@@ -194,7 +195,7 @@ class Membership extends BaseModel
             if (!empty($updateFields)) {
                 $updateFields[] = "updatedAt = NOW()";
                 $query = "UPDATE membership_registrations SET " . implode(", ", $updateFields) . " WHERE id = :id";
-                
+
                 $membershipStmt = $this->db->prepare($query);
                 $membershipSuccess = $membershipStmt->execute($params);
 
@@ -205,7 +206,6 @@ class Membership extends BaseModel
 
             $this->db->commit();
             return true;
-
         } catch (\Exception $e) {
             $this->db->rollBack();
             throw $e;
@@ -266,7 +266,6 @@ class Membership extends BaseModel
 
             $this->db->commit();
             return true;
-
         } catch (\Exception $e) {
             $this->db->rollBack();
             throw $e;
@@ -282,7 +281,7 @@ class Membership extends BaseModel
                 updatedAt = NOW()
             WHERE id = :id
         ");
-        
+
         return $stmt->execute([
             ':id' => $paymentId,
             ':status' => $status
@@ -334,7 +333,7 @@ class Membership extends BaseModel
                 updatedAt = NOW()
             WHERE id = :id
         ");
-        
+
         return $stmt->execute([
             ':id' => $id,
             ':endDate' => $endDate
@@ -358,7 +357,7 @@ class Membership extends BaseModel
                 WHERE mr.id = :id
             )
         ");
-        
+
         return $stmt->execute([':id' => $id]);
     }
 
@@ -373,7 +372,7 @@ class Membership extends BaseModel
             WHERE id = :id
             AND status = 'FROZEN'
         ");
-        
+
         return $stmt->execute([
             ':id' => $id,
             ':frozenDays' => $frozenDays

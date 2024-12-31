@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\BaseModel;
 use PDOException;
 
@@ -33,7 +34,8 @@ class Package extends BaseModel
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public function getPackageStatistics() {
+    public function getPackageStatistics()
+    {
         $sql = "SELECT 
                     mp.name as package_name,
                     COUNT(DISTINCT mr.userId) as total_users,
@@ -42,13 +44,13 @@ class Package extends BaseModel
                 LEFT JOIN membership_registrations mr ON mp.id = mr.packageId
                 WHERE mp.status = 'ACTIVE'
                 GROUP BY mp.id, mp.name, mp.price";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
-        
+
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
-    
+
     public function create($data)
     {
         try {
@@ -119,7 +121,8 @@ class Package extends BaseModel
         }
     }
 
-    public function getMonthlyRevenue() {
+    public function getMonthlyRevenue()
+    {
         $sql = "SELECT 
                     MONTH(mr.startDate) as month,
                     YEAR(mr.startDate) as year,
@@ -130,12 +133,12 @@ class Package extends BaseModel
                 WHERE YEAR(mr.startDate) = YEAR(CURRENT_DATE)
                 GROUP BY YEAR(mr.startDate), MONTH(mr.startDate)
                 ORDER BY year ASC, month ASC";
-        
+
         try {
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
             $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            
+
             // Initialize array for all months
             $monthlyData = [];
             for ($month = 1; $month <= 12; $month++) {
@@ -145,7 +148,7 @@ class Package extends BaseModel
                     'total_revenue' => 0
                 ];
             }
-            
+
             // Fill in actual data
             foreach ($results as $row) {
                 $monthlyData[$row['month']] = [
@@ -154,7 +157,7 @@ class Package extends BaseModel
                     'total_revenue' => (float)$row['total_revenue']
                 ];
             }
-            
+
             return array_values($monthlyData);
         } catch (\PDOException $e) {
             error_log("Error getting monthly revenue: " . $e->getMessage());

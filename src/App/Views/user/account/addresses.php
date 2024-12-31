@@ -96,9 +96,9 @@
             '/gym-php/user/address/create';
 
         fetch(url, {
-            method: 'POST',
-            body: formData
-        })
+                method: 'POST',
+                body: formData
+            })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -112,8 +112,8 @@
     function deleteAddress(id) {
         if (confirm('Bạn có chắc muốn xóa địa chỉ này?')) {
             fetch(`/gym-php/user/address/delete/${id}`, {
-                method: 'POST'
-            })
+                    method: 'POST'
+                })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -127,8 +127,8 @@
 
     function setDefaultAddress(id) {
         fetch(`/gym-php/user/address/set-default/${id}`, {
-            method: 'POST'
-        })
+                method: 'POST'
+            })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

@@ -1,34 +1,54 @@
-<div class="container">
-    <h1>Xóa hội viên</h1>
-    
-    <div class="alert alert-warning">
-        <h4 class="alert-heading">Xác nhận xóa</h4>
-        <p>Bạn có chắc chắn muốn xóa hội viên <strong><?= htmlspecialchars($member['fullName']) ?></strong> không?</p>
-        <hr>
-        <p class="mb-0">Hành động này không thể hoàn tác.</p>
+<?php if (!empty($trainers)): ?>
+    <?php foreach ($trainers as $trainer): ?>
+        <div class="container mt-4">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h1 class="h3 mb-0">Xóa Hội viên</h1>
+                </div>
+                <div class="card-body">
+                    <?php if (isset($_SESSION['error'])): ?>
+                        <div class="alert alert-danger">
+                            <?= $_SESSION['error'];
+                            unset($_SESSION['error']); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <button type="button" class="btn btn-danger" onclick="showDeleteModal(<?= $trainer['id'] ?>, '<?= htmlspecialchars($trainer['fullName']) ?>')">
+                        <i class="fas fa-trash-alt"></i> Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php else: ?>
+<?php endif; ?>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Xóa Hội viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Bạn có chắc chắn muốn xóa hội viên <strong id="deleteMemberName"></strong>?</p>
+                <small class="text-muted">Hành động này không thể hoàn tác.</small>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteMemberForm" action="" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <form action="/gym-php/admin/member-management/delete/<?= $member['id'] ?>" method="POST">
-        <input type="hidden" name="id" value="<?= $member['id'] ?>">
-        
-        <div class="mb-3">
-            <label class="form-label">Username:</label>
-            <p class="form-control-static"><?= htmlspecialchars($member['username']) ?></p>
-        </div>
-        
-        <div class="mb-3">
-            <label class="form-label">Email:</label>
-            <p class="form-control-static"><?= htmlspecialchars($member['email']) ?></p>
-        </div>
-        
-        <div class="mb-3">
-            <label class="form-label">Số điện thoại:</label>
-            <p class="form-control-static"><?= htmlspecialchars($member['phone']) ?></p>
-        </div>
-
-        <div class="mt-4">
-            <a href="/gym-php/admin/member" class="btn btn-secondary">Hủy</a>
-            <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
-        </div>
-    </form>
 </div>
+
+<script>
+    function showDeleteModal(id, name) {
+        document.getElementById('deleteMemberName').textContent = name;
+        document.getElementById('deleteMemberForm').action = `/gym-php/admin/member/delete/${id}`;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+</script>

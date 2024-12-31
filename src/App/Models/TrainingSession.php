@@ -37,4 +37,4 @@ class TrainingSession extends BaseModel
         $stmt->execute(['trainer_id' => $trainerId]);
         return $stmt->fetchAll();
     }
-} 
+}

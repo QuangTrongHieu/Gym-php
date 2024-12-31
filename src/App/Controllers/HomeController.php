@@ -32,7 +32,7 @@ class HomeController extends BaseController
 
             // Lấy tổng số trainer
             $totalTrainers = $this->trainerModel->count();
-            
+
 
             // Tính tổng số trang
             $totalPages = max(1, ceil($totalTrainers / $limit));
@@ -47,7 +47,6 @@ class HomeController extends BaseController
 
             // Render view với dữ liệu
             $this->view('home/index', $data);
-
         } catch (\Exception $e) {
             // Log lỗi chi tiết
             echo '<script>console.error("Error:", ' . json_encode($e->getMessage()) . ');</script>';

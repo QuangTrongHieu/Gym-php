@@ -108,73 +108,75 @@
 
 <!-- CSS để thêm vào file styles.css của bạn -->
 <style>
-.footer-dark {
-    background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
-    color: #ffffff;
-}
+    .footer-dark {
+        background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+        color: #ffffff;
+    }
 
-.copyright {
-    background-color: #000000;
-}
+    .copyright {
+        background-color: #000000;
+    }
 
-.footer-links a, 
-.footer-services li, 
-.footer-contact li, 
-.footer-hours li {
-    color: #ffffff;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
+    .footer-links a,
+    .footer-services li,
+    .footer-contact li,
+    .footer-hours li {
+        color: #ffffff;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
 
-.footer-links a:hover {
-    color: #0d6efd;
-    padding-left: 10px;
-}
+    .footer-links a:hover {
+        color: #0d6efd;
+        padding-left: 10px;
+    }
 
-.social-links .btn {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    line-height: 40px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
+    .social-links .btn {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        line-height: 40px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
 
-.social-links .btn:hover {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-    transform: translateY(-3px);
-}
+    .social-links .btn:hover {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        transform: translateY(-3px);
+    }
 
-.border-bottom {
-    border-color: rgba(255,255,255,0.1) !important;
-}
+    .border-bottom {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
 
-.hover-effect {
-    transition: all 0.3s ease;
-}
+    .hover-effect {
+        transition: all 0.3s ease;
+    }
 
-.hover-effect:hover {
-    transform: translateX(5px);
-}
+    .hover-effect:hover {
+        transform: translateX(5px);
+    }
 
-/* Hiệu ứng hover cho các mục dịch vụ */
-.footer-services li:hover,
-.footer-contact li:hover,
-.footer-hours li:hover {
-    color: #0d6efd;
-    cursor: pointer;
-}
+    /* Hiệu ứng hover cho các mục dịch vụ */
+    .footer-services li:hover,
+    .footer-contact li:hover,
+    .footer-hours li:hover {
+        color: #0d6efd;
+        cursor: pointer;
+    }
 
-/* Animation cho icons */
-.fas, .far, .fab {
-    transition: all 0.3s ease;
-}
+    /* Animation cho icons */
+    .fas,
+    .far,
+    .fab {
+        transition: all 0.3s ease;
+    }
 
-li:hover .fas,
-li:hover .far,
-li:hover .fab {
-    transform: scale(1.2);
-    color: #0d6efd;
-}
+    li:hover .fas,
+    li:hover .far,
+    li:hover .fab {
+        transform: scale(1.2);
+        color: #0d6efd;
+    }
 </style>

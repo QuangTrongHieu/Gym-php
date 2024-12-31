@@ -1,6 +1,6 @@
 <div class="container-fluid px-4">
     <h1 class="mt-4">Quản lý Thiết bị</h1>
-    
+
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?= $_SESSION['success'] ?>
@@ -50,10 +50,10 @@
                                 <td><?= $equipment['id'] ?></td>
                                 <td class="text-center">
                                     <?php if (!empty($equipment['image_path'])): ?>
-                                        <img src="/gym-php<?= $equipment['image_path'] ?>" 
-                                             alt="<?= htmlspecialchars($equipment['name']) ?>" 
-                                             class="img-thumbnail"
-                                             style="max-width: 100px; max-height: 100px; object-fit: cover;">
+                                        <img src="/gym-php<?= $equipment['image_path'] ?>"
+                                            alt="<?= htmlspecialchars($equipment['name']) ?>"
+                                            class="img-thumbnail"
+                                            style="max-width: 100px; max-height: 100px; object-fit: cover;">
                                     <?php else: ?>
                                         <span class="text-muted">Không có ảnh</span>
                                     <?php endif; ?>
@@ -70,16 +70,16 @@
                                 <td><?= $equipment['lastMaintenanceDate'] ? date('d/m/Y', strtotime($equipment['lastMaintenanceDate'])) : 'Chưa có' ?></td>
                                 <td><?= $equipment['nextMaintenanceDate'] ? date('d/m/Y', strtotime($equipment['nextMaintenanceDate'])) : 'Chưa có' ?></td>
                                 <td>
-                                    <button type="button" 
-                                            class="btn btn-warning btn-sm" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#editEquipmentModal<?= $equipment['id'] ?>">
+                                    <button type="button"
+                                        class="btn btn-warning btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editEquipmentModal<?= $equipment['id'] ?>">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button type="button" 
-                                            class="btn btn-danger btn-sm" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#deleteEquipmentModal<?= $equipment['id'] ?>">
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteEquipmentModal<?= $equipment['id'] ?>">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -128,7 +128,9 @@
                 }
             },
             "pageLength": 10,
-            "order": [[0, "desc"]]
+            "order": [
+                [0, "desc"]
+            ]
         });
     });
 </script>

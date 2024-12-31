@@ -44,11 +44,10 @@ $router->add('/admin/packages/create', ['controller' => 'packages', 'action' => 
 $router->add('/admin/packages/edit/{id:\d+}', ['controller' => 'packages', 'action' => 'edit']);
 $router->add('/admin/packages/delete/{id:\d+}', ['controller' => 'packages', 'action' => 'delete']);
 
-$router->add('/admin/member', ['controller' => 'member', 'action' => 'index']);
-$router->add('/admin/member/create', ['controller' => 'member', 'action' => 'create']);
-$router->add('/admin/member/edit/{id:\d+}', ['controller' => 'member', 'action' => 'edit']);
-$router->add('/admin/member/update/{id:\d+}', ['controller' => 'member', 'action' => 'update']);
-$router->add('/admin/member/export', ['controller' => 'member', 'action' => 'export']);
+$router->add('/admin/member', ['controller' => 'User', 'action' => 'adminIndex']);
+$router->add('/admin/member/create', ['controller' => 'User', 'action' => 'createMember']);
+$router->add('/admin/member/edit/{id:\d+}', ['controller' => 'User', 'action' => 'editMember']);
+$router->add('/admin/member/delete/{id:\d+}', ['controller' => 'User', 'action' => 'deleteMember']);
 
 $router->add('/admin/revenue', ['controller' => 'revenue', 'action' => 'index']);
 
@@ -79,7 +78,7 @@ $router->add('/schedule', ['controller' => 'Schedule', 'action' => 'index']);
 $router->add('/schedule/create', ['controller' => 'Schedule', 'action' => 'create']);
 
 // Trainer routes
-$router->add('/trainers', ['controller' => 'Trainer', 'action' => 'dashboard']);
+// $router->add('/trainers', ['controller' => 'Trainer', 'action' => 'dashboard']);
 $router->add('/trainers/create', ['controller' => 'Trainer', 'action' => 'create']);
 $router->add('/trainers/update/{id:\d+}', ['controller' => 'Trainer', 'action' => 'update']);
 $router->add('/trainers/delete/{id:\d+}', ['controller' => 'Trainer', 'action' => 'delete']);
@@ -89,12 +88,18 @@ $router->add('/trainers/sessions/{id:\d+}/status', ['controller' => 'Trainer', '
 $router->add('/trainers/{id:\d+}/performance', ['controller' => 'Trainer', 'action' => 'getPerformanceStats']);
 $router->add('/trainers/{id:\d+}/clients', ['controller' => 'Trainer', 'action' => 'getClients']);
 $router->add('/trainer/trainers-login', ['controller' => 'Trainer', 'action' => 'login']);
-$router->add('/trainer/login', ['controller' => 'Auth', 'action' => 'login']);
-$router->add('/trainer/logout', ['controller' => 'Auth', 'action' => 'logout']); 
+// $router->add('/trainer/login', ['controller' => 'Auth', 'action' => 'login']);
+// $router->add('/trainer/logout', ['controller' => 'Auth', 'action' => 'logout']); 
+
+// Trainer auth routes 
+$router->add('/trainer/login', ['controller' => 'Trainer', 'action' => 'login']);
+$router->add('/trainer/dashboard', ['controller' => 'Trainer', 'action' => 'dashboard']);
+$router->add('/trainer/logout', ['controller' => 'Trainer', 'action' => 'logout']);
 
 // User routes
 $router->add('/user', ['controller' => 'User', 'action' => 'index']);
 $router->add('/user/profile', ['controller' => 'User', 'action' => 'profile']);
+$router->add('/user/profile/update', ['controller' => 'User', 'action' => 'updateProfile']);
 $router->add('/user/upload-avatar', ['controller' => 'User', 'action' => 'uploadAvatar']);
 $router->add('/user/addresses', ['controller' => 'User', 'action' => 'addresses']);
 $router->add('/user/address/{id:\d+}', ['controller' => 'User', 'action' => 'getAddress']);
@@ -108,6 +113,8 @@ $router->add('/trainer/{id:\d+}', ['controller' => 'RegisTrainer', 'action' => '
 
 // Contact route
 $router->add('/contact', ['controller' => 'Contact', 'action' => 'index']);
+
+$router->add('/membership/register/{id}', ['controller' => 'User', 'action' => 'showRegistrationForm']);
 
 // Trainer authentication routes
 

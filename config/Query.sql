@@ -1,34 +1,31 @@
--- Xóa database nếu tồn tại và tạo mới
-DROP DATABASE IF EXISTS `gym-php-mvc`;
-CREATE DATABASE `gym-php-mvc`;
-USE `gym-php-mvc`;
+-- Create database
+DROP DATABASE IF EXISTS `gym-php`;
+CREATE DATABASE `gym-php`;
+USE `gym-php`;
 
--- Thiết lập môi trường
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-SET FOREIGN_KEY_CHECKS = 0;
-
+-- Create tables with proper constraints
 -- 1. Bảng Users
 CREATE TABLE users (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `avatar` varchar(255) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `fullName` varchar(255) NOT NULL,
-  `dateOfBirth` date NOT NULL,
-  `sex` enum('Male','Female','Other') NOT NULL,
-  `phone` varchar(20) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `membershipStatus` enum('ACTIVE','EXPIRED','SUSPENDED') NOT NULL DEFAULT 'EXPIRED',
-  `eRole` enum('ADMIN','TRAINER','MEMBER', 'USER') NOT NULL DEFAULT 'MEMBER',
-  `status` enum('ACTIVE','INACTIVE') NOT NULL DEFAULT 'ACTIVE',
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_username` (`username`),
-  UNIQUE KEY `unique_email` (`email`),
-  UNIQUE KEY `unique_phone` (`phone`)
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    avatar VARCHAR(255) DEFAULT 'default.jpg',
+    username VARCHAR(50) NOT NULL,
+    fullName VARCHAR(255) NOT NULL,
+    dateOfBirth DATE NOT NULL,
+    sex ENUM('Male', 'Female', 'Other') NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    membershipStatus ENUM('ACTIVE', 'EXPIRED', 'SUSPENDED') NOT NULL DEFAULT 'EXPIRED',
+    eRole ENUM('ADMIN', 'TRAINER', 'MEMBER', 'USER') NOT NULL DEFAULT 'MEMBER',
+    status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_username (username),
+    UNIQUE KEY unique_email (email),
+    UNIQUE KEY unique_phone (phone),
+    INDEX idx_role_status (eRole, status),
+    INDEX idx_membership (membershipStatus)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 2. Bảng Admins
@@ -46,29 +43,29 @@ CREATE TABLE admins (
   UNIQUE KEY `unique_admin_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 3. Bảng Trainers
+-- 2. Bảng Trainers
 CREATE TABLE trainers (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `avatar` varchar(255) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `fullName` varchar(255) NOT NULL,
-  `dateOfBirth` date NOT NULL,
-  `sex` enum('Male','Female','Other') NOT NULL,
-  `phone` varchar(20) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `specialization` text NOT NULL,
-  `experience` int(11) NOT NULL,
-  `certification` text NOT NULL,
-  `salary` decimal(10,0) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `eRole` enum('ADMIN','TRAINER','MEMBER', 'USER') NOT NULL DEFAULT 'TRAINER',
-  `status` enum('ACTIVE','INACTIVE') NOT NULL DEFAULT 'ACTIVE',
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_trainer_username` (`username`),
-  UNIQUE KEY `unique_trainer_email` (`email`),
-  UNIQUE KEY `unique_trainer_phone` (`phone`)
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    avatar VARCHAR(255) NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    fullName VARCHAR(255) NOT NULL,
+    dateOfBirth DATE NOT NULL,
+    sex ENUM('Male', 'Female', 'Other') NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    specialization TEXT NOT NULL,
+    experience INT(11) NOT NULL,
+    certification TEXT NOT NULL,
+    salary DECIMAL(10, 0) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    eRole ENUM('ADMIN', 'TRAINER', 'MEMBER', 'USER') NOT NULL DEFAULT 'TRAINER',
+    status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_trainer_username (username),
+    UNIQUE KEY unique_trainer_email (email),
+    UNIQUE KEY unique_trainer_phone (phone)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 4. Bảng Membership Packages
@@ -131,7 +128,7 @@ CREATE TABLE membership_registrations (
   KEY `userId` (`userId`),
   KEY `packageId` (`packageId`),
   KEY `paymentId` (`paymentId`),
-  CONSTRAINT `membership_registrations_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`),
+  CONSTRAINT `membership_registrations_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `membership_registrations_ibfk_2` FOREIGN KEY (`packageId`) REFERENCES `membership_packages` (`id`),
   CONSTRAINT `membership_registrations_ibfk_3` FOREIGN KEY (`paymentId`) REFERENCES `payments` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -154,7 +151,7 @@ CREATE TABLE pt_registrations (
   KEY `trainerId` (`trainerId`),
   KEY `packageId` (`packageId`),
   KEY `paymentId` (`paymentId`),
-  CONSTRAINT `pt_registrations_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`),
+  CONSTRAINT `pt_registrations_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `pt_registrations_ibfk_2` FOREIGN KEY (`trainerId`) REFERENCES `trainers` (`id`),
   CONSTRAINT `pt_registrations_ibfk_3` FOREIGN KEY (`packageId`) REFERENCES `pt_packages` (`id`),
   CONSTRAINT `pt_registrations_ibfk_4` FOREIGN KEY (`paymentId`) REFERENCES `payments` (`id`)
@@ -331,21 +328,21 @@ ADD INDEX idx_checkin_time (checkInTime, checkOutTime);
 -- Triggers
 DELIMITER $$
 
--- Trigger cập nhật trạng thái thành viên
-CREATE TRIGGER after_membership_registration_update 
-AFTER UPDATE ON membership_registrations
-FOR EACH ROW 
+CREATE TRIGGER check_trainer_schedule_trigger
+BEFORE INSERT ON training_sessions
+FOR EACH ROW
 BEGIN
-    IF NEW.status != OLD.status THEN
-        UPDATE users 
-        SET membershipStatus = CASE
-            WHEN NEW.status = 'ACTIVE' THEN 'ACTIVE'
-            WHEN NEW.status = 'FROZEN' THEN 'SUSPENDED'
-            ELSE 'EXPIRED'
-        END
-        WHERE id = NEW.userId;
+    IF EXISTS (
+        SELECT 1 FROM training_sessions
+        WHERE ptRegistrationId = NEW.ptRegistrationId
+        AND sessionDate = NEW.sessionDate
+        AND status IN ('SCHEDULED', 'ACTIVE')
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Trainer already has a session at this time';
     END IF;
 END $$
+DELIMITER ;
 
 -- Trigger cập nhật số buổi tập còn lại
 CREATE TRIGGER after_training_session_update
@@ -356,6 +353,61 @@ BEGIN
         UPDATE pt_registrations
         SET remainingSessions = remainingSessions - 1
         WHERE id = NEW.ptRegistrationId;
+    END IF;
+END $$
+
+
+-- Trigger kiểm tra lịch trình huấn luyện viên
+CREATE TRIGGER check_trainer_availability
+BEFORE INSERT ON trainer_schedules
+FOR EACH ROW
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM trainer_schedules
+        WHERE trainerId = NEW.trainerId 
+        AND sessionDate = NEW.sessionDate
+        AND status != 'CANCELLED'
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Trainer already has session at this time';
+    END IF;
+END $$
+
+-- Trigger kiểm tra ngày buổi tập
+CREATE TRIGGER check_session_date_trigger
+BEFORE INSERT ON training_sessions
+FOR EACH ROW
+BEGIN
+    IF NEW.sessionDate < NOW() THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Session date must be in the future';
+    END IF;
+END $$
+
+-- Trigger kiểm tra ngày đăng ký thành viên
+CREATE TRIGGER check_membership_dates_trigger
+BEFORE INSERT ON membership_registrations
+FOR EACH ROW
+BEGIN
+    IF NEW.startDate > NEW.endDate THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Start date must be before or equal to end date';
+    END IF;
+END $$
+
+-- Trigger kiểm tra lịch trình huấn luyện viên
+CREATE TRIGGER check_trainer_schedule_trigger
+BEFORE INSERT ON trainer_schedules
+FOR EACH ROW
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM trainer_schedules
+        WHERE trainerId = NEW.trainerId 
+        AND sessionDate = NEW.sessionDate
+        AND status = 'SCHEDULED'
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Trainer already has session at this time';
     END IF;
 END $$
 
@@ -392,3 +444,46 @@ GROUP BY t.id;
 -- Bật lại foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
 COMMIT;
+
+-- 1. Add cascading deletes for user relationships
+ALTER TABLE membership_registrations
+DROP FOREIGN KEY membership_registrations_ibfk_1,
+ADD CONSTRAINT membership_registrations_ibfk_1 
+FOREIGN KEY (userId) REFERENCES users(id)
+ON DELETE CASCADE;
+
+ALTER TABLE pt_registrations 
+DROP FOREIGN KEY pt_registrations_ibfk_1,
+ADD CONSTRAINT pt_registrations_ibfk_1
+FOREIGN KEY (userId) REFERENCES users(id)
+ON DELETE CASCADE;
+
+-- 2. Add trainer schedule validation check
+CREATE TABLE trainer_schedules (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    trainerId INT NOT NULL,
+    memberId INT NOT NULL, 
+    sessionDate DATETIME NOT NULL,
+    status ENUM('SCHEDULED','COMPLETED','CANCELLED') DEFAULT 'SCHEDULED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (trainerId) REFERENCES users(id),
+    FOREIGN KEY (memberId) REFERENCES users(id),
+    UNIQUE KEY unique_trainer_schedule (trainerId, sessionDate, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 3. Add membership package validation
+ALTER TABLE membership_registrations
+ADD CONSTRAINT check_dates 
+CHECK (startDate <= endDate);
+
+-- 4. Add training session validation
+ALTER TABLE training_sessions 
+ADD CONSTRAINT check_session_dates
+CHECK (sessionDate >= CURRENT_TIMESTAMP);
+
+-- 1. Drop constraints first
+ALTER TABLE training_sessions 
+DROP CONSTRAINT IF EXISTS check_session_dates;
+
+ALTER TABLE membership_registrations
+DROP CONSTRAINT IF EXISTS check_dates;

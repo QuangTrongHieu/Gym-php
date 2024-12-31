@@ -13,15 +13,15 @@ class Schedule extends BaseModel
     {
         $conditions = [];
         $params = [];
-        
+
         if ($month && $year) {
             $conditions[] = "MONTH(s.training_date) = :month AND YEAR(s.training_date) = :year";
             $params[':month'] = $month;
             $params[':year'] = $year;
         }
-        
+
         $whereClause = !empty($conditions) ? "WHERE " . implode(' AND ', $conditions) : "";
-        
+
         $sql = "SELECT s.*, u.fullName as user_name, t.fullName as trainer_name,
                        u.email as user_email, t.email as trainer_email,
                        u.phone as user_phone, t.phone as trainer_phone
@@ -30,10 +30,10 @@ class Schedule extends BaseModel
                 LEFT JOIN trainers t ON s.trainer_id = t.id
                 {$whereClause}
                 ORDER BY s.training_date ASC, s.start_time ASC";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -41,15 +41,15 @@ class Schedule extends BaseModel
     {
         $conditions = ["s.user_id = :user_id"];
         $params = [':user_id' => $userId];
-        
+
         if ($month && $year) {
             $conditions[] = "MONTH(s.training_date) = :month AND YEAR(s.training_date) = :year";
             $params[':month'] = $month;
             $params[':year'] = $year;
         }
-        
+
         $whereClause = implode(' AND ', $conditions);
-        
+
         $sql = "SELECT s.*, u.fullName as user_name, t.fullName as trainer_name,
                        u.email as user_email, t.email as trainer_email,
                        u.phone as user_phone, t.phone as trainer_phone
@@ -58,10 +58,10 @@ class Schedule extends BaseModel
                 LEFT JOIN trainers t ON s.trainer_id = t.id
                 WHERE {$whereClause}
                 ORDER BY s.training_date ASC, s.start_time ASC";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -69,15 +69,15 @@ class Schedule extends BaseModel
     {
         $conditions = ["s.trainer_id = :trainer_id"];
         $params = [':trainer_id' => $trainerId];
-        
+
         if ($month && $year) {
             $conditions[] = "MONTH(s.training_date) = :month AND YEAR(s.training_date) = :year";
             $params[':month'] = $month;
             $params[':year'] = $year;
         }
-        
+
         $whereClause = implode(' AND ', $conditions);
-        
+
         $sql = "SELECT s.*, u.fullName as user_name, t.fullName as trainer_name,
                        u.email as user_email, t.email as trainer_email,
                        u.phone as user_phone, t.phone as trainer_phone
@@ -86,10 +86,10 @@ class Schedule extends BaseModel
                 LEFT JOIN trainers t ON s.trainer_id = t.id
                 WHERE {$whereClause}
                 ORDER BY s.training_date ASC, s.start_time ASC";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -104,11 +104,11 @@ class Schedule extends BaseModel
                     OR (start_time < :end_time AND end_time >= :end_time)
                     OR (start_time >= :start_time AND end_time <= :end_time)
                 )";
-                
+
         if ($excludeId) {
             $sql .= " AND id != :exclude_id";
         }
-        
+
         $stmt = $this->db->prepare($sql);
         $params = [
             ':trainer_id' => $trainerId,
@@ -116,14 +116,14 @@ class Schedule extends BaseModel
             ':start_time' => $startTime,
             ':end_time' => $endTime
         ];
-        
+
         if ($excludeId) {
             $params[':exclude_id'] = $excludeId;
         }
-        
+
         $stmt->execute($params);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         return $result['count'] > 0;
     }
 
@@ -131,9 +131,9 @@ class Schedule extends BaseModel
     {
         $sql = "INSERT INTO {$this->table} (user_id, trainer_id, training_date, start_time, end_time, notes, status) 
                 VALUES (:user_id, :trainer_id, :training_date, :start_time, :end_time, :notes, :status)";
-        
+
         $stmt = $this->db->prepare($sql);
-        
+
         return $stmt->execute([
             ':user_id' => $data['user_id'],
             ':trainer_id' => $data['trainer_id'],
@@ -156,9 +156,9 @@ class Schedule extends BaseModel
                     notes = :notes,
                     status = :status
                 WHERE id = :id";
-        
+
         $stmt = $this->db->prepare($sql);
-        
+
         return $stmt->execute([
             ':id' => $id,
             ':user_id' => $data['user_id'],

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use Core\Auth;
@@ -74,7 +75,7 @@ abstract class BaseController
             }
             require_once $layoutPath;
         }
-        
+
         return $content;
     }
 
@@ -115,7 +116,7 @@ abstract class BaseController
     {
         if (!$this->auth->isLoggedIn()) {
             $role = $allowedRoles[0] ?? '';
-            switch($role) {
+            switch ($role) {
                 case 'ADMIN':
                     $this->redirect('admin-login');
                     break;

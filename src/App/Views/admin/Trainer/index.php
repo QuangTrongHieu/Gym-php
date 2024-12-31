@@ -1,4 +1,3 @@
-
 <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show">
         <?= $_SESSION['success']; ?>
@@ -51,46 +50,41 @@ $defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
                 </thead>
                 <tbody>
                     <?php if (!empty($trainer)): ?>
-                        <?php foreach($trainer as $item): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($item['id']) ?></td>
-                            <td>
-                                <?php
-                                if (!empty($item['avatar']) && $item['avatar'] !== 'default.jpg') {
-                                    $avatarPath = "/gym-php/public/uploads/trainers/" . htmlspecialchars($item['avatar']);
-                                } else {
-                                    $avatarPath = $defaultAvatarBase64;
-                                }
-                                ?>
-                                <img src="<?= $avatarPath ?>" 
-                                     class="trainer-avatar"
-                                     alt="<?= htmlspecialchars($item['fullName']) ?>"
-                                     loading="lazy">
-                            </td>
-                            <td><?= htmlspecialchars($item['fullName']) ?></td>
-                            <td><?= htmlspecialchars($item['username']) ?></td>
-                            <td><?= htmlspecialchars($item['email']) ?></td>
-                            <td><?= htmlspecialchars($item['phone']) ?></td>
-                            <td><?= htmlspecialchars($item['specialization']) ?></td>
-                            <td><?= number_format($item['salary'], 0, ',', '.') ?> VNĐ</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button type="button" 
-                                            class="btn btn-warning btn-sm"
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#editModal<?= $item['id'] ?>"
-                                            title="Sửa thông tin">
-                                        <i class="fas fa-edit"></i>
+                        <?php foreach ($trainer as $item): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($item['id']) ?></td>
+                                <td>
+                                    <?php
+                                    if (!empty($item['avatar']) && $item['avatar'] !== 'default.jpg') {
+                                        $avatarPath = "/gym-php/public/uploads/trainers/" . htmlspecialchars($item['avatar']);
+                                    } else {
+                                        $avatarPath = $defaultAvatarBase64;
+                                    }
+                                    ?>
+                                    <img src="<?= $avatarPath ?>"
+                                        class="trainer-avatar"
+                                        alt="<?= htmlspecialchars($item['fullName']) ?>"
+                                        loading="lazy">
+                                </td>
+                                <td><?= htmlspecialchars($item['fullName']) ?></td>
+                                <td><?= htmlspecialchars($item['username']) ?></td>
+                                <td><?= htmlspecialchars($item['email']) ?></td>
+                                <td><?= htmlspecialchars($item['phone']) ?></td>
+                                <td><?= htmlspecialchars($item['specialization']) ?></td>
+                                <td><?= number_format($item['salary'], 0, ',', '.') ?> VNĐ</td>
+                                <td class="text-end">
+                                    <a href="/gym-php/admin/trainer/edit/<?= $item['id'] ?>" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
+                                        onclick="prepareDelete(<?= $item['id'] ?>, '<?= htmlspecialchars($item['fullName'], ENT_QUOTES) ?>')">
+                                        <i class="fas fa-trash-alt"></i> Xóa
                                     </button>
-                                    <button type="button" 
-                                            class="btn btn-danger btn-sm"
-                                            onclick="showDeleteModal(<?= $item['id'] ?>, '<?= htmlspecialchars(addslashes($item['fullName'])) ?>')"
-                                            title="Xóa">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
@@ -106,38 +100,74 @@ $defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
     </div>
 </div>
 
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Xóa Huấn luyện viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Bạn có chắc chắn muốn xóa huấn luyện viên <strong id="deleteTrainerName"></strong> không?
+                    <br>
+                    <small class="text-muted">Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Hủy
+                </button>
+                <form id="deleteForm" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Xác nhận xóa
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-.trainer-avatar {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid #ddd;
-    transition: transform 0.2s ease;
-    background-color: #f8f9fa;
-}
+    .trainer-avatar {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+        transition: transform 0.2s ease;
+        background-color: #f8f9fa;
+    }
 
-.trainer-avatar:hover {
-    transform: scale(1.1);
-    border-color: #007bff;
-}
+    .trainer-avatar:hover {
+        transform: scale(1.1);
+        border-color: #007bff;
+    }
 
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-}
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
 
-.action-buttons .btn {
-    padding: 0.25rem 0.5rem;
-}
+    .action-buttons .btn {
+        padding: 0.25rem 0.5rem;
+    }
 
-.table td {
-    vertical-align: middle;
-}
+    .table td {
+        vertical-align: middle;
+    }
 </style>
 
-<?php 
+<script>
+    function prepareDelete(id, name) {
+        document.getElementById('deleteTrainerName').textContent = name;
+        document.getElementById('deleteForm').action = `/gym-php/admin/trainer/delete/${id}`;
+    }
+</script>
+
+<?php
 require_once ROOT_PATH . '/src/App/Views/admin/Trainer/edit.php';
 require_once ROOT_PATH . '/src/App/Views/admin/Trainer/create.php';
 require_once ROOT_PATH . '/src/App/Views/admin/Trainer/delete.php';

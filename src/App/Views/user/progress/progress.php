@@ -1,5 +1,3 @@
-
-
 <div class="container mt-4">
     <h2 class="text-center mb-4">Theo Dõi Tiến Độ Tập Luyện</h2>
 
@@ -61,15 +59,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if(isset($data['workout_history'])): ?>
-                                    <?php foreach($data['workout_history'] as $workout): ?>
-                                    <tr>
-                                        <td><?php echo $workout->date; ?></td>
-                                        <td><?php echo $workout->exercise_name; ?></td>
-                                        <td><?php echo $workout->duration; ?> phút</td>
-                                        <td><?php echo $workout->calories; ?> kcal</td>
-                                        <td><?php echo $workout->notes; ?></td>
-                                    </tr>
+                                <?php if (isset($data['workout_history'])): ?>
+                                    <?php foreach ($data['workout_history'] as $workout): ?>
+                                        <tr>
+                                            <td><?php echo $workout->date; ?></td>
+                                            <td><?php echo $workout->exercise_name; ?></td>
+                                            <td><?php echo $workout->duration; ?> phút</td>
+                                            <td><?php echo $workout->calories; ?> kcal</td>
+                                            <td><?php echo $workout->notes; ?></td>
+                                        </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </tbody>
@@ -84,25 +82,25 @@
 <!-- Script cho biểu đồ -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const ctx = document.getElementById('progressChart').getContext('2d');
-const progressChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: <?php echo json_encode($data['chart_labels'] ?? []); ?>,
-        datasets: [{
-            label: 'Thời gian tập (phút)',
-            data: <?php echo json_encode($data['chart_data'] ?? []); ?>,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    const progressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: <?php echo json_encode($data['chart_labels'] ?? []); ?>,
+            datasets: [{
+                label: 'Thời gian tập (phút)',
+                data: <?php echo json_encode($data['chart_data'] ?? []); ?>,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
         }
-    }
-});
+    });
 </script>

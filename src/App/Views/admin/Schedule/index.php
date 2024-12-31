@@ -20,8 +20,8 @@ $title = 'Quản lý lịch tập';
                     <label class="form-label">Tháng</label>
                     <select name="month" class="form-select" onchange="this.form.submit()">
                         <?php for ($i = 1; $i <= 12; $i++) : ?>
-                            <option value="<?= str_pad($i, 2, '0', STR_PAD_LEFT) ?>" 
-                                    <?= $currentMonth == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' ?>>
+                            <option value="<?= str_pad($i, 2, '0', STR_PAD_LEFT) ?>"
+                                <?= $currentMonth == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' ?>>
                                 Tháng <?= $i ?>
                             </option>
                         <?php endfor; ?>
@@ -30,9 +30,9 @@ $title = 'Quản lý lịch tập';
                 <div class="col-md-2">
                     <label class="form-label">Năm</label>
                     <select name="year" class="form-select" onchange="this.form.submit()">
-                        <?php 
+                        <?php
                         $currentYear = date('Y');
-                        for ($i = $currentYear - 1; $i <= $currentYear + 1; $i++) : 
+                        for ($i = $currentYear - 1; $i <= $currentYear + 1; $i++) :
                         ?>
                             <option value="<?= $i ?>" <?= $year == $i ? 'selected' : '' ?>>
                                 <?= $i ?>
@@ -105,14 +105,14 @@ $title = 'Quản lý lịch tập';
                                     echo "<td class='bg-light'></td>";
                                 } else {
                                     $date = "$currentYear-$currentMonth-" . str_pad($currentDay, 2, '0', STR_PAD_LEFT);
-                                    $daySchedules = array_filter($schedules, function($schedule) use ($date) {
+                                    $daySchedules = array_filter($schedules, function ($schedule) use ($date) {
                                         return $schedule['training_date'] == $date;
                                     });
-                                    
+
                                     echo "<td class='position-relative'>";
                                     echo "<div class='date-number'>$currentDay</div>";
                                     echo "<div class='schedule-list' style='max-height: 100px; overflow-y: auto;'>";
-                                    
+
                                     foreach ($daySchedules as $schedule) {
                                         $statusClass = '';
                                         switch ($schedule['status']) {
@@ -126,15 +126,15 @@ $title = 'Quản lý lịch tập';
                                                 $statusClass = 'bg-danger';
                                                 break;
                                         }
-                                        
+
                                         echo "<div class='schedule-item small p-1 mb-1 rounded {$statusClass} text-white'>";
-                                        echo "<div>" . date('H:i', strtotime($schedule['start_time'])) . " - " . 
-                                             date('H:i', strtotime($schedule['end_time'])) . "</div>";
+                                        echo "<div>" . date('H:i', strtotime($schedule['start_time'])) . " - " .
+                                            date('H:i', strtotime($schedule['end_time'])) . "</div>";
                                         echo "<div>HLV: {$schedule['trainer_name']}</div>";
                                         echo "<div>KH: {$schedule['user_name']}</div>";
                                         echo "</div>";
                                     }
-                                    
+
                                     echo "</div></td>";
                                     $currentDay++;
                                 }
@@ -150,28 +150,30 @@ $title = 'Quản lý lịch tập';
 </div>
 
 <style>
-.date-number {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    font-weight: bold;
-}
-.schedule-list {
-    padding-top: 25px;
-}
-.schedule-item {
-    font-size: 0.8rem;
-    cursor: pointer;
-}
+    .date-number {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-weight: bold;
+    }
+
+    .schedule-list {
+        padding-top: 25px;
+    }
+
+    .schedule-item {
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
 </style>
 
 <script>
-document.getElementById('filterType').addEventListener('change', function() {
-    const filterIdContainer = document.getElementById('filterIdContainer');
-    filterIdContainer.style.display = this.value === 'all' ? 'none' : 'block';
-});
+    document.getElementById('filterType').addEventListener('change', function() {
+        const filterIdContainer = document.getElementById('filterIdContainer');
+        filterIdContainer.style.display = this.value === 'all' ? 'none' : 'block';
+    });
 </script>
-<?php 
+<?php
 require_once ROOT_PATH . '/src/App/Views/admin/Schedule/edit.php';
 require_once ROOT_PATH . '/src/App/Views/admin/Schedule/create.php';
 require_once ROOT_PATH . '/src/App/Views/admin/Schedule/delete.php';

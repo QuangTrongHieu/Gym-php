@@ -25,32 +25,32 @@ $pageTitle = "Chỉnh sửa thông tin cá nhân";
             <form action="/gym-php/trainer/profile/update" method="POST" class="user">
                 <div class="form-group">
                     <label for="fullName">Họ và tên</label>
-                    <input type="text" class="form-control" id="fullName" name="fullName" 
-                           value="<?= htmlspecialchars($trainer->fullName ?? '') ?>" required>
+                    <input type="text" class="form-control" id="fullName" name="fullName"
+                        value="<?= htmlspecialchars($trainer->fullName ?? '') ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" 
-                           value="<?= htmlspecialchars($trainer->email ?? '') ?>" required>
+                    <input type="email" class="form-control" id="email" name="email"
+                        value="<?= htmlspecialchars($trainer->email ?? '') ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Số điện thoại</label>
-                    <input type="tel" class="form-control" id="phone" name="phone" 
-                           value="<?= htmlspecialchars($trainer->phone ?? '') ?>">
+                    <input type="tel" class="form-control" id="phone" name="phone"
+                        value="<?= htmlspecialchars($trainer->phone ?? '') ?>">
                 </div>
 
                 <div class="form-group">
                     <label for="specialization">Chuyên môn</label>
-                    <textarea class="form-control" id="specialization" name="specialization" 
-                              rows="3"><?= htmlspecialchars($trainer->specialization ?? '') ?></textarea>
+                    <textarea class="form-control" id="specialization" name="specialization"
+                        rows="3"><?= htmlspecialchars($trainer->specialization ?? '') ?></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="experience">Kinh nghiệm (năm)</label>
-                    <input type="number" class="form-control" id="experience" name="experience" 
-                           value="<?= htmlspecialchars($trainer->experience ?? '') ?>">
+                    <input type="number" class="form-control" id="experience" name="experience"
+                        value="<?= htmlspecialchars($trainer->experience ?? '') ?>">
                 </div>
 
                 <div class="form-group">

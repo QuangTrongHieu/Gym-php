@@ -36,4 +36,4 @@ class RevenueController extends BaseController
             'revenueData' => $revenueData
         ]);
     }
-} 
+}

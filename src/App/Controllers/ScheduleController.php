@@ -100,7 +100,7 @@ class ScheduleController extends BaseController
     {
         $userRole = $_SESSION['user']['role'] ?? '';
         $userId = $_SESSION['user']['id'] ?? null;
-        
+
         if (!$userId || !in_array($userRole, ['admin', 'trainer'])) {
             $this->json(['error' => 'Không có quyền truy cập'], 403);
             return;
@@ -108,9 +108,11 @@ class ScheduleController extends BaseController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate input data
-            if (empty($_POST['user_id']) || empty($_POST['trainer_id']) || 
-                empty($_POST['training_date']) || empty($_POST['start_time']) || 
-                empty($_POST['end_time'])) {
+            if (
+                empty($_POST['user_id']) || empty($_POST['trainer_id']) ||
+                empty($_POST['training_date']) || empty($_POST['start_time']) ||
+                empty($_POST['end_time'])
+            ) {
                 $_SESSION['error'] = 'Vui lòng điền đầy đủ thông tin';
                 header('Location: /gym-php/admin/schedule');
                 exit();
@@ -155,7 +157,7 @@ class ScheduleController extends BaseController
     {
         $userRole = $_SESSION['user']['role'] ?? '';
         $userId = $_SESSION['user']['id'] ?? null;
-        
+
         if (!$userId || !in_array($userRole, ['admin', 'trainer'])) {
             $this->json(['error' => 'Không có quyền truy cập'], 403);
             return;
@@ -163,9 +165,11 @@ class ScheduleController extends BaseController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate input data
-            if (empty($_POST['user_id']) || empty($_POST['trainer_id']) || 
-                empty($_POST['training_date']) || empty($_POST['start_time']) || 
-                empty($_POST['end_time'])) {
+            if (
+                empty($_POST['user_id']) || empty($_POST['trainer_id']) ||
+                empty($_POST['training_date']) || empty($_POST['start_time']) ||
+                empty($_POST['end_time'])
+            ) {
                 $_SESSION['error'] = 'Vui lòng điền đầy đủ thông tin';
                 header('Location: /gym-php/admin/schedule');
                 exit();
@@ -211,7 +215,7 @@ class ScheduleController extends BaseController
     {
         $userRole = $_SESSION['user']['role'] ?? '';
         $userId = $_SESSION['user']['id'] ?? null;
-        
+
         if (!$userId || !in_array($userRole, ['admin', 'trainer'])) {
             $this->json(['error' => 'Không có quyền truy cập'], 403);
             return;

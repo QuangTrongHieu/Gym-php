@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Core\Model;
+;
 use PDO;
 
-class PackageStatistics extends Model {
+class PackageStatistics extends BaseModel {
     public function getPackageStatistics() {
         $sql = "SELECT 
                     mp.name as package_name,

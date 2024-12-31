@@ -1,17 +1,17 @@
-
-
 <div class="container-fluid px-4">
     <h1 class="mt-4">Quản lý Gói tập</h1>
-    
-    <?php if(isset($_SESSION['success'])): ?>
+
+    <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success">
-            <?= $_SESSION['success']; unset($_SESSION['success']); ?>
+            <?= $_SESSION['success'];
+            unset($_SESSION['success']); ?>
         </div>
     <?php endif; ?>
 
-    <?php if(isset($_SESSION['error'])): ?>
+    <?php if (isset($_SESSION['error'])): ?>
         <div class="alert alert-danger">
-            <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+            <?= $_SESSION['error'];
+            unset($_SESSION['error']); ?>
         </div>
     <?php endif; ?>
 
@@ -35,25 +35,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach($packages as $package): ?>
-                    <tr>
-                        <td><?= $package['id'] ?></td>
-                        <td><?= $package['name'] ?></td>
-                        <td><?= $package['description'] ?></td>
-                        <td><?= $package['duration'] ?></td>
-                        <td><?= number_format($package['price']) ?> VNĐ</td>
-                        <td><?= $package['status'] ?></td>
-                        <td>
-                            <a href="/gym-php/admin/packages/edit/<?= $package['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
-                            <form action="/gym-php/admin/packages/delete/<?= $package['id'] ?>" method="POST" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
-                            </form>
-                        </td>
-                    </tr>
+                    <?php foreach ($packages as $package): ?>
+                        <tr>
+                            <td><?= $package['id'] ?></td>
+                            <td><?= $package['name'] ?></td>
+                            <td><?= $package['description'] ?></td>
+                            <td><?= $package['duration'] ?></td>
+                            <td><?= number_format($package['price']) ?> VNĐ</td>
+                            <td><?= $package['status'] ?></td>
+                            <td>
+                                <a href="/gym-php/admin/packages/edit/<?= $package['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
+                                <form action="/gym-php/admin/packages/delete/<?= $package['id'] ?>" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-

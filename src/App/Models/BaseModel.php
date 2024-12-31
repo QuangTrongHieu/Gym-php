@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Models;
 
 use Core\Database;
+use PDOException;
 use PDO;
 
 class BaseModel
@@ -46,10 +48,10 @@ class BaseModel
     {
         $columns = implode(', ', array_keys($data));
         $values = ':' . implode(', :', array_keys($data));
-        
+
         $sql = "INSERT INTO {$this->table} ($columns) VALUES ($values)";
         $stmt = $this->db->prepare($sql);
-        
+
         return $stmt->execute($data);
     }
 
@@ -77,10 +79,10 @@ class BaseModel
                 $setClause .= "$key = :$key, ";
             }
             $setClause = rtrim($setClause, ', ');
-            
+
             $sql = "UPDATE {$this->table} SET $setClause WHERE {$this->primaryKey} = :id";
             $stmt = $this->db->prepare($sql);
-            
+
             $data['id'] = $id;
             if (!$stmt->execute($data)) {
                 throw new \PDOException("Error updating record");

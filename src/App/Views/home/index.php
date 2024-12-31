@@ -108,24 +108,29 @@
 
 <style>
     .hero-section {
-        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7));
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7));
         background-size: cover;
         background-position: center;
         min-height: 100vh;
     }
 
-    .service-card, .trainer-card, .testimonial-card {
+    .service-card,
+    .trainer-card,
+    .testimonial-card {
         background: white;
         border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease;
     }
 
-    .service-card:hover, .trainer-card:hover, .testimonial-card:hover {
+    .service-card:hover,
+    .trainer-card:hover,
+    .testimonial-card:hover {
         transform: translateY(-10px);
     }
 
-    .service-card i, .trainer-card img {
+    .service-card i,
+    .trainer-card img {
         font-size: 2.5rem;
         color: #0d6efd;
     }
@@ -137,28 +142,28 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Smooth scroll cho các anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scroll cho các anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Animation khi scroll
+        window.addEventListener('scroll', function() {
+            const elements = document.querySelectorAll('.service-card, .trainer-card, .testimonial-card');
+            elements.forEach(element => {
+                const position = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight;
+
+                if (position < screenPosition) {
+                    element.classList.add('animate__animated', 'animate__fadeInUp');
+                }
             });
         });
     });
-
-    // Animation khi scroll
-    window.addEventListener('scroll', function() {
-        const elements = document.querySelectorAll('.service-card, .trainer-card, .testimonial-card');
-        elements.forEach(element => {
-            const position = element.getBoundingClientRect().top;
-            const screenPosition = window.innerHeight;
-            
-            if(position < screenPosition) {
-                element.classList.add('animate__animated', 'animate__fadeInUp');
-            }
-        });
-    });
-});
 </script>

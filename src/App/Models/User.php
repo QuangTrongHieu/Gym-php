@@ -9,11 +9,18 @@ use Core\Helpers\FileUploader;
 class User extends BaseModel
 {
     protected $table = 'users';
-    protected $uploadPath = 'public/uploads/users';
+    protected const UPLOAD_DIR = 'public/uploads/members/avatars';
+    protected const DEFAULT_AVATAR = 'default.jpg';
 
     public function __construct($db = null)
     {
         parent::__construct($db);
+        
+        // Ensure upload directory exists
+        $uploadPath = ROOT_PATH . '/' . self::UPLOAD_DIR;
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
     }
 
     public function findByUsername($username)
@@ -52,6 +59,19 @@ class User extends BaseModel
         } catch (PDOException $e) {
             error_log("Error finding user by phone: " . $e->getMessage());
             return false;
+        }
+    }
+
+    public function findByRole($role)
+    {
+        try {
+            $sql = "SELECT * FROM {$this->table} WHERE eRole = :role ORDER BY createdAt DESC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['role' => $role]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error finding users by role: " . $e->getMessage());
+            return [];
         }
     }
 
@@ -180,21 +200,51 @@ class User extends BaseModel
         }
     }
 
-    public function updateAvatar($userId, $file)
+    public function updateAvatar($userId, $avatarFileName)
     {
         try {
-            $uploader = new FileUploader();
-            $avatarPath = $uploader->handleProfileImage($file);
-            
-            $sql = "UPDATE users SET avatar = ? WHERE id = ?";
+            // Get current avatar
+            $currentUser = $this->getById($userId);
+            if (!$currentUser) {
+                throw new \Exception('User not found');
+            }
+
+            // Delete old avatar if it exists and is not the default
+            if (!empty($currentUser['avatar']) && $currentUser['avatar'] !== self::DEFAULT_AVATAR) {
+                $oldAvatarPath = ROOT_PATH . '/' . self::UPLOAD_DIR . '/' . $currentUser['avatar'];
+                if (file_exists($oldAvatarPath) && is_file($oldAvatarPath)) {
+                    unlink($oldAvatarPath);
+                }
+            }
+
+            // Update avatar in database
+            $sql = "UPDATE {$this->table} SET avatar = :avatar, updatedAt = :updatedAt WHERE id = :id";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([$avatarPath, $userId]);
-            
-            return $avatarPath;
+            $success = $stmt->execute([
+                'id' => $userId,
+                'avatar' => $avatarFileName,
+                'updatedAt' => date('Y-m-d H:i:s')
+            ]);
+
+            if (!$success) {
+                throw new \Exception('Failed to update avatar in database');
+            }
+
+            return $avatarFileName;
         } catch (\Exception $e) {
+            error_log("Error updating avatar: " . $e->getMessage());
             throw new \RuntimeException('Không thể cập nhật ảnh đại diện: ' . $e->getMessage());
         }
     }
+
+    public function getAvatarUrl($avatar = null)
+    {
+        if (empty($avatar) || $avatar === self::DEFAULT_AVATAR) {
+            return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMzEgMjMxIj48cGF0aCBkPSJNMzMuODMsMzMuODNhMTE1LjUsMTE1LjUsMCwxLDEsMCwxNjMuMzQsMTE1LjQ5LDExNS40OSwwLDAsMSwwLTE2My4zNFpNMTE1LjUsMTkyLjc1YTc3LjI1LDc3LjI1LDAsMCwwLDQ3LjY3LTE2LjRsLTYuOTQtNDEuNjZhMTUuMzYsMTUuMzYsMCwwLDAtMTUuMTEtMTIuOTRIODkuODhhMTUuMzYsMTUuMzYsMCwwLDAtMTUuMTEsMTIuOTLMNjcuODMsMTc2LjM1QTc3LjI1LDc3LjI1LDAsMCwwLDExNS41LDE5Mi43NVptMC0xNTQuNWE3Ny4yNSw3Ny4yNSwwLDAsMC00Ny42NywxNi40bDYuOTQsNDEuNjZhMTUuMzYsMTUuMzYsMCwwLDAsMTUuMTEsMTIuOTRoNTEuMjRhMTUuMzYsMTUuMzYsMCwwLDAsMTUuMTEtMTIuOTRsNi45NC00MS42NkE3Ny4yNSw3Ny4yNSwwLDAsMCwxMTUuNSwzOC4yNVoiLz48L3N2Zz4=';
+        }
+        return '/gym-php/' . self::UPLOAD_DIR . '/' . $avatar;
+    }
+
     public function getById($id)
     {
         try {

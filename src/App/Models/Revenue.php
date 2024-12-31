@@ -13,7 +13,7 @@ class Revenue extends BaseModel
                 FROM membership_registrations mr 
                 JOIN packages p ON mr.package_id = p.id 
                 GROUP BY p.id, p.name";
-                
+
         return $this->db->query($sql)->fetchAll();
     }
-} 
+}

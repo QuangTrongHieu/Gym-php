@@ -31,10 +31,10 @@ class MemberController extends BaseController
             if ($this->db->inTransaction()) {
                 $this->db->rollback();
             }
-            
+
             $members = $this->membershipModel->findAll();
             $packages = $this->packageModel->findAll();
-            
+
             $this->view('admin/member/index', [
                 'title' => 'Quản lý Hội viên',
                 'members' => $members,
@@ -71,8 +71,10 @@ class MemberController extends BaseController
                 ];
 
                 // Validate input
-                if (empty($data['username']) || empty($_POST['password']) || empty($data['fullName']) || 
-                    empty($data['email']) || empty($data['phone'])) {
+                if (
+                    empty($data['username']) || empty($_POST['password']) || empty($data['fullName']) ||
+                    empty($data['email']) || empty($data['phone'])
+                ) {
                     throw new \Exception('Vui lòng điền đầy đủ thông tin bắt buộc');
                 }
 
@@ -119,14 +121,13 @@ class MemberController extends BaseController
 
                 $this->db->commit();
                 $_SESSION['success'] = 'Thêm thành viên thành công';
-                
             } catch (\Exception $e) {
                 if ($this->db->inTransaction()) {
                     $this->db->rollback();
                 }
                 $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
             }
-            
+
             $this->redirect('admin/member');
         }
     }
@@ -201,7 +202,6 @@ class MemberController extends BaseController
                 'member' => $member,
                 'packages' => $packages
             ]);
-
         } catch (\Exception $e) {
             if ($this->db->inTransaction()) {
                 $this->db->rollback();
@@ -250,7 +250,6 @@ class MemberController extends BaseController
                 'title' => 'Xóa hội viên',
                 'member' => $member
             ]);
-
         } catch (\Exception $e) {
             if ($this->db->inTransaction()) {
                 $this->db->rollback();

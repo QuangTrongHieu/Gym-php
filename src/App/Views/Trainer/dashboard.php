@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../layouts/Trainer_layout.php';
     <div class="row">
         <div class="col-md-12">
             <h2 class="mb-4">Bảng điều khiển</h2>
-            
+
             <!-- Lịch tập Card -->
             <div class="col-xl-6 col-md-12 mb-4">
                 <div class="card border-left-info shadow h-100 py-2">

@@ -2,14 +2,15 @@
 
 
 // Thêm phần theo dõi lịch tập
-function displayTrainingSchedule($userId) {
+function displayTrainingSchedule($userId)
+{
     // Lấy dữ liệu lịch tập từ cơ sở dữ liệu
     $trainingSchedule = getTrainingSchedule($userId);
-    
+
     echo "<h1>Lịch Tập Của Bạn</h1>";
     echo "<table>";
     echo "<tr><th>Ngày</th><th>Hoạt Động</th><th>Thời Gian</th></tr>";
-    
+
     foreach ($trainingSchedule as $training) {
         echo "<tr>";
         echo "<td>" . htmlspecialchars($training['date']) . "</td>";
@@ -17,7 +18,7 @@ function displayTrainingSchedule($userId) {
         echo "<td>" . htmlspecialchars($training['duration']) . "</td>";
         echo "</tr>";
     }
-    
+
     echo "</table>";
 }
 
@@ -85,17 +86,17 @@ function displayTrainingSchedule($userId) {
                                             </td>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <img src="<?= $schedule['trainer_avatar'] ?? '/gym-php/public/assets/images/default-avatar.png' ?>" 
-                                                         class="rounded-circle me-2" 
-                                                         width="32" 
-                                                         height="32"
-                                                         alt="Trainer">
+                                                    <img src="<?= $schedule['trainer_avatar'] ?? '/gym-php/public/assets/images/default-avatar.png' ?>"
+                                                        class="rounded-circle me-2"
+                                                        width="32"
+                                                        height="32"
+                                                        alt="Trainer">
                                                     <span><?= htmlspecialchars($schedule['trainer_name']) ?></span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <?php
-                                                $statusClass = match($schedule['status']) {
+                                                $statusClass = match ($schedule['status']) {
                                                     'completed' => 'success',
                                                     'upcoming' => 'primary',
                                                     'cancelled' => 'danger',
@@ -108,14 +109,14 @@ function displayTrainingSchedule($userId) {
                                             </td>
                                             <td>
                                                 <div class="btn-group">
-                                                    <button class="btn btn-sm btn-outline-primary" 
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#editTrainingModal"
-                                                            data-schedule-id="<?= $schedule['id'] ?>">
+                                                    <button class="btn btn-sm btn-outline-primary"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editTrainingModal"
+                                                        data-schedule-id="<?= $schedule['id'] ?>">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     <button class="btn btn-sm btn-outline-danger"
-                                                            onclick="deleteSchedule(<?= $schedule['id'] ?>)">
+                                                        onclick="deleteSchedule(<?= $schedule['id'] ?>)">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -194,85 +195,92 @@ function displayTrainingSchedule($userId) {
 </div>
 
 <style>
-.badge {
-    font-weight: 500;
-    padding: 0.5em 0.75em;
-}
-.bg-success-subtle {
-    background-color: rgba(25, 135, 84, 0.1);
-}
-.bg-primary-subtle {
-    background-color: rgba(13, 110, 253, 0.1);
-}
-.bg-danger-subtle {
-    background-color: rgba(220, 53, 69, 0.1);
-}
-.table > :not(caption) > * > * {
-    padding: 1rem 0.75rem;
-}
-.btn-group .btn {
-    padding: 0.25rem 0.5rem;
-}
-.card {
-    border: none;
-    transition: transform 0.2s ease-in-out;
-}
-.card:hover {
-    transform: translateY(-2px);
-}
+    .badge {
+        font-weight: 500;
+        padding: 0.5em 0.75em;
+    }
+
+    .bg-success-subtle {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+
+    .bg-primary-subtle {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+
+    .bg-danger-subtle {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    .table> :not(caption)>*>* {
+        padding: 1rem 0.75rem;
+    }
+
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .card {
+        border: none;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize calendar
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        events: '/gym-php/api/training/schedule',
-        eventClick: function(info) {
-            // Handle event click
-            showEventDetails(info.event);
-        }
-    });
-    calendar.render();
-});
-
-function saveTraining() {
-    const form = document.getElementById('addTrainingForm');
-    const formData = new FormData(form);
-
-    fetch('/gym-php/api/training/add', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Có lỗi xảy ra: ' + data.message);
-        }
-    });
-}
-
-function deleteSchedule(id) {
-    if (confirm('Bạn có chắc muốn xóa lịch tập này?')) {
-        fetch(`/gym-php/api/training/delete/${id}`, {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Có lỗi xảy ra: ' + data.message);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize calendar
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: '/gym-php/api/training/schedule',
+            eventClick: function(info) {
+                // Handle event click
+                showEventDetails(info.event);
             }
         });
+        calendar.render();
+    });
+
+    function saveTraining() {
+        const form = document.getElementById('addTrainingForm');
+        const formData = new FormData(form);
+
+        fetch('/gym-php/api/training/add', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Có lỗi xảy ra: ' + data.message);
+                }
+            });
     }
-}
+
+    function deleteSchedule(id) {
+        if (confirm('Bạn có chắc muốn xóa lịch tập này?')) {
+            fetch(`/gym-php/api/training/delete/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Có lỗi xảy ra: ' + data.message);
+                    }
+                });
+        }
+    }
 </script>

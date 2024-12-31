@@ -34,51 +34,57 @@ class Trainer extends BaseModel
         return $this->db->inTransaction();
     }
 
-    public function getAllTrainers() {
+    public function getAllTrainers()
+    {
         $sql = "SELECT * FROM trainers WHERE status = 'active'";
         return $this->db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function getById($id) {
+    public function getById($id)
+    {
         $sql = "SELECT * FROM trainers WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public function create($data) {
+    public function create($data)
+    {
         $sql = "INSERT INTO {$this->table} (username, password, fullName, dateOfBirth, 
                 sex, phone, email, specialization, experience, certification, salary, 
                 eRole, status, avatar) 
                 VALUES (:username, :password, :fullName, :dateOfBirth, :sex, :phone, 
                 :email, :specialization, :experience, :certification, :salary, 
                 :eRole, :status, :avatar)";
-                
+
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }
 
-    public function update($id, $data) {
+    public function update($id, $data)
+    {
         $fields = [];
         foreach ($data as $key => $value) {
             $fields[] = "$key = :$key";
         }
-        
+
         $sql = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :id";
         $data['id'] = $id;
-        
+
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $sql = "UPDATE trainers SET status = 'inactive' WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id]);
         return $stmt->rowCount();
     }
 
-    public function getPerformanceStats($trainerId) {
+    public function getPerformanceStats($trainerId)
+    {
         $sql = "SELECT 
                 COUNT(DISTINCT pt.client_id) as total_clients,
                 COUNT(ts.id) as total_sessions,
@@ -180,10 +186,10 @@ class Trainer extends BaseModel
         foreach ($data as $key => $value) {
             $fields[] = "$key = :$key";
         }
-        
+
         $sql = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :id";
         $data['id'] = $id;
-        
+
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }
@@ -196,7 +202,7 @@ class Trainer extends BaseModel
                 WHERE s.trainerId = :trainerId 
                 AND s.date >= CURRENT_DATE 
                 ORDER BY s.date, s.startTime";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['trainerId' => $trainerId]);
         $schedules = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -210,7 +216,7 @@ class Trainer extends BaseModel
             $date = date('d/m/Y', strtotime($schedule['date']));
             $startTime = date('H:i', strtotime($schedule['startTime']));
             $endTime = date('H:i', strtotime($schedule['endTime']));
-            
+
             $formattedSchedule .= "Ngày: {$date}\n";
             $formattedSchedule .= "Thời gian: {$startTime} - {$endTime}\n";
             $formattedSchedule .= "Học viên: {$schedule['memberName']}\n\n";

@@ -1,11 +1,9 @@
-
-
 <div class="container contact-section py-5">
     <div class="contact-header text-center mb-5">
         <h1 class="display-4 fw-bold">Liên Hệ Với Chúng Tôi</h1>
         <p class="lead text-muted">Hãy để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất</p>
     </div>
-    
+
     <div class="contact-form">
         <div class="contact-info mb-5">
             <div class="row g-4">
@@ -104,110 +102,112 @@
 </div>
 
 <style>
-.contact-section {
-    background-color: #f8f9fa;
-}
-
-.contact-info-item {
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.contact-info-item:hover {
-    transform: translateY(-5px);
-}
-
-.contact-icon {
-    color: var(--bs-primary);
-}
-
-.form-control:focus {
-    border-color: var(--bs-primary);
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-.btn-primary {
-    padding: 0.8rem 2rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.success-message {
-    display: none;
-    text-align: center;
-    padding: 2rem;
-    margin: 2rem auto;
-    max-width: 500px;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    animation: slideIn 0.5s ease-out;
-}
-
-.success-message i {
-    color: #28a745;
-    margin-bottom: 1.5rem;
-    animation: scaleIn 0.5s ease-out;
-}
-
-.success-message h4 {
-    color: #2c3e50;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-}
-
-.success-message p {
-    color: #6c757d;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 0;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+    .contact-section {
+        background-color: #f8f9fa;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-@keyframes scaleIn {
-    from {
-        transform: scale(0);
+    .contact-info-item {
+        text-align: center;
+        transition: all 0.3s ease;
     }
-    to {
-        transform: scale(1);
+
+    .contact-info-item:hover {
+        transform: translateY(-5px);
     }
-}
+
+    .contact-icon {
+        color: var(--bs-primary);
+    }
+
+    .form-control:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .btn-primary {
+        padding: 0.8rem 2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .success-message {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 500px;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .success-message i {
+        color: #28a745;
+        margin-bottom: 1.5rem;
+        animation: scaleIn 0.5s ease-out;
+    }
+
+    .success-message h4 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .success-message p {
+        color: #6c757d;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+        }
+
+        to {
+            transform: scale(1);
+        }
+    }
 </style>
 
 <script>
-// Form validation
-(function () {
-    'use strict'
-    var forms = document.querySelectorAll('.needs-validation')
-    Array.prototype.slice.call(forms).forEach(function (form) {
-        form.addEventListener('submit', function (event) {
-            if (!form.checkValidity()) {
-                event.preventDefault()
-                event.stopPropagation()
-            } else {
-                event.preventDefault()
-                // Show success message
-                form.style.display = 'none'
-                document.getElementById('successMessage').style.display = 'block'
-            }
-            form.classList.add('was-validated')
-        }, false)
-    })
-})()
+    // Form validation
+    (function() {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                } else {
+                    event.preventDefault()
+                    // Show success message
+                    form.style.display = 'none'
+                    document.getElementById('successMessage').style.display = 'block'
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
 </script>
