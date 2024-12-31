@@ -1,11 +1,25 @@
 <!-- Hero Section -->
 <div class="hero-section">
-    <div class="container">
-        <div class="row align-items-center min-vh-100">
-            <div class="col-md-6">
-                <h1 class="display-4 fw-bold text-white mb-4">Phòng Gym Cao Cấp Việt Nam</h1>
-                <p class="lead text-white mb-4">Nơi bạn tìm thấy sức khỏe và sự hoàn hảo</p>
-                <a href="#services" class="btn btn-primary btn-lg">Khám Phá Dịch Vụ</a>
+    <div class="hero-carousel">
+        <div class="hero-slide active" style="background-image: url('/gym-php/public/images/banner3.jpg')"></div>
+        <div class="hero-slide" style="background-image: url('/gym-php/public/images/banner2.png')"></div>
+        <div class="hero-slide" style="background-image: url('/gym-php/public/images/banner4.png')"></div>
+    </div>
+    <div class="hero-content">
+        <div class="container">
+            <div class="row align-items-center min-vh-100">
+                <div class="col-md-6">
+                    <h1 class="display-4 fw-bold text-white mb-4 animate__animated animate__fadeInDown">
+                        Phòng Gym Cao Cấp Việt Nam
+                    </h1>
+                    <p class="lead text-white mb-4 animate__animated animate__fadeInUp">
+                        Nơi bạn tìm thấy sức khỏe và sự hoàn hảo
+                    </p>
+                    <div class="animate__animated animate__fadeInUp animate__delay-1s">
+                        <a href="#services" class="btn btn-primary btn-lg me-3">Khám Phá Dịch Vụ</a>
+                        <a href="/gym-php/register" class="btn btn-outline-light btn-lg">Đăng Ký Ngay</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -108,10 +122,89 @@
 
 <style>
     .hero-section {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7));
+        position: relative;
+        overflow: hidden;
+        min-height: 100vh;
+    }
+
+    .hero-carousel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .hero-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         background-size: cover;
         background-position: center;
-        min-height: 100vh;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+
+    .hero-slide.active {
+        opacity: 1;
+    }
+
+    .hero-slide::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7));
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .btn-primary {
+        background-color: #ff4d4d;
+        border-color: #ff4d4d;
+        padding: 12px 30px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .btn-primary:hover {
+        background-color: #ff3333;
+        border-color: #ff3333;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-light {
+        padding: 12px 30px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .btn-outline-light:hover {
+        background-color: #fff;
+        color: #000;
+        transform: translateY(-2px);
+    }
+
+    @keyframes zoom {
+        from {
+            transform: scale(1);
+        }
+        to {
+            transform: scale(1.1);
+        }
+    }
+
+    .hero-slide.active {
+        animation: zoom 20s infinite alternate;
     }
 
     .service-card,
@@ -143,7 +236,20 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Smooth scroll cho các anchor links
+        // Slider functionality
+        const slides = document.querySelectorAll('.hero-slide');
+        let currentSlide = 0;
+
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        // Change slide every 5 seconds
+        setInterval(nextSlide, 5000);
+
+        // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -153,7 +259,7 @@
             });
         });
 
-        // Animation khi scroll
+        // Animation when scrolling
         window.addEventListener('scroll', function() {
             const elements = document.querySelectorAll('.service-card, .trainer-card, .testimonial-card');
             elements.forEach(element => {

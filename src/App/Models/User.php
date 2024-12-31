@@ -268,4 +268,45 @@ class User extends BaseModel
             return false;
         }
     }
+
+    public function getStatsByDateRange($startDate, $endDate, $role = null)
+    {
+        try {
+            $sql = "SELECT DATE(createdAt) as date, COUNT(*) as count 
+                    FROM {$this->table}
+                    WHERE createdAt BETWEEN ? AND ?";
+            
+            $params = [$startDate, $endDate];
+
+            if ($role) {
+                $sql .= " AND eRole = ?";
+                $params[] = $role;
+            }
+
+            $sql .= " GROUP BY DATE(createdAt)
+                      ORDER BY date ASC";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            
+            return $stmt->fetchAll();
+        } catch (\PDOException $e) {
+            error_log("Error getting user stats: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getCountByRole($role)
+    {
+        try {
+            $sql = "SELECT COUNT(*) as count FROM {$this->table} WHERE eRole = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$role]);
+            $result = $stmt->fetch();
+            return (int)$result['count'];
+        } catch (\PDOException $e) {
+            error_log("Error getting count by role: " . $e->getMessage());
+            return 0;
+        }
+    }
 }

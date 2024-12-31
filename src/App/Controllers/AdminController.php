@@ -162,5 +162,22 @@ class AdminController extends BaseController
         }
     }
 
-    
+    public function getUserStats()
+    {
+        try {
+            $memberCount = $this->userModel->getCountByRole('member');
+            $trainerCount = $this->userModel->getCountByRole('trainer');
+            $userCount = $this->userModel->getCountByRole('user');
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'members' => [$memberCount],
+                'trainers' => [$trainerCount],
+                'users' => [$userCount]
+            ]);
+        } catch (\Exception $e) {
+            header('HTTP/1.1 500 Internal Server Error');
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
 }

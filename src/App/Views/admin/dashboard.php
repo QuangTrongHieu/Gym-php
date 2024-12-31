@@ -67,91 +67,126 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <i class="fas fa-chart-bar me-2"></i>
-                        Biểu đồ doanh thu và số người đăng ký theo tháng
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Thống kê người dùng
                     </h5>
-                    <canvas id="revenueChart"></canvas>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="userPieChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-legend mt-3">
+                                <div class="legend-item mb-2">
+                                    <span class="legend-color" style="background-color: rgb(75, 192, 192)"></span>
+                                    <span>Hội viên</span>
+                                    <span class="member-count"></span>
+                                </div>
+                                <div class="legend-item mb-2">
+                                    <span class="legend-color" style="background-color: rgb(255, 99, 132)"></span>
+                                    <span>Huấn luyện viên</span>
+                                    <span class="trainer-count"></span>
+                                </div>
+                                <div class="legend-item mb-2">
+                                    <span class="legend-color" style="background-color: rgb(54, 162, 235)"></span>
+                                    <span>Người dùng</span>
+                                    <span class="user-count"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+</style>
+
 <!-- Add Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
+document.addEventListener('DOMContentLoaded', function() {
+    let userPieChart;
+
+    function initChart(data) {
+        const ctx = document.getElementById('userPieChart').getContext('2d');
+        
+        if (userPieChart) {
+            userPieChart.destroy();
+        }
+
+        // Calculate totals
+        const memberTotal = data.members[data.members.length - 1];
+        const trainerTotal = data.trainers[data.trainers.length - 1];
+        const userTotal = data.users[data.users.length - 1];
+
+        // Update legend counts
+        document.querySelector('.member-count').textContent = `(${memberTotal})`;
+        document.querySelector('.trainer-count').textContent = `(${trainerTotal})`;
+        document.querySelector('.user-count').textContent = `(${userTotal})`;
+
+        userPieChart = new Chart(ctx, {
+            type: 'pie',
             data: {
-                labels: <?php echo json_encode($monthlyRevenue['labels'] ?? []); ?>,
+                labels: ['Hội viên', 'Huấn luyện viên', 'Người dùng'],
                 datasets: [{
-                    label: 'Doanh thu (VNĐ)',
-                    data: <?php echo json_encode($monthlyRevenue['revenue'] ?? []); ?>,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgb(75, 192, 192)',
-                    borderWidth: 1,
-                    yAxisID: 'y'
-                }, {
-                    label: 'Số người đăng ký',
-                    data: <?php echo json_encode($monthlyRevenue['users'] ?? []); ?>,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    borderWidth: 1,
-                    type: 'line',
-                    yAxisID: 'y1'
+                    data: [memberTotal, trainerTotal, userTotal],
+                    backgroundColor: [
+                        'rgb(75, 192, 192)',
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)'
+                    ],
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: 'Doanh thu (VNĐ)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return new Intl.NumberFormat('vi-VN').format(value) + ' VNĐ';
-                            }
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'Số người đăng ký'
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        }
-                    }
-                },
                 plugins: {
+                    legend: {
+                        display: false
+                    },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                if (context.dataset.yAxisID === 'y') {
-                                    return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN').format(context.raw) + ' VNĐ';
-                                } else {
-                                    return 'Số người đăng ký: ' + context.raw;
-                                }
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const value = context.raw;
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${context.label}: ${value} (${percentage}%)`;
                             }
                         }
                     }
                 }
             }
         });
-    });
+    }
+
+    function fetchData() {
+        fetch('/gym-php/admin/getUserStats?days=1')
+            .then(response => response.json())
+            .then(data => {
+                initChart(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    // Initial load
+    fetchData();
+
+    // Update every minute
+    setInterval(fetchData, 60000);
+});
 </script>
