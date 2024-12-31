@@ -14,7 +14,7 @@
 
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle"></i>
-                    Bạn có chắc chắn muốn xóa huấn luyện viên <strong><?= htmlspecialchars($trainer['fullName']) ?></strong> không?
+                    Bạn có chắc chắn muốn xóa huấn luyện viên <strong><?= htmlspecialchars($trainer['fullName'] ?? 'Không xác định') ?></strong> không?
                     <br>
                     <small class="text-muted">Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn.</small>
                 </div>

@@ -115,6 +115,7 @@ $router->add('/trainer/{id:\d+}', ['controller' => 'RegisTrainer', 'action' => '
 $router->add('/contact', ['controller' => 'Contact', 'action' => 'index']);
 
 $router->add('/membership/register/{id}', ['controller' => 'User', 'action' => 'showRegistrationForm']);
+$router->add("/user/change-password", ["controller" => "User", "action" => "changePassword"]);
 
 // Trainer authentication routes
 

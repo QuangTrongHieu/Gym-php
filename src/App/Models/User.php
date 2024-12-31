@@ -15,7 +15,7 @@ class User extends BaseModel
     public function __construct($db = null)
     {
         parent::__construct($db);
-        
+
         // Ensure upload directory exists
         $uploadPath = ROOT_PATH . '/' . self::UPLOAD_DIR;
         if (!file_exists($uploadPath)) {
@@ -80,10 +80,10 @@ class User extends BaseModel
         try {
             // Đảm bảo các trường bắt buộc
             $requiredFields = ['username', 'fullName', 'dateOfBirth', 'sex', 'phone', 'email', 'password'];
-            
+
             // Xóa role khỏi required fields và set mặc định
             $data['eRole'] = 'USER'; // Sửa từ 'role' thành 'eRole' để khớp với tên cột trong DB
-            
+
             foreach ($requiredFields as $field) {
                 if (!isset($data[$field])) {
                     throw new \Exception("Missing required field: {$field}");
@@ -125,7 +125,6 @@ class User extends BaseModel
             throw new \Exception("Không thể cập nhật thông tin. Vui lòng thử lại sau.");
         }
     }
-
     public function updatePassword($id, $newPassword)
     {
         try {
@@ -191,7 +190,8 @@ class User extends BaseModel
         }
     }
 
-    public function uploadAvatar($file) {
+    public function uploadAvatar($file)
+    {
         try {
             $uploader = new FileUploader();
             return $uploader->handleProfileImage($file);

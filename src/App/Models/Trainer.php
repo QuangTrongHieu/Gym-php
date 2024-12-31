@@ -224,4 +224,13 @@ class Trainer extends BaseModel
 
         return rtrim($formattedSchedule);
     }
+
+    public function hasActiveSchedules($trainerId)
+    {
+        $sql = "SELECT COUNT(*) FROM trainer_schedules WHERE trainerId = :trainerId AND status = 'SCHEDULED'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':trainerId', $trainerId, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchColumn() > 0;
+    }
 }

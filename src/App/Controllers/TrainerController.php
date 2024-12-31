@@ -21,10 +21,7 @@ class TrainerController extends BaseController
     public function __construct()
     {
         parent::__construct();
-        $this->trainerModel = new Trainer(); // UserController.php - updateProfile()
-        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-            $data['avatar'] = $this->handleImageUpload($_FILES['avatar'], $user['avatar'] ?? null);
-        }
+        $this->trainerModel = new Trainer();
         $this->uploader = new FileUploader();
 
         // Ensure upload directory exists
@@ -48,8 +45,28 @@ class TrainerController extends BaseController
             throw new \Exception('Kích thước file quá lớn. Giới hạn ' . (self::MAX_FILE_SIZE / 1024 / 1024) . 'MB');
         }
 
+        // Kiểm tra và tạo thư mục nếu chưa tồn tại
+        $uploadDir = ROOT_PATH . '/' . self::UPLOAD_DIR;
+        if (!file_exists($uploadDir)) {
+            if (!mkdir($uploadDir, 0755, true)) {
+                throw new \Exception('Không thể tạo thư mục upload');
+            }
+        }
+
         // Validate MIME type
+        if (!file_exists($file['tmp_name'])) {
+            throw new \Exception('File tạm không tồn tại hoặc upload thất bại');
+        }
+
+        if (!is_readable($file['tmp_name'])) {
+            throw new \Exception('Không thể đọc file tạm');
+        }
+
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo === false) {
+            throw new \Exception('Không thể kiểm tra loại file');
+        }
+
         $mimeType = finfo_file($finfo, $file['tmp_name']);
         finfo_close($finfo);
 
@@ -57,11 +74,9 @@ class TrainerController extends BaseController
             throw new \Exception('Loại file không được hỗ trợ. Chỉ chấp nhận file ảnh (JPG, PNG, GIF, WEBP)');
         }
 
-        $uploadDir = ROOT_PATH . '/' . self::UPLOAD_DIR . '/';
-
         // Delete old avatar if exists
         if ($oldAvatar && $oldAvatar !== 'default.jpg') {
-            $oldAvatarPath = $uploadDir . $oldAvatar;
+            $oldAvatarPath = $uploadDir . '/' . $oldAvatar;
             if (file_exists($oldAvatarPath) && is_file($oldAvatarPath)) {
                 unlink($oldAvatarPath);
             }
@@ -70,13 +85,7 @@ class TrainerController extends BaseController
         // Generate safe filename
         $extension = self::ALLOWED_TYPES[$mimeType];
         $fileName = 'trainer_' . uniqid() . '_' . time() . '.' . $extension;
-        $targetPath = $uploadDir . $fileName;
-
-        // Validate image dimensions and content
-        $imageInfo = getimagesize($file['tmp_name']);
-        if ($imageInfo === false) {
-            throw new \Exception('File không phải là hình ảnh hợp lệ');
-        }
+        $targetPath = $uploadDir . '/' . $fileName;
 
         // Move uploaded file
         if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
@@ -196,18 +205,17 @@ class TrainerController extends BaseController
                     }
                 }
 
-                // Start transaction
-                $this->trainerModel->db->beginTransaction();
+                $this->trainerModel->beginTransaction();
 
                 if (!$this->trainerModel->update($id, $data)) {
                     throw new \Exception('Không thể cập nhật thông tin huấn luyện viên');
                 }
 
-                $this->trainerModel->db->commit();
+                $this->trainerModel->commit();
                 $_SESSION['success'] = 'Cập nhật thông tin huấn luyện viên thành công';
             } catch (\Exception $e) {
-                if ($this->trainerModel->db->inTransaction()) {
-                    $this->trainerModel->db->rollBack();
+                if ($this->trainerModel->inTransaction()) {
+                    $this->trainerModel->rollBack();
                 }
                 $_SESSION['error'] = 'Có lỗi xảy ra: ' . $e->getMessage();
             }

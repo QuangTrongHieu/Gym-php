@@ -17,7 +17,67 @@
 <?php
 // Base64 encoded default avatar - simple user icon
 $defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlOWVjZWYiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjM1IiByPSIyMCIgZmlsbD0iI2FkYjViZCIvPjxwYXRoIGQ9Ik0xNSw4NWMwLTIwLDE1LTM1LDM1LTM1czM1LDE1LDM1LDM1IiBmaWxsPSIjYWRiNWJkIi8+PC9zdmc+';
+
+// Function to get avatar URL with validation
+function getAvatarUrl($avatar) {
+    if (empty($avatar)) {
+        return null;
+    }
+    
+    // Nếu là default.jpg, trả về đường dẫn mặc định
+    if ($avatar === 'default.jpg') {
+        $defaultPath = ROOT_PATH . '/public/uploads/trainers/default.jpg';
+        if (file_exists($defaultPath)) {
+            return '/gym-php/public/uploads/trainers/default.jpg';
+        }
+        return null;
+    }
+    
+    // Kiểm tra và tạo thư mục nếu chưa tồn tại
+    $uploadDir = ROOT_PATH . '/public/uploads/trainers';
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    $avatarPath = $uploadDir . '/' . $avatar;
+    if (!file_exists($avatarPath)) {
+        error_log("Avatar not found: " . $avatarPath);
+        return null;
+    }
+    
+    // Kiểm tra quyền đọc file
+    if (!is_readable($avatarPath)) {
+        error_log("Avatar not readable: " . $avatarPath);
+        return null;
+    }
+    
+    return '/gym-php/public/uploads/trainers/' . htmlspecialchars($avatar);
+}
 ?>
+
+<style>
+    .trainer-avatar {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #e9ecef;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .action-buttons .btn {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+</style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Quản lý Huấn luyện viên</h1>
@@ -55,16 +115,18 @@ $defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
                                 <td><?= htmlspecialchars($item['id']) ?></td>
                                 <td>
                                     <?php
-                                    if (!empty($item['avatar']) && $item['avatar'] !== 'default.jpg') {
-                                        $avatarPath = "/gym-php/public/uploads/trainers/" . htmlspecialchars($item['avatar']);
+                                    $avatarUrl = getAvatarUrl($item['avatar']);
+                                    if ($avatarUrl) {
+                                        echo '<img src="' . $avatarUrl . '" 
+                                                  class="trainer-avatar" 
+                                                  alt="Avatar of ' . htmlspecialchars($item['fullName']) . '"
+                                                  onerror="this.src=\'' . $defaultAvatarBase64 . '\'">';
                                     } else {
-                                        $avatarPath = $defaultAvatarBase64;
+                                        echo '<img src="' . $defaultAvatarBase64 . '" 
+                                                  class="trainer-avatar" 
+                                                  alt="Default Avatar">';
                                     }
                                     ?>
-                                    <img src="<?= $avatarPath ?>"
-                                        class="trainer-avatar"
-                                        alt="<?= htmlspecialchars($item['fullName']) ?>"
-                                        loading="lazy">
                                 </td>
                                 <td><?= htmlspecialchars($item['fullName']) ?></td>
                                 <td><?= htmlspecialchars($item['username']) ?></td>
@@ -73,9 +135,11 @@ $defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
                                 <td><?= htmlspecialchars($item['specialization']) ?></td>
                                 <td><?= number_format($item['salary'], 0, ',', '.') ?> VNĐ</td>
                                 <td class="text-end">
-                                    <a href="/gym-php/admin/trainer/edit/<?= $item['id'] ?>" class="btn btn-primary btn-sm">
+                                    <button type="button" class="btn btn-primary btn-sm" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editModal<?= $item['id'] ?>">
                                         <i class="fas fa-edit"></i> Sửa
-                                    </a>
+                                    </button>
                                     <button type="button"
                                         class="btn btn-danger btn-sm"
                                         data-bs-toggle="modal"
@@ -128,37 +192,6 @@ $defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
         </div>
     </div>
 </div>
-
-<style>
-    .trainer-avatar {
-        width: 50px;
-        height: 50px;
-        object-fit: cover;
-        border-radius: 50%;
-        border: 2px solid #ddd;
-        transition: transform 0.2s ease;
-        background-color: #f8f9fa;
-    }
-
-    .trainer-avatar:hover {
-        transform: scale(1.1);
-        border-color: #007bff;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
-    }
-
-    .action-buttons .btn {
-        padding: 0.25rem 0.5rem;
-    }
-
-    .table td {
-        vertical-align: middle;
-    }
-</style>
 
 <script>
     function prepareDelete(id, name) {

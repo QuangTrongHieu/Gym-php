@@ -8,86 +8,47 @@
                 <input type="hidden" name="csrf_token" value="<?= $this->csrf_token ?>" />
                 <div class="mb-3">
                     <label class="form-label">Tên đăng nhập</label>
-                    <input type="text"
-                        class="form-control"
-                        name="username"
-                        value="<?= isset($username) ? htmlspecialchars($username) : '' ?>"
-                        readonly />
+                    <input type="text" class="form-control" name="username" value="<?= isset($username) ? htmlspecialchars($username) : '' ?>" readonly />
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label">Họ và tên</label>
-                    <input type="text"
-                        class="form-control"
-                        name="fullName"
-                        value="<?= isset($fullName) ? htmlspecialchars($fullName) : '' ?>"
-                        required />
+                    <input type="text" class="form-control" name="fullName" value="<?= isset($fullName) ? htmlspecialchars($fullName) : '' ?>" required />
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label">Email</label>
                     <div class="input-group">
-                        <input type="email"
-                            class="form-control"
-                            name="email"
-                            value="<?= isset($email) ? htmlspecialchars($email) : '' ?>"
-                            readonly />
-                        <button type="button"
-                            class="btn btn-outline-primary"
-                            data-bs-toggle="modal"
-                            data-bs-target="#changeEmailModal">
-                            Thay đổi
-                        </button>
+                        <input type="email" class="form-control" name="email" value="<?= isset($email) ? htmlspecialchars($email) : '' ?>" readonly />
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changeEmailModal">Thay đổi</button>
                     </div>
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label">Số điện thoại</label>
                     <div class="input-group">
-                        <input type="tel"
-                            class="form-control"
-                            name="phone"
-                            value="<?= isset($phone) ? htmlspecialchars($phone) : '' ?>"
-                            readonly />
-                        <button type="button"
-                            class="btn btn-outline-primary"
-                            data-bs-toggle="modal"
-                            data-bs-target="#changePhoneModal">
-                            Thay đổi
-                        </button>
+                        <input type="tel" class="form-control" name="phone" value="<?= isset($phone) ? htmlspecialchars($phone) : '' ?>" readonly />
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changePhoneModal">Thay đổi</button>
                     </div>
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label">Giới tính</label>
                     <div class="d-flex gap-4">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="sex" value="Male"
-                                <?= (isset($sex) && $sex == 'Male') ? 'checked' : '' ?> />
+                            <input class="form-check-input" type="radio" name="sex" value="Male" <?= (isset($sex) && $sex == 'Male') ? 'checked' : '' ?> />
                             <label class="form-check-label">Nam</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="sex" value="Female"
-                                <?= (isset($sex) && $sex == 'Female') ? 'checked' : '' ?> />
+                            <input class="form-check-input" type="radio" name="sex" value="Female" <?= (isset($sex) && $sex == 'Female') ? 'checked' : '' ?> />
                             <label class="form-check-label">Nữ</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="sex" value="Other"
-                                <?= (isset($sex) && $sex == 'Other') ? 'checked' : '' ?> />
+                            <input class="form-check-input" type="radio" name="sex" value="Other" <?= (isset($sex) && $sex == 'Other') ? 'checked' : '' ?> />
                             <label class="form-check-label">Khác</label>
                         </div>
                     </div>
                 </div>
-
                 <div class="mb-4">
                     <label class="form-label">Ngày sinh</label>
-                    <input type="date"
-                        class="form-control"
-                        name="dateOfBirth"
-                        value="<?= isset($dateOfBirth) ? htmlspecialchars($dateOfBirth) : '' ?>"
-                        required />
+                    <input type="date" class="form-control" name="dateOfBirth" value="<?= isset($dateOfBirth) ? htmlspecialchars($dateOfBirth) : '' ?>" required />
                 </div>
-
                 <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
             </form>
         </div>
