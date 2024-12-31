@@ -14,11 +14,6 @@
     </div>
 <?php endif; ?>
 
-<?php
-// Base64 encoded default avatar - simple user icon
-$defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlOWVjZWYiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjM1IiByPSIyMCIgZmlsbD0iI2FkYjViZCIvPjxwYXRoIGQ9Ik0xNSw4NWMwLTIwLDE1LTM1LDM1LTM1czM1LDE1LDM1LDM1IiBmaWxsPSIjYWRiNWJkIi8+PC9zdmc+';
-?>
-
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Quản lý Hội viên</h1>
     <div>
@@ -49,68 +44,64 @@ $defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($members)): ?>
-                        <?php foreach ($members as $item): ?>
+                    <?php if (empty($members)): ?>
+                        <tr>
+                            <td colspan="9" class="text-center">Không có hội viên nào</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($members as $member): ?>
                             <tr>
-                                <td><?= htmlspecialchars($item['id']) ?></td>
+                                <td><?= $member['id'] ?></td>
                                 <td>
-                                    <img src="<?= $item['avatarUrl'] ?? $defaultAvatarBase64 ?>"
-                                        class="member-avatar"
-                                        alt="<?= htmlspecialchars($item['fullName']) ?>"
-                                        loading="lazy">
+                                    <img src="<?= !empty($member['avatarUrl']) ? htmlspecialchars($member['avatarUrl']) : '/gym-php/public/assets/images/default-avatar.png' ?>"
+                                         class="rounded-circle"
+                                         alt="Avatar"
+                                         style="width: 40px; height: 40px; object-fit: cover;" />
                                 </td>
-                                <td><?= htmlspecialchars($item['fullName']) ?></td>
-                                <td><?= htmlspecialchars($item['username']) ?></td>
-                                <td><?= htmlspecialchars($item['email']) ?></td>
-                                <td><?= htmlspecialchars($item['phone']) ?></td>
+                                <td><?= htmlspecialchars($member['fullName']) ?></td>
+                                <td><?= htmlspecialchars($member['username']) ?></td>
+                                <td><?= htmlspecialchars($member['email']) ?></td>
+                                <td><?= htmlspecialchars($member['phone']) ?></td>
                                 <td>
-                                    <?php if (!empty($item['package_name'])): ?>
-                                        <div class="package-info">
-                                            <span class="package-name"><?= htmlspecialchars($item['package_name']) ?></span>
-                                            <small class="text-muted d-block">
-                                                <?= date('d/m/Y', strtotime($item['startDate'])) ?> -
-                                                <?= date('d/m/Y', strtotime($item['endDate'])) ?>
-                                            </small>
-                                        </div>
-                                    <?php else: ?>
-                                        <span class="badge bg-secondary">Chưa đăng ký</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if (!empty($item['membership_status'])): ?>
-                                        <span class="badge <?= $item['membership_status'] == 'active' ? 'bg-success' : 'bg-danger' ?>">
-                                            <?= $item['membership_status'] == 'active' ? 'Đang hoạt động' : 'Hết hạn' ?>
+                                    <?php if (isset($member['package'])): ?>
+                                        <span class="badge bg-success">
+                                            <?= htmlspecialchars($member['package']['name']) ?>
                                         </span>
                                     <?php else: ?>
                                         <span class="badge bg-secondary">Chưa đăng ký</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
+                                    <?php
+                                    $statusClass = match($member['status']) {
+                                        'ACTIVE' => 'success',
+                                        'INACTIVE' => 'danger',
+                                        default => 'secondary'
+                                    };
+                                    $statusText = match($member['status']) {
+                                        'ACTIVE' => 'Hoạt động',
+                                        'INACTIVE' => 'Không hoạt động',
+                                        default => 'Không xác định'
+                                    };
+                                    ?>
+                                    <span class="badge bg-<?= $statusClass ?>">
+                                        <?= $statusText ?>
+                                    </span>
+                                </td>
+                                <td>
                                     <div class="action-buttons">
-                                        <button type="button"
-                                            class="btn btn-warning btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editModal<?= $item['id'] ?>"
-                                            title="Sửa thông tin">
+                                        <a href="/gym-php/admin/member/edit/<?= $member['id'] ?>" 
+                                           class="btn btn-sm btn-primary">
                                             <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-danger btn-sm"
-                                            onclick="showDeleteModal(<?= $item['id'] ?>, '<?= htmlspecialchars(addslashes($item['fullName'])) ?>')"
-                                            title="Xóa">
+                                        </a>
+                                        <a href="/gym-php/admin/member/delete/<?= $member['id'] ?>" 
+                                           class="btn btn-sm btn-danger">
                                             <i class="fas fa-trash"></i>
-                                        </button>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="9" class="text-center py-4">
-                                <i class="fas fa-info-circle text-info me-2"></i>
-                                Không có dữ liệu hội viên
-                            </td>
-                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -131,14 +122,6 @@ $defaultAvatarBase64 = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
 
     .table td {
         vertical-align: middle;
-    }
-
-    .package-info {
-        line-height: 1.2;
-    }
-
-    .package-name {
-        font-weight: 500;
     }
 
     .badge {

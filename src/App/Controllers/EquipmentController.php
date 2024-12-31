@@ -13,59 +13,30 @@ class EquipmentController extends BaseController
         $this->equipmentModel = new Equipment();
     }
 
-    private function handleImageUpload($file, $oldAvatar = null)
+    private function handleImageUpload($file)
     {
         if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
-            if ($file['error'] === UPLOAD_ERR_NO_FILE) {
-                return false; // Không có file được tải lên, không phải lỗi
-            }
-            throw new \Exception($this->getFileErrorMessage($file['error']));
+            return false;
         }
 
-        // Kiểm tra kích thước file
-        if ($file['size'] > self::UPLOAD_CONFIG['max_size']) {
-            throw new \Exception('Kích thước file quá lớn. Giới hạn ' . (self::UPLOAD_CONFIG['max_size'] / 1024 / 1024) . 'MB');
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            return false;
         }
 
-        // Kiểm tra loại MIME
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
-
-        if (!array_key_exists($mimeType, self::UPLOAD_CONFIG['allowed_types'])) {
-            throw new \Exception('Loại file không được hỗ trợ. Chỉ chấp nhận file ảnh (JPG, PNG, GIF, WEBP)');
+        $uploadDir = ROOT_PATH . '/public/uploads/equipment/';
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
         }
 
-        $uploadDir = ROOT_PATH . '/' . self::UPLOAD_CONFIG['dir'] . '/';
-
-        // Xóa avatar cũ nếu tồn tại
-        if ($oldAvatar && $oldAvatar !== 'default.jpg') {
-            $oldAvatarPath = $uploadDir . $oldAvatar;
-            if (file_exists($oldAvatarPath) && is_file($oldAvatarPath)) {
-                unlink($oldAvatarPath);
-            }
-        }
-
-        // Tạo tên file an toàn
-        $extension = self::UPLOAD_CONFIG['allowed_types'][$mimeType];
-        $fileName = 'member_' . uniqid() . '_' . time() . '.' . $extension;
+        $fileName = uniqid() . '_' . basename($file['name']);
         $targetPath = $uploadDir . $fileName;
 
-        // Kiểm tra kích thước và nội dung ảnh
-        $imageInfo = getimagesize($file['tmp_name']);
-        if ($imageInfo === false) {
-            throw new \Exception('File không phải là hình ảnh hợp lệ');
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            return '/public/uploads/equipment/' . $fileName;
         }
 
-        // Di chuyển file đã tải lên
-        if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
-            throw new \Exception('Không thể lưu file. Vui lòng kiểm tra quyền thư mục');
-        }
-
-        // Đặt quyền an toàn cho file
-        chmod($targetPath, 0644);
-
-        return $fileName;
+        return false;
     }
 
     public function index()

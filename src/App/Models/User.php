@@ -116,15 +116,26 @@ class User extends BaseModel
     public function update($id, $data)
     {
         try {
-            // Cập nhật timestamp
-            $data['updatedAt'] = date('Y-m-d H:i:s');
-
-            return parent::update($id, $data);
-        } catch (PDOException $e) {
+            $setClause = [];
+            $params = [];
+            
+            foreach ($data as $key => $value) {
+                $setClause[] = "`$key` = ?";
+                $params[] = $value;
+            }
+            
+            $params[] = $id;
+            
+            $sql = "UPDATE " . $this->table . " SET " . implode(', ', $setClause) . " WHERE id = ?";
+            
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute($params);
+        } catch (\PDOException $e) {
             error_log("Error updating user: " . $e->getMessage());
-            throw new \Exception("Không thể cập nhật thông tin. Vui lòng thử lại sau.");
+            return false;
         }
     }
+
     public function updatePassword($id, $newPassword)
     {
         try {
@@ -237,12 +248,12 @@ class User extends BaseModel
         }
     }
 
-    public function getAvatarUrl($avatar = null)
+    public function getAvatarUrl($avatar)
     {
-        if (empty($avatar) || $avatar === self::DEFAULT_AVATAR) {
-            return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMzEgMjMxIj48cGF0aCBkPSJNMzMuODMsMzMuODNhMTE1LjUsMTE1LjUsMCwxLDEsMCwxNjMuMzQsMTE1LjQ5LDExNS40OSwwLDAsMSwwLTE2My4zNFpNMTE1LjUsMTkyLjc1YTc3LjI1LDc3LjI1LDAsMCwwLDQ3LjY3LTE2LjRsLTYuOTQtNDEuNjZhMTUuMzYsMTUuMzYsMCwwLDAtMTUuMTEtMTIuOTRIODkuODhhMTUuMzYsMTUuMzYsMCwwLDAtMTUuMTEsMTIuOTLMNjcuODMsMTc2LjM1QTc3LjI1LDc3LjI1LDAsMCwwLDExNS41LDE5Mi43NVptMC0xNTQuNWE3Ny4yNSw3Ny4yNSwwLDAsMC00Ny42NywxNi40bDYuOTQsNDEuNjZhMTUuMzYsMTUuMzYsMCwwLDAsMTUuMTEsMTIuOTRoNTEuMjRhMTUuMzYsMTUuMzYsMCwwLDAsMTUuMTEtMTIuOTRsNi45NC00MS42NkE3Ny4yNSw3Ny4yNSwwLDAsMCwxMTUuNSwzOC4yNVoiLz48L3N2Zz4=';
+        if (empty($avatar)) {
+            return '/gym-php/public/assets/images/default-avatar.png';
         }
-        return '/gym-php/' . self::UPLOAD_DIR . '/' . $avatar;
+        return '/gym-php/public/uploads/members/avatars/' . $avatar;
     }
 
     public function getById($id)

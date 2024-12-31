@@ -29,7 +29,7 @@ class UserController extends BaseController
         ]
     ];
 
-    private const DEFAULT_AVATAR = '/assets/images/avatar/default-avatar.png';
+    private const DEFAULT_AVATAR = '/gym-php/public/assets/images/default-avatar.png';
 
     public function __construct()
     {
@@ -128,91 +128,56 @@ class UserController extends BaseController
     private function handleImageUpload($file, $oldAvatar = null)
     {
         if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
-            if ($file['error'] === UPLOAD_ERR_NO_FILE) {
-                return false; // Không có file được tải lên, không phải lỗi
-            }
-            throw new \Exception($this->getFileErrorMessage($file['error']));
+            throw new \Exception('Lỗi khi tải file lên');
         }
 
-        // Kiểm tra kích thước file
+        // Validate file size
         if ($file['size'] > self::UPLOAD_CONFIG['max_size']) {
-            throw new \Exception('Kích thước file quá lớn. Giới hạn ' . (self::UPLOAD_CONFIG['max_size'] / 1024 / 1024) . 'MB');
+            throw new \Exception('File quá lớn. Giới hạn ' . (self::UPLOAD_CONFIG['max_size'] / 1024 / 1024) . 'MB');
         }
 
-        // Kiểm tra loại MIME
+        // Get file extension from MIME type
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file['tmp_name']);
         finfo_close($finfo);
 
         if (!array_key_exists($mimeType, self::UPLOAD_CONFIG['allowed_types'])) {
-            throw new \Exception('Loại file không được hỗ trợ. Chỉ chấp nhận file ảnh (JPG, PNG, GIF, WEBP)');
+            throw new \Exception('Chỉ chấp nhận file ảnh (JPG, PNG, GIF, WEBP)');
         }
 
-        $uploadDir = ROOT_PATH . '/' . self::UPLOAD_CONFIG['dir'] . '/';
+        // Create upload directory if not exists
+        $uploadDir = ROOT_PATH . '/' . self::UPLOAD_CONFIG['dir'];
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
 
-        // Xóa avatar cũ nếu tồn tại
-        if ($oldAvatar && $oldAvatar !== 'default.jpg') {
-            $oldAvatarPath = $uploadDir . $oldAvatar;
-            if (file_exists($oldAvatarPath) && is_file($oldAvatarPath)) {
+        // Delete old avatar
+        if ($oldAvatar && $oldAvatar !== basename(self::DEFAULT_AVATAR)) {
+            $oldAvatarPath = $uploadDir . '/' . $oldAvatar;
+            if (file_exists($oldAvatarPath)) {
                 unlink($oldAvatarPath);
             }
         }
 
-        // Tạo tên file an toàn
+        // Generate new filename
         $extension = self::UPLOAD_CONFIG['allowed_types'][$mimeType];
-        $fileName = 'member_' . uniqid() . '_' . time() . '.' . $extension;
-        $targetPath = $uploadDir . $fileName;
+        $fileName = 'avatar_' . uniqid() . '.' . $extension;
+        $targetPath = $uploadDir . '/' . $fileName;
 
-        // Kiểm tra kích thước và nội dung ảnh
-        $imageInfo = getimagesize($file['tmp_name']);
-        if ($imageInfo === false) {
-            throw new \Exception('File không phải là hình ảnh hợp lệ');
-        }
-
-        // Di chuyển file đã tải lên
         if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
             throw new \Exception('Không thể lưu file. Vui lòng kiểm tra quyền thư mục');
         }
 
-        // Đặt quyền an toàn cho file
         chmod($targetPath, 0644);
-
         return $fileName;
     }
 
-    private function getFileErrorMessage($error)
-    {
-        switch ($error) {
-            case UPLOAD_ERR_INI_SIZE:
-            case UPLOAD_ERR_FORM_SIZE:
-                return 'File vượt quá kích thước cho phép (' . (self::UPLOAD_CONFIG['max_size'] / 1024 / 1024) . 'MB)';
-            case UPLOAD_ERR_PARTIAL:
-                return 'File chỉ được tải lên một phần. Vui lòng thử lại';
-            case UPLOAD_ERR_NO_FILE:
-                return 'Không có file nào được tải lên';
-            case UPLOAD_ERR_NO_TMP_DIR:
-                return 'Thiếu thư mục tạm. Vui lòng liên hệ quản trị viên';
-            case UPLOAD_ERR_CANT_WRITE:
-                return 'Không thể ghi file. Vui lòng kiểm tra quyền thư mục';
-            case UPLOAD_ERR_EXTENSION:
-                return 'Upload bị chặn bởi extension';
-            default:
-                return 'Lỗi không xác định (' . $error . ')';
-        }
-    }
-
-    private function getAvatarUrl(?string $avatar): string
+    private function getAvatarUrl($avatar)
     {
         if (empty($avatar)) {
-            return self::DEFAULT_AVATAR;
+            return '/gym-php/public/assets/images/default-avatar.png';
         }
-
-        $avatarPath = '/gym-php/' . self::UPLOAD_CONFIG['dir'] . '/' . $avatar;
-        if (file_exists(ROOT_PATH . '/' . self::UPLOAD_CONFIG['dir'] . '/' . $avatar)) {
-            return $avatarPath;
-        }
-
-        return self::DEFAULT_AVATAR;
+        return '/gym-php/public/uploads/members/avatars/' . $avatar;
     }
 
     // User Profile Methods
@@ -243,33 +208,61 @@ class UserController extends BaseController
 
     public function updateProfile()
     {
-        $this->requireLogin();
-        $this->requirePostMethod();
-
         try {
-            return $this->handleTransaction(function () {
-                $userId = $this->auth->getUserId();
-                $data = $this->validateMemberData($_POST);
+            if (!$this->isPost()) {
+                throw new \Exception('Phương thức không được hỗ trợ');
+            }
 
-                // Xử lý upload ảnh
-                if (isset($_FILES['avatar'])) {
-                    $data['avatar'] = $this->handleImageUpload(
-                        $_FILES['avatar'],
-                        $this->userModel->findById($userId)['avatar'] ?? null
-                    );
+            $userId = $_POST['id'] ?? null;
+            if (!$userId) {
+                throw new \Exception('ID không hợp lệ');
+            }
+
+            // Lấy thông tin user hiện tại
+            $user = $this->userModel->findById($userId);
+            if (!$user) {
+                throw new \Exception('Không tìm thấy thông tin người dùng');
+            }
+
+            // Chuẩn bị dữ liệu cập nhật
+            $data = [
+                'id' => $userId,
+                'fullName' => $_POST['fullName'] ?? $user['fullName'],
+                'email' => $_POST['email'] ?? $user['email'],
+                'phone' => $_POST['phone'] ?? $user['phone'],
+                'sex' => $_POST['sex'] ?? $user['sex'],
+                'dateOfBirth' => $_POST['dateOfBirth'] ?? $user['dateOfBirth']
+            ];
+
+            // Xử lý upload ảnh nếu có
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] !== UPLOAD_ERR_NO_FILE) {
+                try {
+                    $avatarFileName = $this->handleImageUpload($_FILES['avatar'], $user['avatar'] ?? null);
+                    if ($avatarFileName !== false) {
+                        $data['avatar'] = $avatarFileName;
+                    }
+                } catch (\Exception $e) {
+                    $_SESSION['error'] = 'Lỗi upload ảnh: ' . $e->getMessage();
+                    $this->redirect('/profile');
+                    return;
                 }
+            }
 
-                // Cập nhật thông tin
-                if (!$this->userModel->update($userId, $data)) {
-                    throw new \Exception('Cập nhật thất bại');
-                }
+            // Xử lý mật khẩu nếu được cung cấp
+            if (!empty($_POST['password'])) {
+                $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            }
 
-                $_SESSION['success'] = 'Cập nhật thành công';
-                return true;
-            });
+            // Cập nhật thông tin
+            if ($this->userModel->update($data)) {
+                $_SESSION['success'] = 'Cập nhật thông tin thành công';
+                $this->redirect('/profile');
+            } else {
+                throw new \Exception('Cập nhật thông tin thất bại');
+            }
         } catch (\Exception $e) {
             $_SESSION['error'] = $e->getMessage();
-            return false;
+            $this->redirect('/profile');
         }
     }
 
@@ -287,7 +280,7 @@ class UserController extends BaseController
                 'title' => 'Quản lý Hội viên',
                 'members' => $members,
                 'packages' => $packages
-            ], 'admin_layout');
+            ]);
         } catch (\Exception $e) {
             $this->handleError($e, 'admin/member');
         }
@@ -338,9 +331,14 @@ class UserController extends BaseController
             $this->ensureTransactionClosed();
 
             $member = $this->userModel->findById($id);
-            if (!$member || $member['eRole'] !== 'USER') {
-                throw new \Exception('Không tìm thấy thành viên hoặc không có quyền truy cập');
+            if (!$member) {
+                throw new \Exception('Không tìm thấy thông tin hội viên');
             }
+
+            // Lấy thông tin gói tập và membership hiện tại
+            $memberships = $this->membershipModel->findByUserId($id);
+            $activeMembership = !empty($memberships) ? $memberships[0] : null;
+            $packages = $this->packageModel->findAll();
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $this->db->beginTransaction();
@@ -352,34 +350,55 @@ class UserController extends BaseController
                     $data['avatar'] = $this->handleImageUpload($_FILES['avatar'], $member['avatar']);
                 }
 
+                // Cập nhật thông tin hội viên
                 if (!$this->userModel->update($id, $data)) {
                     throw new \Exception('Không thể cập nhật thông tin hội viên');
+                }
+
+                // Cập nhật hoặc tạo mới membership nếu có chọn gói tập
+                if (!empty($_POST['package_id'])) {
+                    if ($activeMembership) {
+                        // Cập nhật membership hiện tại
+                        $membershipData = [
+                            'packageId' => $_POST['package_id'],
+                            'startDate' => $_POST['startDate'] ?? date('Y-m-d'),
+                            'endDate' => $_POST['endDate'] ?? null,
+                            'status' => $_POST['membership_status'] ?? 'ACTIVE'
+                        ];
+                        if (!$this->membershipModel->update($activeMembership['id'], $membershipData)) {
+                            throw new \Exception('Không thể cập nhật thông tin gói tập');
+                        }
+                    } else {
+                        // Tạo membership mới
+                        $this->createMembership($id, $_POST['package_id']);
+                    }
                 }
 
                 $this->db->commit();
                 $_SESSION['success'] = 'Cập nhật thông tin thành công';
                 $this->redirect('admin/member');
+                return;
             }
 
-            $packages = $this->packageModel->findAll();
-            $memberships = $this->membershipModel->findByUserId($id);
-            $activeMembership = !empty($memberships) ? $memberships[0] : null;
-
-            // Prepare member data for display
-            if ($activeMembership) {
-                $member['package_id'] = $activeMembership['packageId'];
-                $member['startDate'] = date('Y-m-d', strtotime($activeMembership['startDate']));
-                $member['endDate'] = date('Y-m-d', strtotime($activeMembership['endDate']));
-                $member['membership_id'] = $activeMembership['id'];
-            }
+            // Chuẩn bị dữ liệu cho form
+            $member['package_id'] = $activeMembership['packageId'] ?? null;
+            $member['membership_status'] = $activeMembership['status'] ?? null;
+            $member['startDate'] = $activeMembership ? date('Y-m-d', strtotime($activeMembership['startDate'])) : null;
+            $member['endDate'] = $activeMembership ? date('Y-m-d', strtotime($activeMembership['endDate'])) : null;
 
             $this->view('admin/member/edit', [
                 'title' => 'Chỉnh sửa thông tin hội viên',
                 'member' => $member,
-                'packages' => $packages
+                'packages' => $packages,
+                'membership' => $activeMembership
             ]);
+
         } catch (\Exception $e) {
-            $this->handleError($e, 'admin/member');
+            if ($this->db->inTransaction()) {
+                $this->db->rollback();
+            }
+            $_SESSION['error'] = $e->getMessage();
+            $this->redirect('admin/member');
         }
     }
 
@@ -391,8 +410,8 @@ class UserController extends BaseController
             $this->ensureTransactionClosed();
 
             $member = $this->userModel->findById($id);
-            if (!$member || $member['eRole'] !== 'USER') {
-                throw new \Exception('Không tìm thấy hội viên hoặc không có quyền xóa');
+            if (!$member) {
+                throw new \Exception('Không tìm thấy hội viên');
             }
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -424,7 +443,11 @@ class UserController extends BaseController
                 'member' => $member
             ]);
         } catch (\Exception $e) {
-            $this->handleError($e, 'admin/member');
+            if ($this->db->inTransaction()) {
+                $this->db->rollback();
+            }
+            $_SESSION['error'] = $e->getMessage();
+            $this->redirect('admin/member');
         }
     }
 
@@ -599,49 +622,61 @@ class UserController extends BaseController
 
     public function updateAvatar()
     {
-        header('Content-Type: application/json');
-
         try {
-            if (!isset($_SESSION['user_id'])) {
-                throw new \Exception('Vui lòng đăng nhập để thực hiện chức năng này');
-            }
-
             if (!isset($_FILES['avatar'])) {
-                throw new \Exception('Không tìm thấy file tải lên');
+                throw new \Exception('Không tìm thấy file ảnh');
             }
 
             $file = $_FILES['avatar'];
-            if ($file['error'] !== UPLOAD_ERR_OK) {
-                throw new \Exception($this->getFileErrorMessage($file['error']));
+            $userId = $_SESSION['user']['id'];
+
+            // Kiểm tra và tạo thư mục nếu chưa tồn tại
+            $uploadDir = dirname(dirname(dirname(__DIR__))) . '/public/uploads/members/avatars/';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
             }
 
-            $userId = $_SESSION['user_id'];
+            // Kiểm tra loại file
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!in_array($file['type'], $allowedTypes)) {
+                throw new \Exception('Chỉ chấp nhận file ảnh định dạng JPG, PNG hoặc GIF');
+            }
+
+            // Kiểm tra kích thước file (5MB)
+            if ($file['size'] > 5 * 1024 * 1024) {
+                throw new \Exception('Kích thước file không được vượt quá 5MB');
+            }
+
+            // Tạo tên file mới
+            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $newFileName = 'avatar_' . $userId . '_' . time() . '.' . $extension;
+            $targetPath = $uploadDir . $newFileName;
+
+            // Di chuyển file
+            if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+                throw new \Exception('Không thể lưu file ảnh');
+            }
+
+            // Cập nhật đường dẫn ảnh trong database
             $user = $this->userModel->findById($userId);
+            if ($user) {
+                // Xóa ảnh cũ nếu có
+                if (!empty($user['avatar'])) {
+                    $oldAvatarPath = $uploadDir . $user['avatar'];
+                    if (file_exists($oldAvatarPath)) {
+                        unlink($oldAvatarPath);
+                    }
+                }
 
-            if (!$user) {
-                throw new \Exception('Không tìm thấy thông tin người dùng');
+                // Cập nhật avatar mới
+                $this->userModel->update($userId, ['avatar' => $newFileName]);
             }
-
-            $fileName = $this->handleImageUpload($file, $user['avatar']);
-
-            // Start transaction
-            $this->db->beginTransaction();
-
-            if (!$this->userModel->update($userId, ['avatar' => $fileName])) {
-                throw new \Exception('Không thể cập nhật ảnh đại diện');
-            }
-
-            $this->db->commit();
 
             echo json_encode([
                 'success' => true,
-                'avatarUrl' => $this->getAvatarUrl($fileName)
+                'avatarUrl' => $this->getAvatarUrl($newFileName)
             ]);
         } catch (\Exception $e) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
-            }
-
             http_response_code(400);
             echo json_encode([
                 'success' => false,
